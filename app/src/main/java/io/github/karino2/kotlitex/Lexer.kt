@@ -37,7 +37,7 @@ class Lexer(val input: String) {
                 "${combiningDiacriticalMarkString}*" +            // ...plus accents
                 // Original code was below. but I can't understand the meanings. So I add some character group.
                 // "|\\\\verb\\*([^]).*?\\3" +                       // \verb*
-                "|\\\\verb\\*([^*a-zA-Z]).*?\\3" +                       // \verb*
+                "|\\\\verb\\*([^a]|a).*?\\3" +                       // \verb*
                 "|\\\\verb([^*a-zA-Z]).*?\\4" +                   // \verb unstarred
                 "|${controlWordWhitespaceRegexString}" +          // \macroName + spaces
                 "|${controlSymbolRegexString})"                  // \\, \', etc.
