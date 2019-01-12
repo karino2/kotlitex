@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 data class Token(val text: String, val loc: SourceLocation?)
 
-class ParseError(val msg: String, val token: Token): Exception(msg)
+class ParseError(val msg: String, val token: Token?): Exception(msg)
 
 
 class Lexer(val input: String) {
