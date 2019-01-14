@@ -3,6 +3,9 @@ package io.github.karino2.kotlitex
 import android.util.Log
 import java.lang.IllegalArgumentException
 
+data class Measurement(val number: Int, val unit: String)
+
+
 object RenderTreeBuilder {
     val groupBuilders = mutableMapOf<String, (ParseNode, Options)->RenderNode>()
 
@@ -266,11 +269,314 @@ object RenderTreeBuilder {
 
 
 
-
-    fun getTypeOfDomTree(node: RenderNode, side: String /* left or right */) : CssClass {
+    // Return the outermost node of a domTree.
+    fun getOutermostNode(
+            node: RenderNode,
+            side: String /* "left" or "right" */
+            ): RenderNode
+    {
         // TODO:
-        return CssClass.mord
+        /*
+        if (node instanceof DocumentFragment ||
+            node instanceof Anchor) {
+            const children = node.children;
+            if (children.length) {
+                if (side === "right") {
+                    return getOutermostNode(children[children.length - 1], "right");
+                } else if (side === "left") {
+                    return getOutermostNode(children[0], "right");
+                }
+            }
+        }
+        */
+        return node;
     }
+
+    fun getTypeOfDomTree(in_node: RenderNode?, side: String /* left or right */) : CssClass {
+        if (in_node == null) {
+            return CssClass.EMPTY
+        }
+
+        val node = getOutermostNode(in_node, side)
+        // This makes a lot of assumptions as to where the type of atom
+        // appears.  We should do a better job of enforcing this.
+        // TODO:
+        /*
+        return DomEnum[node.classes[0]] || null;
+        */
+        if(node.hasClass(CssClass.mord))
+            return CssClass.mord
+        return CssClass.EMPTY
+    }
+
+    // Binary atoms (first class `mbin`) change into ordinary atoms (`mord`)
+    // depending on their surroundings. See TeXbook pg. 442-446, Rules 5 and 6,
+    // and the text before Rule 19.
+    fun isBinLeftCanceller(
+        node: RenderNode?,
+        isRealGroup: Boolean
+        ): Boolean
+    {
+        // TODO: This code assumes that a node's math class is the first element
+        // of its `classes` array. A later cleanup should ensure this, for
+        // instance by changing the signature of `makeSpan`.
+        if (node != null) {
+            return when(getTypeOfDomTree(node, "right")) {
+                CssClass.mbin, CssClass.mopen, CssClass.mrel,
+                CssClass.mop, CssClass.mpunct -> true
+                else -> false
+            }
+        } else {
+            return isRealGroup;
+        }
+    };
+
+    fun isBinRightCanceller(
+        node: RenderNode?,
+        isRealGroup: Boolean
+        ): Boolean
+    {
+        if (node != null) {
+            return when(getTypeOfDomTree(node, "left")) {
+                CssClass.mrel, CssClass.mclose, CssClass.mpunct -> true
+                else -> false
+            }
+        } else {
+            return isRealGroup;
+        }
+    }
+
+    val thinspace = Measurement(3, "mu")
+    val mediumspace = Measurement(4, "mu")
+    val thickspace = Measurement(5, "mu")
+
+    // Spacing relationships for display and text styles
+    fun getSpacings(leftType: CssClass, rightType: CssClass) : Measurement? {
+        return when(leftType) {
+            CssClass.mord -> {
+                when(rightType) {
+                    CssClass.mop, CssClass.minner -> thinspace
+                    CssClass.mbin-> mediumspace
+                    CssClass.mrel-> thickspace
+                    else -> null
+                }
+            }
+            CssClass.mop -> {
+                when(rightType) {
+                    CssClass.mord, CssClass.mop, CssClass.minner -> thinspace
+                    CssClass.mrel -> thickspace
+                    else -> null
+                }
+            }
+            CssClass.mbin -> {
+                when(rightType) {
+                    CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.minner -> mediumspace
+                    else -> null
+                }
+            }
+            CssClass.mrel -> {
+                when(rightType) {
+                    CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.minner -> thickspace
+                    else -> null
+                }
+            }
+            CssClass.mopen -> null
+            CssClass.mclose -> {
+                when(rightType) {
+                    CssClass.mop, CssClass.minner -> thinspace
+                    CssClass.mbin -> mediumspace
+                    CssClass.mrel -> thickspace
+                    else -> null
+                }
+            }
+            CssClass.mpunct -> {
+                when(rightType) {
+                    CssClass.mrel -> thickspace
+                    CssClass.mord, CssClass.mop, CssClass.mopen,
+                        CssClass.mclose, CssClass.mpunct, CssClass.minner -> thinspace
+                    else -> null
+                }
+            }
+            CssClass.minner -> {
+                when(rightType) {
+                    CssClass.mbin -> mediumspace
+                    CssClass.mrel -> thickspace
+                    CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.mpunct, CssClass.minner -> thinspace
+                    else -> null
+                }
+            }
+            else -> null
+        }
+    }
+
+    // Spacing relationships for script and scriptscript styles
+    fun getTightSpacings(leftType: CssClass, rightType: CssClass) : Measurement? {
+        when(leftType) {
+            CssClass.mbin, CssClass.mrel, CssClass.mopen, CssClass.mpunct -> return null
+        }
+
+        return when(Pair(leftType, rightType)) {
+            Pair(CssClass.mord, CssClass.mop) -> thinspace
+            Pair(CssClass.mop, CssClass.mord) -> thinspace
+            Pair(CssClass.mop, CssClass.mop) -> thinspace
+            Pair(CssClass.mclose, CssClass.mop) -> thinspace
+            Pair(CssClass.minner, CssClass.mop) -> thinspace
+            else -> null
+        }
+    }
+
+    // If `node` is an atom return whether it's been assigned the mtight class.
+    // If `node` is a document fragment, return the value of isLeftTight() for the
+    // leftmost node in the fragment.
+    // 'mtight' indicates that the node is script or scriptscript style.
+    fun isLeftTight(in_node: RenderNode): Boolean {
+        val node = getOutermostNode(in_node, "left");
+        return node.hasClass(CssClass.mtight);
+    }
+
+    fun calculateSize(sizeValue: Measurement, options: Options) : Double {
+        // TODO: now only support mu.
+        val scale = options.fontMetrics.cssEmPerMu
+        return Math.min(sizeValue.number * scale, options.maxSize);
+    }
+
+    // Glue is a concept from TeX which is a flexible space between elements in
+    // either a vertical or horizontal list. In KaTeX, at least for now, it's
+    // static space between elements in a horizontal layout.
+    fun makeGlue(measurement: Measurement, options: Options): SpanNode {
+        // Make an empty span for the space
+        val rule = makeSpan(mutableSetOf(CssClass.mspace), mutableListOf(), options);
+        val size = calculateSize(measurement, options);
+        rule.style.marginRight = "${size}em";
+        return rule;
+    };
+
+
+    /**
+     * Take a list of nodes, build them in order, and return a list of the built
+     * nodes. documentFragments are flattened into their contents, so the
+     * returned list contains no fragments. `isRealGroup` is true if `expression`
+     * is a real group (no atoms will be added on either side), as opposed to
+     * a partial group (e.g. one created by \color). `surrounding` is an array
+     * consisting type of nodes that will be added to the left and right.
+     */
+    fun buildExpression(
+        expression: List<ParseNode>,
+        options: Options,
+        isRealGroup: Boolean
+        // TODO: , surrounding: [?DomType, ?DomType] = [null, null],
+        ): List<RenderNode> {
+        // Parse expressions into `groups`.
+        val rawGroups = mutableListOf<RenderNode>();
+        for (expr in expression) {
+            val output = buildGroup(expr, options);
+            /* TODO:
+            if (output instanceof DocumentFragment) {
+                const children: HtmlDomNode[] = output.children;
+                rawGroups.push(...children);
+            } else {
+                rawGroups.push(output);
+            }
+            */
+            rawGroups.add(output)
+        }
+        // At this point `rawGroups` consists entirely of `symbolNode`s and `span`s.
+
+        // Ignore explicit spaces (e.g., \;, \,) when determining what implicit
+        // spacing should go between atoms of different classes, and add dummy
+        // spans for determining spacings between surrounding atoms.
+        val rowNonSpace = rawGroups.filter{group-> group != null && !group.klasses.contains(CssClass.mspace)}
+        val nonSpaces = listOf<RenderNode?>(null, *rowNonSpace.toTypedArray(), null)
+        /* TODO:
+        const nonSpaces: (?HtmlDomNode)[] = [
+        surrounding[0] ? makeSpan([surrounding[0]], [], options) : null,
+        ...rawGroups.filter(group => group && group.classes[0] !== "mspace"),
+        surrounding[1] ? makeSpan([surrounding[1]], [], options) : null,
+        ];
+        */
+
+        // Before determining what spaces to insert, perform bin cancellation.
+        // Binary operators change to ordinary symbols in some contexts.
+        for (i in 1 until (nonSpaces.size-1)) {
+            val nonSpacesI = nonSpaces[i]!!
+            val left = getOutermostNode(nonSpacesI, "left");
+            if (left.klasses.contains(CssClass.mbin) &&
+                isBinLeftCanceller(nonSpaces[i - 1], isRealGroup)) {
+                left.klasses.remove(CssClass.mbin)
+                left.klasses.add(CssClass.mord)
+            }
+
+            val right = getOutermostNode(nonSpacesI, "right")
+            if (right.klasses.contains(CssClass.mbin) &&
+                isBinRightCanceller(nonSpaces[i + 1], isRealGroup)) {
+                right.klasses.remove(CssClass.mbin)
+                right.klasses.add(CssClass.mord)
+            }
+        }
+
+        val groups = mutableListOf<RenderNode>();
+        var j = 0
+        var i = 0
+
+        // inside loop, sometime i is changed so we cannot use normal for loop
+        while(i < rawGroups.size) {
+            groups.add(rawGroups[i]);
+
+            // For any group that is not a space, get the next non-space.  Then
+            // lookup what implicit space should be placed between those atoms and
+            // add it to groups.
+            if (!rawGroups[i].klasses.contains(CssClass.mspace) && j < nonSpaces.size - 1) {
+                // if current non-space node is left dummy span, add a glue before
+                // first real non-space node
+                if (j == 0) {
+                    groups.removeAt(groups.size-1)
+                    i--;
+                }
+
+                // Get the type of the current non-space node.  If it's a document
+                // fragment, get the type of the rightmost node in the fragment.
+                val left = getTypeOfDomTree(nonSpaces[j], "right")
+
+                // Get the type of the next non-space node.  If it's a document
+                // fragment, get the type of the leftmost node in the fragment.
+                val right = getTypeOfDomTree(nonSpaces[j + 1], "left")
+
+                // We use buildExpression inside of sizingGroup, but it returns a
+                // document fragment of elements.  sizingGroup sets `isRealGroup`
+                // to false to avoid processing spans multiple times.
+                if (left != CssClass.EMPTY && right != CssClass.EMPTY && isRealGroup) {
+                    val nonSpacesJp1 = nonSpaces[j + 1]!!
+                    val space = if(isLeftTight(nonSpacesJp1)) getTightSpacings(left, right) else getSpacings(left, right)
+
+                    if (space != null) {
+                        var glueOptions = options
+
+                        if (expression.size == 1) {
+                            /* TODO:
+                            val node =expression[0] as
+                            checkNodeType(expression[0], "sizing") ||
+                                    checkNodeType(expression[0], "styling");
+                            if (node == null) {
+                                // No match.
+                            } else if (node.type === "sizing") {
+                                glueOptions = options.havingSize(node.size);
+                            } else if (node.type === "styling") {
+                                glueOptions = options.havingStyle(styleMap[node.style]);
+                            }
+                                    */
+                        }
+
+                        groups.add(makeGlue(space, glueOptions))
+                    }
+                }
+                j++;
+            }
+            i++
+        }
+
+        return groups;
+    }
+
 
     init {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }

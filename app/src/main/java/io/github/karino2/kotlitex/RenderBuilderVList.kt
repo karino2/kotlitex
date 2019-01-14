@@ -56,7 +56,7 @@ object RenderBuilderVList {
                 // shifted to the correct specified shift
                 val depth = -oldChildren[0].shift - oldChildren[0].elem.depth;
                 var currPos = depth
-                for( i in 0..oldChildren.size) {
+                for( (i, _) in oldChildren.withIndex()) {
                     val diff = -oldChildren[i].shift - currPos -
                             oldChildren[i].elem.depth;
                     val size = diff -
@@ -82,7 +82,7 @@ object RenderBuilderVList {
                         // We always start at the bottom, so calculate the bottom by adding up
                         // all the sizes
                         var bottom = params.positionData;
-                        for (i in 0..params.children.size) {
+                        for (i in 0 until params.children.size) {
                             val child = params.children[i];
 
                             bottom -= when(child) {

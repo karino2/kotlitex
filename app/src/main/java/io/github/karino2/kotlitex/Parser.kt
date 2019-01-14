@@ -29,7 +29,7 @@ data class SourceLocation(val lexer: Lexer?, val start:Int, val end: Int) {
     }
 
     fun getSource(): String {
-        return this.lexer!!.input.slice(start..end);
+        return this.lexer!!.input.slice(start until end);
     }
 
 }
@@ -273,7 +273,7 @@ class Parser(val input: String) {
             if (arg.length < 2 || arg[0] != arg.last()) {
                 throw ParseError("\\verb assertion failed -- \nplease report what input caused this bug", null)
             }
-            arg = arg.slice(1..(arg.length-1)) // remove first and last char
+            arg = arg.slice(1 until (arg.length-1)) // remove first and last char
             return NodeVerb(Mode.TEXT, null, arg, star)
         } else if (text === "%") {
             this.consumeComment();
@@ -282,7 +282,7 @@ class Parser(val input: String) {
         // At this point, we should have a symbol, possibly with accents.
         // First expand any accented base symbol according to unicodeSymbols.
         if (Symbols.unicodeSymbols.containsKey(text[0])
-            && !Symbols.get(mode).containsKey(text.substring(0..1))) {
+            && !Symbols.get(mode).containsKey(text.substring(0 until 1))) {
             // This behavior is not strict (XeTeX-compatible) in math mode.
             if (this.settings.strict != null && mode == Mode.MATH) {
                 this.settings.reportNonstrict("unicodeTextInMathMode",
@@ -353,8 +353,7 @@ class Parser(val input: String) {
         this.consume();
         // Transform combining characters into accents
         if (match != null) {
-            for (i in 0..match.value.length){
-                val accent = match.value[i];
+            for (accent in match.value){
                 if (!Symbols.unicodeAccents.containsKey(accent)) {
                     throw ParseError("Unknown accent ' ${accent}'", nucleus)
                 }

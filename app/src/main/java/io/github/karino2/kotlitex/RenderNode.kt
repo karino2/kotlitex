@@ -1,8 +1,8 @@
 package io.github.karino2.kotlitex
 
 enum class CssClass {
-    amsrm,
-    base, mathdefault, mord, mtight, msupsub, vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, sizing,  size3, struct,
+    amsrm, base, mathdefault, mbin, mclose, minner, mop, mopen, mord, mpunct, mrel, mtight, msupsub, mspace,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, sizing,  size3, struct,
     textbf, textit, textrm,
     EMPTY;
 
