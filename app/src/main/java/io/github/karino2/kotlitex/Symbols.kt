@@ -21,12 +21,51 @@ object Symbols {
     )
     */
 
+
+
+
     fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics {
+        val metmap = MetricMap.metricMap[font] ?: throw Exception("Font metrics not found for font: ${font}.")
+
+        /*
         // TODO:
-        if(font == "Math-Italic")
-            return CharacterMetrics(0.0, 0.43056, 0.0, 0.02778, 0.57153)
-        return CharacterMetrics(0.0, 0.64444, 0.0, 0.0, 0.5)
-        // return CharacterMetrics(0.0, 0.68889, 0.0, 0.0, 0.72222)
+        let ch = character.charCodeAt(0);
+        if (character[0] in extraCharacterMap) {
+            ch = extraCharacterMap[character[0]].charCodeAt(0);
+        }
+        */
+        val ch = character[0].toInt().toString()
+        val metric = metmap[ch]
+
+        /*
+        TODO:
+        if (!metrics && mode === 'text') {
+            // We don't typically have font metrics for Asian scripts.
+            // But since we support them in text mode, we need to return
+            // some sort of metrics.
+            // So if the character is in a script we support but we
+            // don't have metrics for it, just use the metrics for
+            // the Latin capital letter M. This is close enough because
+            // we (currently) only care about the height of the glpyh
+            // not its width.
+            if (supportedCodepoint(ch)) {
+                metrics = metricMap[font][77]; // 77 is the charcode for 'M'
+            }
+        }
+         */
+        if(metric == null) {
+            return CharacterMetrics(0.0, 0.0, 0.0, 0.0, 0.0)
+        }
+
+        return CharacterMetrics(metric[0], metric[1], metric[2], metric[3], metric[4])
+
+        // TODO:
+        /*
+            if(font == "Math-Italic")
+                return CharacterMetrics(0.0, 0.43056, 0.0, 0.02778, 0.57153)
+            return CharacterMetrics(0.0, 0.64444, 0.0, 0.0, 0.5)
+            */
+            // return CharacterMetrics(0.0, 0.68889, 0.0, 0.0, 0.72222)
     }
 
     fun lookupSymbol(in_value: String, fontName:String, mode: Mode) : Pair<String, CharacterMetrics?> {
