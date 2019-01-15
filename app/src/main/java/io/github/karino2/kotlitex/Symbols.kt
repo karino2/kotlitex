@@ -23,7 +23,10 @@ object Symbols {
 
     fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics {
         // TODO:
-        return CharacterMetrics(0.0, 0.68889, 0.0, 0.0, 0.72222)
+        if(font == "Math-Italic")
+            return CharacterMetrics(0.0, 0.43056, 0.0, 0.02778, 0.57153)
+        return CharacterMetrics(0.0, 0.64444, 0.0, 0.0, 0.5)
+        // return CharacterMetrics(0.0, 0.68889, 0.0, 0.0, 0.72222)
     }
 
     fun lookupSymbol(in_value: String, fontName:String, mode: Mode) : Pair<String, CharacterMetrics?> {

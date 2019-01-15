@@ -12,7 +12,7 @@ val sizeMultipliers = listOf(
 // See: https://tex.stackexchange.com/questions/22350/difference-between-textrm-and-mathrm
 data class Options(var style: Style, val _color: String?="", var size: Int = BASESIZE, val font: String="",
                    val fontFamily: String = "", val fontWeight : CssClass = CssClass.EMPTY, val fontShape: CssClass = CssClass.EMPTY,
-                   val sizeMultiplier: Double = sizeMultipliers[size], val maxSize: Double = Double.POSITIVE_INFINITY) {
+                   val sizeMultiplier: Double = sizeMultipliers[size-1], val maxSize: Double = Double.POSITIVE_INFINITY) {
 
     val textSize = size
 
@@ -143,7 +143,7 @@ getGlobalMetrics: metrics { cssEmPerMu: 0.05555555555555555,
         if (this.style == style) {
             return this
         } else {
-            return this.copy(style = style, size = sizeAtStyle(this.textSize, style))
+            return Options(style=style, size=sizeAtStyle(this.textSize, style))
         }
     }
 

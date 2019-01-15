@@ -13,12 +13,27 @@ object RenderTreeBuilder {
         groupBuilders[nodeType] = builder
     }
 
+    /**
+     * Calculate the height, depth, and maxFontSize of an element based on its
+     * children.
+     */
+    fun sizeElementFromChildren(
+            elem: SpanNode
+    ) {
+        var height = elem.children.map {it.height }.max() ?: 0.0
+        var depth = elem.children.map {it.depth }.max() ?: 0.0
+        var maxFontSize = elem.children.map {it.maxFontSize}.max() ?: 0.0
+
+        elem.height = height
+        elem.depth = depth
+        elem.maxFontSize = maxFontSize
+    };
+
+
     fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : SpanNode {
 
         val span = SpanNode(klasses, children, options, style)
-        /* TODO:
         sizeElementFromChildren(span);
-        */
         return span
     }
 
