@@ -260,7 +260,7 @@ class Parser(val input: String) {
         val nucleus = nextToken!!
         var text = nucleus.text
 
-        if ("^\\verb[^a-zA-Z]".toRegex().find(text) != null) {
+        if ("^\\\\verb[^a-zA-Z]".toRegex().find(text) != null) {
             this.consume();
 
             var arg = text.substring(5)

@@ -8,7 +8,14 @@ import android.util.AttributeSet
 import android.view.View
 
 class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet) {
-    // TODO: Copy-and-pasted from RenderNodeTest. Will replace once things are being ready...
+    val nodes: List<RenderNode>
+    init {
+        val options = Options(Style.TEXT)
+        val parser = Parser("x^2")
+        val parsed =  parser.parse()
+        nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
+    }
+    /*
     val nodes = list {
         span("mord", children=list {
             sym("x", "mord mathdefault", height=0.43056, skew=0.02778, width=0.57153, maxFontSize=1.0)
@@ -51,6 +58,7 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
             })
         })
     }
+    */
 
     val BaseTextSize: Double = 50.0;
 
