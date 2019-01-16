@@ -332,6 +332,7 @@ object RenderTreeBuilder {
         isRealGroup: Boolean
         ): Boolean
     {
+        // karino: Below comment is original node one, our situationmight be different.
         // TODO: This code assumes that a node's math class is the first element
         // of its `classes` array. A later cleanup should ensure this, for
         // instance by changing the signature of `makeSpan`.
@@ -567,7 +568,7 @@ object RenderTreeBuilder {
                         var glueOptions = options
 
                         if (expression.size == 1) {
-                            /* TODO:
+                            /* TODO: sizing, styling is not exists now. porting later.
                             val node =expression[0] as
                             checkNodeType(expression[0], "sizing") ||
                                     checkNodeType(expression[0], "styling");

@@ -14,27 +14,99 @@ object Symbols {
     val textMap : MutableMap<String, CharInfo> = mutableMapOf()
 
     fun get(mode: Mode) = if(mode == Mode.MATH) mathMap else textMap
-    /*
-            : MutableMap<Mode, MutableMap<String, CharInfo>> = mutableMapOf(
-        Mode.MATH to mutableMapOf(),
-        Mode.TEXT to mutableMapOf()
-    )
-    */
 
+    // These are very rough approximations.  We default to Times New Roman which
+    // should have Latin-1 and Cyrillic characters, but may not depending on the
+    // operating system.  The metrics do not account for extra height from the
+    // accents.  In the case of Cyrillic characters which have both ascenders and
+    // descenders we prefer approximations with ascenders, primarily to prevent
+    // the fraction bar or root line from intersecting the glyph.
+    // TODO(kevinb) allow union of multiple glyph metrics for better accuracy.
+    val extraCharacterMap = mapOf(
+        // Latin-1
+        'Å' to  'A',
+    'Ç' to  'C',
+    'Ð' to  'D',
+    'Þ' to  'o',
+    'å' to  'a',
+    'ç' to  'c',
+    'ð' to  'd',
+    'þ' to  'o',
+
+    // Cyrillic
+    'А' to  'A',
+    'Б' to  'B',
+    'В' to  'B',
+    'Г' to  'F',
+    'Д' to  'A',
+    'Е' to  'E',
+    'Ж' to  'K',
+    'З' to  '3',
+    'И' to  'N',
+    'Й' to  'N',
+    'К' to  'K',
+    'Л' to  'N',
+    'М' to  'M',
+    'Н' to  'H',
+    'О' to  'O',
+    'П' to  'N',
+    'Р' to  'P',
+    'С' to  'C',
+    'Т' to  'T',
+    'У' to  'y',
+    'Ф' to  'O',
+    'Х' to  'X',
+    'Ц' to  'U',
+    'Ч' to  'h',
+    'Ш' to  'W',
+    'Щ' to  'W',
+    'Ъ' to  'B',
+    'Ы' to  'X',
+    'Ь' to  'B',
+    'Э' to  '3',
+    'Ю' to  'X',
+    'Я' to  'R',
+    'а' to  'a',
+    'б' to  'b',
+    'в' to  'a',
+    'г' to  'r',
+    'д' to  'y',
+    'е' to  'e',
+    'ж' to  'm',
+    'з' to  'e',
+    'и' to  'n',
+    'й' to  'n',
+    'к' to  'n',
+    'л' to  'n',
+    'м' to  'm',
+    'н' to  'n',
+    'о' to  'o',
+    'п' to  'n',
+    'р' to  'p',
+    'с' to  'c',
+    'т' to  'o',
+    'у' to  'y',
+    'ф' to  'b',
+    'х' to  'x',
+    'ц' to  'n',
+    'ч' to  'n',
+    'ш' to  'w',
+    'щ' to  'w',
+    'ъ' to  'a',
+    'ы' to  'm',
+    'ь' to  'a',
+    'э' to  'e',
+    'ю' to  'm',
+    'я' to  'r'
+    )
 
 
 
     fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics {
         val metmap = MetricMap.metricMap[font] ?: throw Exception("Font metrics not found for font: ${font}.")
 
-        /*
-        // TODO:
-        let ch = character.charCodeAt(0);
-        if (character[0] in extraCharacterMap) {
-            ch = extraCharacterMap[character[0]].charCodeAt(0);
-        }
-        */
-        val ch = character[0].toInt().toString()
+
+        val ch = (extraCharacterMap[character[0]] ?: character[0]).toInt().toString()
         val metric = metmap[ch]
 
         /*
@@ -58,14 +130,6 @@ object Symbols {
         }
 
         return CharacterMetrics(metric[0], metric[1], metric[2], metric[3], metric[4])
-
-        // TODO:
-        /*
-            if(font == "Math-Italic")
-                return CharacterMetrics(0.0, 0.43056, 0.0, 0.02778, 0.57153)
-            return CharacterMetrics(0.0, 0.64444, 0.0, 0.0, 0.5)
-            */
-            // return CharacterMetrics(0.0, 0.68889, 0.0, 0.0, 0.72222)
     }
 
     fun lookupSymbol(in_value: String, fontName:String, mode: Mode) : Pair<String, CharacterMetrics?> {
@@ -98,16 +162,14 @@ object Symbols {
         '\u0301' to AccentRelation("\\'", "\\acute"),
         '\u0300' to AccentRelation("\\`", "\\grave"),
         '\u0308' to AccentRelation("\\\"", "\\ddot"),
-        '\u0303' to AccentRelation("\\~", "\\tilde")
-        /* TODO: convert below too.
-    '\u0304': {text: '\\=', math: '\\bar'},
-    '\u0306': {text: '\\u', math: '\\breve'},
-    '\u030c': {text: '\\v', math: '\\check'},
-    '\u0302': {text: '\\^', math: '\\hat'},
-    '\u0307': {text: '\\.', math: '\\dot'},
-    '\u030a': {text: '\\r', math: '\\mathring'},
-    '\u030b': {text: '\\H'},
-    */
+        '\u0303' to AccentRelation("\\~", "\\tilde"),
+        '\u0304' to AccentRelation( "\\=",  "\\bar"),
+        '\u0306' to AccentRelation( "\\u",  "\\breve"),
+        '\u030c' to AccentRelation( "\\v",  "\\check"),
+        '\u0302' to AccentRelation( "\\^",  "\\hat"),
+        '\u0307' to AccentRelation( "\\.",  "\\dot"),
+        '\u030a' to AccentRelation( "\\r",  "\\mathring"),
+        '\u030b' to AccentRelation( "\\H", "")
     )
 
     val unicodeSymbols = mapOf(
