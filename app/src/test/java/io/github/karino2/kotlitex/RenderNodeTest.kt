@@ -17,19 +17,19 @@ class SpanBuilder {
              italic: Double = 0.0,
                maxFontSize: Double = 0.0,
              sheight: String? = null
-             ) : SpanNode {
+             ) : RNodeSpan {
 
         val klasses = classesToEnums(klassnames)
         val style = CssStyle(sheight, top)
 
-        val node = SpanNode(children, null,  klasses, height, depth, maxFontSize, style)
+        val node = RNodeSpan(children, null,  klasses, height, depth, maxFontSize, style)
         spans.add(node)
         return node
     }
 
-    fun sym(text: String, klassnames: String, height: Double, skew: Double, width: Double, maxFontSize: Double) : SymbolNode{
+    fun sym(text: String, klassnames: String, height: Double, skew: Double, width: Double, maxFontSize: Double) : RNodeSymbol{
         val klasses = classesToEnums(klassnames)
-        val node = SymbolNode(text, height=height, skew=skew, width=width, klasses=klasses )
+        val node = RNodeSymbol(text, height=height, skew=skew, width=width, klasses=klasses )
         node.maxFontSize = maxFontSize
         spans.add(node)
         return node
@@ -91,15 +91,15 @@ class RenderNodeTest {
         assertEquals(1, spans.size)
         val target = spans[0]
 
-        assertTrue(target is SpanNode)
-        val mord = (target as SpanNode)!!
+        assertTrue(target is RNodeSpan)
+        val mord = (target as RNodeSpan)!!
 
         assertEquals(2, mord.children.size)
         assertTrue(mord.hasClass(CssClass.mord))
 
-        assertTrue(mord.children[0] is SymbolNode)
+        assertTrue(mord.children[0] is RNodeSymbol)
 
-        val symx : SymbolNode = mord.children[0] as SymbolNode
+        val symx : RNodeSymbol = mord.children[0] as RNodeSymbol
         assertEquals("x", symx.text)
 
         /*

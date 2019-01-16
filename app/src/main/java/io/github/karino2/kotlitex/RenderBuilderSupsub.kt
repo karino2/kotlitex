@@ -5,8 +5,8 @@ import java.lang.IllegalArgumentException
 object RenderBuilderSupsub {
     // Super scripts and subscripts, whose precise placement can depend on other
     // functions that precede them.
-    fun makeSupsub(group: ParseNode, options: Options) : SpanNode {
-        if(group !is NodeSupSub) {
+    fun makeSupsub(group: ParseNode, options: Options) : RNodeSpan {
+        if(group !is PNodeSupSub) {
             throw IllegalArgumentException("unexpected type in makeSupsub.")
         }
         // Superscript and subscripts are handled in the TeXbook on page
@@ -73,7 +73,7 @@ object RenderBuilderSupsub {
 
         var marginLeft : String? = null
         if (subm != null) {
-            if(base is SymbolNode) {
+            if(base is RNodeSymbol) {
                 marginLeft = (-base.italic).toString() + "em"
             }
 
@@ -81,7 +81,7 @@ object RenderBuilderSupsub {
             // Account for that by shifting the subscript back the appropriate
             // amount. Note we only do this when the base is a single symbol.
             /* TODO: oiint. base does not have italic in our type system.
-            if(group.base != null && group.base is NodeOp && group.base.name != null) {
+            if(group.base != null && group.base is PNodeOp && group.base.name != null) {
                 if (group.base.name === "\\oiint" || group.base.name === "\\oiiint") {
                     val base1: ParseNode? = group.base
                     marginLeft = (-base.italic).toString() + "em";

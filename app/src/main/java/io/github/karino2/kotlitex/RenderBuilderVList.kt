@@ -40,7 +40,7 @@ data class VListParamFirstBaseLine(val children: List<VListChild>) : VListParam(
 
 object RenderBuilderVList {
 
-    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : SpanNode = RenderTreeBuilder.makeSpan(klasses, children, options, style)
+    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : RNodeSpan = RenderTreeBuilder.makeSpan(klasses, children, options, style)
 
     // Computes the updated `children` list and the overall depth.
     //
@@ -117,7 +117,7 @@ object RenderBuilderVList {
      *
      * See VListParam documentation above.
      */
-    fun makeVList(params: VListParam, options: Options): SpanNode {
+    fun makeVList(params: VListParam, options: Options): RNodeSpan {
         val (children, depth) = getVListChildrenAndDepth(params);
 
         // Create a strut that is taller than any list item. The strut is added to
@@ -190,7 +190,7 @@ object RenderBuilderVList {
 
             // Safari wants the first row to have inline content; otherwise it
             // puts the bottom of the *second* row on the baseline.
-            val topStrut = makeSpan(mutableSetOf(CssClass.vlist_s), mutableListOf(SymbolNode("\u200b")))
+            val topStrut = makeSpan(mutableSetOf(CssClass.vlist_s), mutableListOf(RNodeSymbol("\u200b")))
 
             mutableListOf(makeSpan(mutableSetOf(CssClass.vlist_r), mutableListOf(vlist, topStrut)),
                 makeSpan(mutableSetOf(CssClass.vlist_r), mutableListOf(depthStrut)))

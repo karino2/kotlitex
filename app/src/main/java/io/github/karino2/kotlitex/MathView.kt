@@ -37,10 +37,10 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
     private fun drawRenderNodes(canvas: Canvas, nodes: List<RenderNode>) {
         for (parent in nodes) {
             when (parent) {
-                is SpanNode -> {
+                is RNodeSpan -> {
                     drawRenderNodes(canvas, parent.children)
                 }
-                is SymbolNode -> {
+                is RNodeSymbol -> {
                     textPaint.textSize = (BaseTextSize * parent.maxFontSize).toFloat()
                     canvas.drawText(parent.text, point.x, point.y, textPaint)
 
