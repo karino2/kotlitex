@@ -4,7 +4,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 
-class SymbolAsserter(val node: SymbolNode) {
+class SymbolAsserter(val node: RNodeSymbol) {
     fun text(v: String) = assertEquals(v, node.text)
     fun h(v: Double) = assertEquals(v, node.height, 0.0001)
     fun depth(v: Double) = assertEquals(v, node.depth, 0.001)
@@ -16,12 +16,12 @@ class SymbolAsserter(val node: SymbolNode) {
 }
 
 fun assertSymbol(node: RenderNode?, body: SymbolAsserter.()->Unit) {
-    assertTrue(node is SymbolNode)
-    val sym: SymbolNode = node as SymbolNode
+    assertTrue(node is RNodeSymbol)
+    val sym: RNodeSymbol = node as RNodeSymbol
     SymbolAsserter(sym).body()
 }
 
-class SpanAsserter(val node: SpanNode) {
+class SpanAsserter(val node: RNodeSpan) {
     fun cnum(numOfChildren: Int) = assertEquals(numOfChildren, node.children.size)
     fun h(v: Double) = assertEquals(v, node.height, 0.0001)
     fun depth(v: Double) = assertEquals(v, node.depth, 0.001)
@@ -37,8 +37,8 @@ class SpanAsserter(val node: SpanNode) {
 }
 
 fun assertSpan(node: RenderNode?, body: SpanAsserter.()->Unit) {
-    assertTrue(node is SpanNode)
-    val sym: SpanNode = node as SpanNode
+    assertTrue(node is RNodeSpan)
+    val sym: RNodeSpan = node as RNodeSpan
     SpanAsserter(sym).body()
 }
 
@@ -56,7 +56,7 @@ class RenderTreeBuilderTest {
         val builder = RenderTreeBuilder
         val actual = builder.buildGroup(input[0], options)
 
-        assertTrue(actual is SpanNode)
+        assertTrue(actual is RNodeSpan)
     }
 
 
@@ -85,7 +85,7 @@ class RenderTreeBuilderTest {
             cnum(2)
 
             /*
-            SymbolNode {
+            RNodeSymbol {
             text: 'x',
             height: 0.43056,
             depth: 0,

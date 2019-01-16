@@ -13,19 +13,19 @@ class SpanBuilder {
              italic: Double = 0.0,
                maxFontSize: Double = 0.0,
              sheight: String? = null
-             ) : SpanNode {
+             ) : RNodeSpan {
 
         val klasses = classesToEnums(klassnames)
         val style = CssStyle(sheight, top)
 
-        val node = SpanNode(children, null,  klasses, height, depth, maxFontSize, style)
+        val node = RNodeSpan(children, null,  klasses, height, depth, maxFontSize, style)
         spans.add(node)
         return node
     }
 
-    fun sym(text: String, klassnames: String, height: Double, skew: Double, width: Double, maxFontSize: Double) : SymbolNode{
+    fun sym(text: String, klassnames: String, height: Double, skew: Double, width: Double, maxFontSize: Double) : RNodeSymbol{
         val klasses = classesToEnums(klassnames)
-        val node = SymbolNode(text, height=height, skew=skew, width=width, klasses=klasses )
+        val node = RNodeSymbol(text, height=height, skew=skew, width=width, klasses=klasses )
         node.maxFontSize = maxFontSize
         spans.add(node)
         return node

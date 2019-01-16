@@ -61,9 +61,9 @@ sealed class RenderNode (val klasses : MutableSet<CssClass> = mutableSetOf(), va
     fun hasClass(klass : CssClass) = klasses.contains(klass)
 }
 
-class SpanNode(var children: MutableList<RenderNode> = mutableListOf(), var width: Double? = null,
-                    klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
-                    depth: Double = 0.0, maxFontSize: Double = 0.0, style: CssStyle = CssStyle())
+class RNodeSpan(var children: MutableList<RenderNode> = mutableListOf(), var width: Double? = null,
+                klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
+                depth: Double = 0.0, maxFontSize: Double = 0.0, style: CssStyle = CssStyle())
     : RenderNode(klasses, height, depth, maxFontSize, style) {
 
     constructor(klasses : MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options?, style: CssStyle = CssStyle() )
@@ -78,10 +78,10 @@ class SpanNode(var children: MutableList<RenderNode> = mutableListOf(), var widt
     }
 }
 
-class SymbolNode(val text: String,
-    val italic: Double = 0.0,
-    val skew: Double = 0.0,
-    val width: Double = 0.0,
-    klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
-                 depth: Double = 0.0, style: CssStyle = CssStyle())
+class RNodeSymbol(val text: String,
+                  val italic: Double = 0.0,
+                  val skew: Double = 0.0,
+                  val width: Double = 0.0,
+                  klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
+                  depth: Double = 0.0, style: CssStyle = CssStyle())
     : RenderNode(klasses, height, depth, 0.0, style)

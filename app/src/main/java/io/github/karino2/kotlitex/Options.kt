@@ -18,81 +18,15 @@ data class Options(var style: Style, val _color: String?="", var size: Int = BAS
 
     val color: String?
     get() {
-        // TODO:
-        // return "#6495ed"
         return _color
     }
 
-    /*
-getGlobalMetrics: metrics { cssEmPerMu: 0.05555555555555555,
-  slant: 0.25,
-  space: 0,
-  stretch: 0,
-  shrink: 0,
-  xHeight: 0.431,
-  quad: 1,
-  extraSpace: 0,
-  num1: 0.677,
-  num2: 0.394,
-  num3: 0.444,
-  denom1: 0.686,
-  denom2: 0.345,
-  sup1: 0.413,
-  sup2: 0.363,
-  sup3: 0.289,
-  sub1: 0.15,
-  sub2: 0.247,
-  supDrop: 0.386,
-  subDrop: 0.05,
-  delim1: 2.39,
-  delim2: 1.01,
-  axisHeight: 0.25,
-  defaultRuleThickness: 0.04,
-  bigOpSpacing1: 0.111,
-  bigOpSpacing2: 0.166,
-  bigOpSpacing3: 0.2,
-  bigOpSpacing4: 0.6,
-  bigOpSpacing5: 0.1,
-  sqrtRuleThickness: 0.04,
-  ptPerEm: 10,
-  doubleRuleSep: 0.2 }
- */
-    // TODO:
+
+
     val fontMetrics: FontMetrics
-    get() = FontMetrics(
-        0.05555555555555555,
-        0.25,
-        0.0,
-        0.0,
-        0.0,
-        0.431,
-        1,
-        0.0,
-        0.677,
-        0.394,
-        0.444,
-        0.686,
-        0.345,
-        0.413,
-        0.363,
-        0.289,
-        0.15,
-        0.247,
-        0.386,
-        0.05,
-        2.39,
-        1.01,
-        0.25,
-        0.04,
-        0.111,
-        0.166,
-        0.2,
-        0.6,
-        0.1,
-        0.04,
-        10,
-        0.2
-    )
+    by lazy {
+            FontMetrics.getGlobalMetrics(size)
+        }
 
     /*
     sizingClasses

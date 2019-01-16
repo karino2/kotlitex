@@ -218,7 +218,7 @@ class Parser(val input: String) {
             // End group namespace before consuming symbol after close brace
             this.gullet.endGroup();
             expect(closeBrace)
-            return NodeOrdGroup(mode, SourceLocation.range(firstToken, lastToken), expression)
+            return PNodeOrdGroup(mode, SourceLocation.range(firstToken, lastToken), expression)
         }else if(optional) {
             // Return nothing for an optional group
             result = null;
@@ -274,7 +274,7 @@ class Parser(val input: String) {
                 throw ParseError("\\verb assertion failed -- \nplease report what input caused this bug", null)
             }
             arg = arg.slice(1 until (arg.length-1)) // remove first and last char
-            return NodeVerb(Mode.TEXT, null, arg, star)
+            return PNodeVerb(Mode.TEXT, null, arg, star)
         } else if (text === "%") {
             this.consumeComment();
             return this.parseSymbol();
@@ -314,12 +314,12 @@ class Parser(val input: String) {
             val group: Group = Symbols.get(mode).get(text)?.group ?: throw Exception("Never happens")
             val loc = SourceLocation.range(nucleus)
             var s /* TODO: SymbolParseNode */ = if (group is Atoms) {
-                NodeAtom(group, mode, loc, text)
+                PNodeAtom(group, mode, loc, text)
             } else {
                 // TODO: handle all Non Atom
                 when(group) {
-                    NonAtoms.textord -> NodeTextOrd(mode, loc, text)
-                    NonAtoms.mathord -> NodeMathOrd(mode, loc, text)
+                    NonAtoms.textord -> PNodeTextOrd(mode, loc, text)
+                    NonAtoms.mathord -> PNodeMathOrd(mode, loc, text)
                     else -> throw NotImplementedError("NYI for non ATOM symbols.")
 
                 }
@@ -346,7 +346,7 @@ class Parser(val input: String) {
                         nucleus)
                 }
             }
-            symbol = NodeTextOrd(mode, SourceLocation.range(nucleus), text)
+            symbol = PNodeTextOrd(mode, SourceLocation.range(nucleus), text)
         } else {
             return null;  // EOF, ^, _, {, }, etc.
         }
@@ -362,7 +362,7 @@ class Parser(val input: String) {
                 val command = Symbols.unicodeAccents[accent]?.get(mode) ?: throw ParseError(
                             "Accent ${accent} unsupported in ${this.mode} mode", nucleus)
 
-                symbol = NodeAccent(mode, SourceLocation.range(nucleus), command, false, true, symbol)
+                symbol = PNodeAccent(mode, SourceLocation.range(nucleus), command, false, true, symbol)
             }
         }
         return symbol
@@ -395,7 +395,7 @@ class Parser(val input: String) {
 
             if (lex.text === "\\limits" || lex.text === "\\nolimits") {
                 // We got a limit control
-                val opNode = base as NodeOp ?:
+                val opNode = base as PNodeOp ?:
                                throw ParseError("Limit controls must follow a math operator", lex)
 
                 val limits = lex.text == "\\limits";
@@ -419,7 +419,7 @@ class Parser(val input: String) {
                 if (superscript != null) {
                     throw ParseError("Double superscript", lex);
                 }
-                val prime = NodeTextOrd(mode, null, "\\prime")
+                val prime = PNodeTextOrd(mode, null, "\\prime")
 
                 // Many primes can be grouped together, so we handle this here
                 val primes : MutableList<ParseNode> = mutableListOf(prime);
@@ -436,7 +436,7 @@ class Parser(val input: String) {
                     primes.add(handleSupSubscript("superscript"));
                 }
                 // Put everything into an ordgroup as the superscript
-                superscript = NodeOrdGroup(mode, null, primes)
+                superscript = PNodeOrdGroup(mode, null, primes)
             } else if (lex.text === "%") {
                 this.consumeComment();
             } else {
@@ -450,7 +450,7 @@ class Parser(val input: String) {
         if (superscript !=null || subscript != null) {
             // If we got either a superscript or subscript, create a supsub
 
-            return NodeSupSub(mode, null, base, superscript, subscript)
+            return PNodeSupSub(mode, null, base, superscript, subscript)
         } else {
             // Otherwise return the original body
             return base

@@ -18,7 +18,7 @@ object RenderTreeBuilder {
      * children.
      */
     fun sizeElementFromChildren(
-            elem: SpanNode
+            elem: RNodeSpan
     ) {
         var height = elem.children.map {it.height }.max() ?: 0.0
         var depth = elem.children.map {it.depth }.max() ?: 0.0
@@ -30,9 +30,9 @@ object RenderTreeBuilder {
     };
 
 
-    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : SpanNode {
+    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : RNodeSpan {
 
-        val span = SpanNode(klasses, children, options, style)
+        val span = RNodeSpan(klasses, children, options, style)
         sizeElementFromChildren(span);
         return span
     }
@@ -91,7 +91,7 @@ object RenderTreeBuilder {
         mode: Mode,
         options: Options?,
         classes: MutableSet<CssClass>
-    ): SymbolNode {
+    ): RNodeSymbol {
         val (value, metrics) = Symbols.lookupSymbol(value, fontName, mode);
 
         var symbolNode = if (metrics != null) {
@@ -99,14 +99,14 @@ object RenderTreeBuilder {
             if (mode == Mode.TEXT || (options != null && options.font == "mathit")) {
                 italic = 0.0;
             }
-            SymbolNode(
+            RNodeSymbol(
                     value, height=metrics.height, depth=metrics.depth, italic = italic, skew = metrics.skew,
             width=metrics.width, klasses = classes)
         } else {
             // TODO(emily): Figure out a good way to only print this in development
             Log.d("kotlitex", "No character metrics for '$value' in style '$fontName'")
 
-            SymbolNode(value, 0.0, 0.0, 0.0, classes, 0.0);
+            RNodeSymbol(value, 0.0, 0.0, 0.0, classes, 0.0);
         }
 
         if (options != null) {
@@ -188,8 +188,8 @@ object RenderTreeBuilder {
     /**
      * Makes either a mathord or textord in the correct font and color.
      */
-    fun makeOrd(group: ParseNode, options: Options, type: String) : SymbolNode {
-        if(group !is NodeOrd) {
+    fun makeOrd(group: ParseNode, options: Options, type: String) : RNodeSymbol {
+        if(group !is PNodeOrd) {
             throw IllegalArgumentException("unexpected type in makeOrd.")
         }
 
@@ -246,11 +246,11 @@ object RenderTreeBuilder {
         */
 
         // Makes a symbol in the default font for mathords and textords.
-        if (group is NodeMathOrd) {
+        if (group is PNodeMathOrd) {
             val (fontName, fontClass) = mathdefault(text, mode, options, classes)
             classes.add(fontClass)
             return makeSymbol(text, fontName, mode, options, classes);
-        } else if (group is NodeTextOrd) {
+        } else if (group is PNodeTextOrd) {
             val font = Symbols.get(mode)[text]?.font
             if (font == "ams") {
                 val fontName = retrieveTextFontName("amsrm", options.fontWeight,
@@ -332,6 +332,7 @@ object RenderTreeBuilder {
         isRealGroup: Boolean
         ): Boolean
     {
+        // karino: Below comment is original node one, our situationmight be different.
         // TODO: This code assumes that a node's math class is the first element
         // of its `classes` array. A later cleanup should ensure this, for
         // instance by changing the signature of `makeSpan`.
@@ -458,7 +459,7 @@ object RenderTreeBuilder {
     // Glue is a concept from TeX which is a flexible space between elements in
     // either a vertical or horizontal list. In KaTeX, at least for now, it's
     // static space between elements in a horizontal layout.
-    fun makeGlue(measurement: Measurement, options: Options): SpanNode {
+    fun makeGlue(measurement: Measurement, options: Options): RNodeSpan {
         // Make an empty span for the space
         val rule = makeSpan(mutableSetOf(CssClass.mspace), mutableListOf(), options);
         val size = calculateSize(measurement, options);
@@ -567,7 +568,7 @@ object RenderTreeBuilder {
                         var glueOptions = options
 
                         if (expression.size == 1) {
-                            /* TODO:
+                            /* TODO: sizing, styling is not exists now. porting later.
                             val node =expression[0] as
                             checkNodeType(expression[0], "sizing") ||
                                     checkNodeType(expression[0], "styling");

@@ -4,7 +4,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 
-class NodeMathOrdAsserter(val actual : NodeMathOrd) {
+class NodeMathOrdAsserter(val actual : PNodeMathOrd) {
     fun text(expect: String) = assertEquals(expect, actual.text)
     fun start(expect: Int) = assertEquals(expect, actual.loc?.start)
     fun end(expect: Int) = assertEquals(expect, actual.loc?.end)
@@ -12,22 +12,22 @@ class NodeMathOrdAsserter(val actual : NodeMathOrd) {
 }
 
 fun assertMathOrd(node: ParseNode?, body: NodeMathOrdAsserter.() -> Unit) {
-    assertTrue(node is NodeMathOrd)
+    assertTrue(node is PNodeMathOrd)
     // always succeed
-    if(node is NodeMathOrd) {
+    if(node is PNodeMathOrd) {
         NodeMathOrdAsserter(node).body()
     }
 }
-class NodeTextOrdAsserter(val actual : NodeTextOrd) {
+class NodeTextOrdAsserter(val actual : PNodeTextOrd) {
     fun text(expect: String) = assertEquals(expect, actual.text)
     fun start(expect: Int) = assertEquals(expect, actual.loc?.start)
     fun end(expect: Int) = assertEquals(expect, actual.loc?.end)
     fun mode(expect: Mode) = assertEquals(expect, actual.mode)
 }
 fun assertTextOrd(node: ParseNode?, body: NodeTextOrdAsserter.() -> Unit) {
-    assertTrue(node is NodeTextOrd)
+    assertTrue(node is PNodeTextOrd)
     // always succeed
-    if(node is NodeTextOrd) {
+    if(node is PNodeTextOrd) {
         NodeTextOrdAsserter(node).body()
     }
 }
@@ -66,7 +66,7 @@ class ParserTest {
         assertEquals(1, actual.size)
         val supsub = actual[0]
         when(supsub) {
-            is NodeSupSub -> {
+            is PNodeSupSub -> {
                 assertMathOrd(supsub.base) {
                     text("x")
                     start(0)
