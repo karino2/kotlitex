@@ -84,31 +84,7 @@ object Symbols {
         }
     }
     init {
-        // TODO: many defineSymbol...
-        val letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        for(ch in letters) {
-            val chstr = ch.toString()
-            defineSymbol(
-                Mode.MATH,
-                "main",
-                NonAtoms.mathord, chstr, chstr)
-            defineSymbol(
-                Mode.TEXT,
-                "main",
-                NonAtoms.textord, chstr, chstr)
-
-        }
-
-        val mathTextSymbols = "0123456789/@.\"";
-        for (ch in mathTextSymbols) {
-            val chstr = ch.toString()
-            defineSymbol(
-                Mode.MATH,
-                "main",
-                NonAtoms.textord, chstr, chstr);
-        }
-
-
+        SymbolDefinitions.defineAllSymbols()
     }
 
     // We add these Latin-1 letters as symbols for backwards-compatibility,
