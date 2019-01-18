@@ -18,6 +18,11 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
         // Lookup tables for switching from one style to another
         val sup = listOf(S, Sc, S, Sc, SS, SSc, SS, SSc)
         val sub = listOf(Sc, Sc, Sc, Sc, SSc, SSc, SSc, SSc)
+        val _fracNum = listOf(T, Tc, S, Sc, SS, SSc, SS, SSc)
+        val _fracDen = listOf(Tc, Tc, Sc, Sc, SSc, SSc, SSc, SSc)
+        val _cramp = listOf(Dc, Dc, Tc, Tc, Sc, Sc, SSc, SSc)
+        val _text = listOf(D, Dc, T, Tc, T, Tc, T, Tc)
+
 
         // Instances of the different styles
         val styles = listOf(
@@ -33,6 +38,8 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
 
         val DISPLAY: Style = styles[D]
         val TEXT: Style = styles[T]
+        val SCRIPT = styles[S]
+        val SCRIPTSCRIPT = styles[SS]
     }
 
 
@@ -49,4 +56,47 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
     fun sub(): Style {
         return styles[sub[this.id]];
     }
+
+    /**
+     * Get the style of a fraction numerator given the fraction in the current
+     * style.
+     */
+    fun fracNum(): Style {
+        return styles[_fracNum[id]];
+    }
+
+
+    /**
+     * Get the style of a fraction denominator given the fraction in the current
+     * style.
+     */
+    fun fracDen(): Style {
+        return styles[_fracDen[id]];
+    }
+
+    /**
+     * Get the cramped version of a style (in particular, cramping a cramped style
+     * doesn't change the style).
+     */
+    /*
+    cramp(): Style {
+        return styles[cramp[this.id]];
+    }
+    */
+
+    /**
+     * Get a text or display version of this style.
+     */
+    fun text(): Style {
+        return styles[_text[this.id]];
+    }
+
+    /**
+     * Return true if this style is tightly spaced (scriptstyle/scriptscriptstyle)
+     */
+    /*
+    isTight(): boolean {
+        return this.size >= 2;
+    }
+    */
 }

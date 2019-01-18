@@ -181,8 +181,59 @@ class RenderTreeBuilderTest {
                 }
             }
         }
-
     }
 
+    /*
+        Run the same code in node katex, then check value by debugger and write this test.
+     */
+    @Test
+    fun buildExpression_frac_sameAsNode() {
+        val input = parse("\\frac{1}{2}")
+        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+
+        assertEquals(1, actual.size)
+        val target = actual[0]
+        assertSpan(target) {
+            cnum(3)
+            kl(CssClass.mord)
+            depth(0.345)
+            h(0.845108)
+            maxFont(1.0)
+            assertSpan(child(0)) {
+                knum(2)
+                kl(CssClass.mopen)
+                kl(CssClass.nulldelimiter)
+            }
+            assertSpan(child(2)) {
+                knum(2)
+                kl(CssClass.mclose)
+                kl(CssClass.nulldelimiter)
+            }
+            assertSpan(child(1)) {
+                cnum(1)
+                kl(CssClass.mfrac)
+                assertSpan(child(0)) {
+                    cnum(2)
+                    kl(CssClass.vlist_t)
+                    kl(CssClass.vlist_t2)
+                    // give up write down tests...
+
+                    // something interesting at
+                    // target.children[1].children[0].children[0].children[0].children[1]
+                    // here is target.children[1].children[0].
+                    assertSpan(child(0)) {
+                        assertSpan(child(0)) {
+                            assertSpan(child(1)) {
+                                cnum(2)
+                                h(0.04)
+                                style(CssStyle(top="-3.23em"))
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
 
 }

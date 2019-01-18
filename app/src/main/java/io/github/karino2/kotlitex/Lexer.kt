@@ -2,7 +2,17 @@ package io.github.karino2.kotlitex
 
 import java.util.regex.Pattern
 
-data class Token(val text: String, val loc: SourceLocation?)
+data class Token(val text: String, val loc: SourceLocation?) {
+    /**
+     * Given a pair of tokens (this and endToken), compute a `Token` encompassing
+     * the whole input range enclosed by these two.
+     */
+    fun range(
+        endToken: Token,  // last token of the range, inclusive
+        text: String     // the text of the newly constructed token
+        ) = Token(text, SourceLocation.range(this, endToken))
+
+}
 
 class ParseError(val msg: String, val token: Token?): Exception(msg)
 

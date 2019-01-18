@@ -105,6 +105,11 @@ class Parser(val input: String) {
     companion object {
         val endOfExpression = listOf("}", "\\end", "\\right", "&");
         val SUPSUB_GREEDINESS = 1
+
+        init {
+            // Is here right place?
+            FunctionFrac.defineAll()
+        }
     }
 
 
@@ -112,28 +117,34 @@ class Parser(val input: String) {
 
 
     var mode = Mode.MATH
-    var nextToken : Token? = null
+
+
+
+    var _nextToken : Token? = null
 
     val gullet = MacroExpander(input, mode)
 
     fun consume() {
-        nextToken = gullet.expandNextToken()
+        _nextToken = gullet.expandNextToken()
     }
 
+    val nextToken: Token
+        get() = _nextToken!!
+
     fun consumeSpaces() {
-        while (nextToken?.text == " ") {
+        while (nextToken.text == " ") {
             this.consume();
         }
     }
 
     fun consumeComment() {
         // the newline character is normalized in Lexer, check original source
-        while (this.nextToken?.text != "EOF" && this.nextToken?.loc != null &&
-            nextToken?.loc?.getSource()?.indexOf("\n") == -1) {
+        while (nextToken.text != "EOF" && nextToken.loc != null &&
+            nextToken.loc?.getSource()?.indexOf("\n") == -1) {
             this.consume();
         }
 
-        if (nextToken?.text == "EOF") {
+        if (nextToken.text == "EOF") {
             this.settings.reportNonstrict("commentAtEnd",
                 "% comment has no terminating newline; LaTeX would " +
                         "fail because of commenting the end of math mode (e.g. $)", null);
@@ -141,7 +152,7 @@ class Parser(val input: String) {
         if (mode == Mode.MATH) {
             this.consumeSpaces(); // ignore spaces in math mode
         } else {// text mode
-            nextToken?.loc?.let {
+            nextToken.loc?.let {
                 val source = it.getSource();
                 if (source.indexOf("\n") == source.length - 1) {
                     this.consumeSpaces(); // if no space after the first newline
@@ -162,16 +173,341 @@ class Parser(val input: String) {
      * appropriate error otherwise.
      */
     fun expect(text: String, consume: Boolean = true) {
-        if(nextToken!!.text != text) {
+        if(nextToken.text != text) {
             throw ParseError(
-                "Expected '${text}', got '${nextToken!!.text}'",
-                nextToken!!
+                "Expected '${text}', got '${nextToken.text}'",
+                nextToken
             )
         }
         if(consume) {
             consume()
         }
     }
+
+    /**
+     * Parses a group when the mode is changing.
+     */
+    fun parseGroupOfType(
+            name: String,
+            type: LatexArgType?,
+            optional: Boolean,
+            greediness: Int?
+            ): ParseNode? {
+        return when (type) {
+            is ArgColor -> this.parseColorGroup(optional);
+            is ArgSize -> this.parseSizeGroup(optional);
+            is ArgUrl -> this.parseUrlGroup(optional);
+            is ArgMode -> this.parseGroup(name, optional, greediness, null, type.mode);
+            is ArgOriginal -> this.parseGroup(name, optional, greediness)
+            null -> this.parseGroup(name, optional, greediness)
+            else ->
+                throw ParseError(
+                    "Unknown group type as $name", this.nextToken);
+        }
+    }
+
+    /**
+     * Call a function handler with a suitable context and arguments.
+     */
+    fun callFunction(
+        name: String,
+        args: List<ParseNode>,
+        optArgs: List<ParseNode?>,
+        token: Token?,
+        breakOnTokenText: String? /* BreakToken?, */
+        ): ParseNode {
+        val context = FunctionContext(name, this, token, breakOnTokenText)
+        val func = LatexFunctions.functions[name]
+        if (func?.handler != null) {
+            return func.handler(context, args, optArgs);
+        } else {
+            throw ParseError("No function handler for ${name}", null)
+        }
+    }
+
+
+    /**
+     * Parses the arguments of a function or environment
+     */
+    fun parseArguments(
+            func: String,   // Should look like "\name" or "\begin{name}".
+            funcData: FunctionSpec /* FunctionSpec<*> | EnvSpec<*>,*/
+        ): Pair<List<ParseNode>, List<ParseNode?>> {
+        val totalArgs = funcData.numArgs + funcData.numOptionalArgs;
+
+        if (totalArgs == 0) {
+            return Pair(listOf(), listOf())
+        }
+
+        val baseGreediness = funcData.greediness;
+        val args = mutableListOf<ParseNode>()
+        val optArgs = mutableListOf<ParseNode?>()
+
+        repeat(totalArgs) { i->
+            val argType = funcData.argTypes?.get(i);
+            val isOptional = i < funcData.numOptionalArgs
+            // Ignore spaces between arguments.  As the TeXbook says:
+            // "After you have said ‘\def\row#1#2{...}’, you are allowed to
+            //  put spaces between the arguments (e.g., ‘\row x n’), because
+            //  TeX doesn’t use single spaces as undelimited arguments."
+            if (i > 0 && !isOptional) {
+                this.consumeSpaces();
+            }
+            // Also consume leading spaces in math mode, as parseSymbol
+            // won't know what to do with them.  This can only happen with
+            // macros, e.g. \frac\foo\foo where \foo expands to a space symbol.
+            // In LaTeX, the \foo's get treated as (blank) arguments).
+            // In KaTeX, for now, both spaces will get consumed.
+            // TODO(edemaine)
+            if (i == 0 && !isOptional && this.mode == Mode.MATH) {
+                this.consumeSpaces();
+            }
+            val nextToken = this.nextToken;
+            val arg = this.parseGroupOfType(
+                "argument to '$func'",
+            argType, isOptional, baseGreediness);
+            if (arg == null) {
+                if (isOptional) {
+                    optArgs.add(null)
+                    return@repeat // continue
+                }
+                throw ParseError(
+                    "Expected group after '$func'", nextToken);
+            }
+            if(isOptional) {
+                optArgs.add(arg)
+            } else {
+                args.add(arg)
+            }
+        }
+
+        return Pair(args, optArgs)
+    }
+
+
+
+    /**
+     * Parses an entire function, including its base and all of its arguments.
+     */
+    fun parseFunction(
+        breakOnTokenText: String? /* BreakToken?, "]" | "}" | "$" | "\\)" | "\\cr" */,
+        name: String?, // For error reporting.
+        greediness: Int?
+       ): ParseNode? {
+        val token = this.nextToken;
+        val func = token!!.text
+        val funcData = LatexFunctions.functions[func] ?: return null
+
+        if (greediness != null && funcData.spec.greediness <= greediness) {
+            throw ParseError(
+                    "Got function '" + func + "' with no arguments" +
+                            if(name != null) " as $name" else "", token)
+        } else if (this.mode == Mode.TEXT && !funcData.spec.allowedInText) {
+            throw ParseError(
+                "Can't use function '$func' in text mode", token);
+        } else if (this.mode == Mode.MATH && !funcData.spec.allowedInMath) throw ParseError(
+            "Can't use function '$func' in math mode", token)
+
+        // Consume the command token after possibly switching to the
+        // mode specified by the function (for instant mode switching),
+        // and then immediately switch back.
+        if (funcData.spec.consumeMode != null) {
+            val oldMode = this.mode;
+            this.switchMode(funcData.spec.consumeMode);
+            this.consume();
+            this.switchMode(oldMode);
+        } else {
+            this.consume();
+        }
+        val (args, optArgs) = this.parseArguments(func, funcData.spec);
+        return this.callFunction(func, args, optArgs, token, breakOnTokenText);
+    }
+
+
+    /**
+     * Parses a group, essentially returning the string formed by the
+     * brace-enclosed tokens plus some position information.
+     */
+    fun parseStringGroup(
+        modeName: LatexArgType,  // Used to describe the mode in error messages.
+        optional: Boolean,
+        raw: Boolean? = null
+    ): Token? {
+        val groupBegin = if(optional)  "[" else "{"
+        val groupEnd = if(optional) "]" else "}"
+        if (nextToken.text != groupBegin) {
+            if (optional) {
+                return null;
+            } else if (raw == true && nextToken.text != "EOF" &&
+                "[^{}\\[\\]]".toRegex().matches(nextToken.text)){ //  /[^{}[\]]/.test(nextToken.text)) {
+                // allow a single character in raw string group
+                this.consume();
+                return nextToken
+            }
+        }
+        val outerMode = this.mode
+        this.mode = Mode.TEXT
+        this.expect(groupBegin)
+        var str = ""
+        val firstToken = this.nextToken
+        var nested = 0 // allow nested braces in raw string group
+        var lastToken = firstToken
+        loop@ while ((raw == true && nested > 0) || this.nextToken.text != groupEnd) {
+            when (this.nextToken.text) {
+                "EOF" ->
+                throw ParseError(
+                        "Unexpected end of input in " + modeName,
+                firstToken.range(lastToken, str));
+                "%" ->
+                if (raw != true) { // allow % in raw string group
+                    this.consumeComment();
+                    continue@loop
+                }
+                groupBegin -> nested++
+                groupEnd -> nested--
+            }
+            lastToken = this.nextToken
+            str += lastToken.text;
+            this.consume();
+        }
+        this.mode = outerMode;
+        this.expect(groupEnd);
+        return firstToken.range(lastToken, str);
+    }
+
+    /**
+     * Parses a color description.
+     */
+    fun parseColorGroup(optional: Boolean): PNodeColorToken? {
+        val res = this.parseStringGroup(ArgColor, optional) ?: return null
+
+        val match = "^(#[a-f0-9]{3}|#?[a-f0-9]{6}|[a-z]+)\$".toRegex(RegexOption.IGNORE_CASE).matchEntire(res.text) ?:
+            throw ParseError("Invalid color: '" + res.text + "'", res);
+
+
+        var color = match.groupValues[0];
+        if ("^[0-9a-f]{6}$".toRegex(RegexOption.IGNORE_CASE).matches(color)) {
+            // We allow a 6-digit HTML color spec without a leading "#".
+            // This follows the xcolor package's HTML color model.
+            // Predefined color names are all missed by this RegEx pattern.
+            color = "#$color";
+        }
+        return PNodeColorToken(mode, null, color)
+    }
+
+    /**
+     * Parses a regex-delimited group: the largest sequence of tokens
+     * whose concatenated strings match `regex`. Returns the string
+     * formed by the tokens plus some position information.
+     */
+    fun parseRegexGroup(
+        regex: Regex,
+        modeName: String   // Used to describe the mode in error messages.
+    ): Token {
+        val outerMode = this.mode
+        this.mode = Mode.TEXT
+        val firstToken = this.nextToken
+        var lastToken = firstToken
+        var str = ""
+        while (this.nextToken.text != "EOF"
+            && (regex.matches(str + this.nextToken.text)
+                    || this.nextToken.text == "%")) {
+            if (this.nextToken.text == "%") {
+                this.consumeComment();
+                continue;
+            }
+            lastToken = this.nextToken
+            str += lastToken.text
+            this.consume()
+        }
+        if (str == "") {
+            throw ParseError(
+                    "Invalid " + modeName + ": '" + firstToken.text + "'",
+            firstToken)
+        }
+        this.mode = outerMode
+        return firstToken.range(lastToken, str)
+    }
+
+
+    /**
+     * Parses a size specification, consisting of magnitude and unit.
+     */
+    fun parseSizeGroup(optional: Boolean): PNodeSize? {
+        var isBlank = false;
+        var res = (if (!optional && this.nextToken.text != "{") {
+            this.parseRegexGroup(
+                "^[-+]? *(?:$|\\d+|\\d+\\.\\d*|\\.\\d*) *[a-z]{0,2} *$".toRegex(), "size");
+        } else {
+            this.parseStringGroup(ArgSize, optional);
+        }) ?: return null
+
+        if (!optional && res.text.isEmpty()) {
+            // Because we've tested for what is !optional, this block won't
+            // affect \kern, \hspace, etc. It will capture the mandatory arguments
+            // to \genfrac and \above.
+            res = res.copy(text = "0pt") // Enable \above{}
+            isBlank = true;      // This is here specifically for \genfrac
+        }
+        val match = ("([-+]?) *(\\d+(?:\\.\\d*)?|\\.\\d+) *([a-z]{2})".toRegex()).matchEntire(res.text) ?:
+            throw ParseError("Invalid size: '" + res.text + "'", res);
+
+        val data = Measurement(
+            (match.groupValues[1] + match.groupValues[2]).toInt(), // sign + magnitude, cast to number
+            match.groupValues[3]
+        )
+
+        if (!data.isValidUnit) {
+            throw ParseError("Invalid unit: '" + data.unit + "'", res);
+        }
+        return PNodeSize(mode, null, data, isBlank)
+    }
+
+    /**
+     * Parses an URL, checking escaped letters and allowed protocols.
+     */
+    fun parseUrlGroup(optional: Boolean): PNodeUrl? {
+        // get raw string
+        val res = this.parseStringGroup(ArgUrl, optional, true) ?: return null
+
+        // hyperref package allows backslashes alone in href, but doesn't
+        // generate valid links in such cases; we interpret this as
+        // "undefined" behaviour, and keep them as-is. Some browser will
+        // replace backslashes with forward slashes.
+        val url = res.text.replace("\\([#$%&~_^{}]".toRegex(), "$1")
+        val protocolMatch = """^\s*([^\\/#]*?)(?::|&#0*58|&#x0*3a)""".toRegex(RegexOption.IGNORE_CASE).matchEntire(url)
+        val protocol = if(protocolMatch != null)  protocolMatch.groupValues[1] else "_relative"
+
+        val allowed = this.settings.allowedProtocols
+        if ("*" !in allowed && protocol !in allowed)
+            throw ParseError("Forbidden protocol '${protocol}'", res)
+
+        return PNodeUrl(mode, null, url)
+    }
+
+    /**
+     * Converts the textual input of an unsupported command into a text node
+     * contained within a color node whose color is determined by errorColor
+     */
+    fun handleUnsupportedCmd(): ParseNode {
+        val text = this.nextToken.text
+        val textordArray = mutableListOf<PNodeTextOrd>()
+
+        for (ch in text) {
+            textordArray.add(PNodeTextOrd(Mode.TEXT, null, ch.toString()))
+        }
+
+        val textNode = PNodeText(mode, null, textordArray)
+
+
+        val colorNode = PNodeColor(
+            mode, null, this.settings.errorColor, listOf(textNode)
+        )
+
+        this.consume()
+        return colorNode
+    }
+
 
     /**
      * If `optional` is false or absent, this parses an ordinary group,
@@ -194,7 +530,7 @@ class Parser(val input: String) {
         ): ParseNode?
     {
         val outerMode = mode
-        val firstToken = nextToken!!
+        val firstToken = nextToken
         val text = firstToken.text
         if (in_mode != null) {
             switchMode(in_mode)
@@ -227,19 +563,16 @@ class Parser(val input: String) {
             // Otherwise, just return a nucleus
 
             // TODO:
-            result = parseSymbol()
-            /*
-            result = this.parseFunction(breakOnTokenText, name, greediness) ||
+            result = this.parseFunction(breakOnTokenText, name, greediness) ?:
                     this.parseSymbol();
-            if (result == null && text[0] === "\\" &&
-                !implicitCommands.hasOwnProperty(text)) {
+            if (result == null && text[0] == '\\' &&
+                text !in MacroExpander.implicitCommands) {
                 if (this.settings.throwOnError) {
-                    throw new ParseError(
-                            "Undefined control sequence: " + text, firstToken);
+                    throw ParseError(
+                        "Undefined control sequence: $text", firstToken);
                 }
                 result = this.handleUnsupportedCmd();
             }
-            */
         }
         // Switch mode back
         if (in_mode != null) {
@@ -257,7 +590,7 @@ class Parser(val input: String) {
      * symbols and special functions like verbatim
      */
     private fun parseSymbol(): ParseNode? {
-        val nucleus = nextToken!!
+        val nucleus = nextToken
         var text = nucleus.text
 
         if ("^\\\\verb[^a-zA-Z]".toRegex().find(text) != null) {
@@ -391,7 +724,7 @@ class Parser(val input: String) {
             consumeSpaces()
 
             // Lex the first token
-            val lex = this.nextToken!!
+            val lex = this.nextToken
 
             if (lex.text === "\\limits" || lex.text === "\\nolimits") {
                 // We got a limit control
@@ -425,14 +758,14 @@ class Parser(val input: String) {
                 val primes : MutableList<ParseNode> = mutableListOf(prime);
                 this.consume();
                 // Keep lexing tokens until we get something that's not a prime
-                while (nextToken?.text == "'") {
+                while (nextToken.text == "'") {
                     // For each one, add another prime to the list
                     primes.add(prime);
                     this.consume();
                 }
                 // If there's a superscript following the primes, combine that
                 // superscript in with the primes.
-                if (nextToken?.text == "^") {
+                if (nextToken.text == "^") {
                     primes.add(handleSupSubscript("superscript"));
                 }
                 // Put everything into an ordgroup as the superscript
@@ -461,7 +794,7 @@ class Parser(val input: String) {
      * Handle a subscript or superscript with nice errors.
      */
     private fun handleSupSubscript(name: String): ParseNode {
-        val symbolToken = nextToken!!
+        val symbolToken = nextToken
         val symbol = symbolToken.text
         consume()
         consumeSpaces() // ignore spaces before sup/subscript argument
@@ -491,7 +824,7 @@ class Parser(val input: String) {
             if (this.mode == Mode.MATH) {
                 this.consumeSpaces();
             }
-            val lex = nextToken!!
+            val lex = nextToken
             if(endOfExpression.contains(lex.text)) {
                 break
             }
@@ -499,12 +832,9 @@ class Parser(val input: String) {
                 break
             }
 
-            // TODO: implement functions
-            /*
-            if (breakOnInfix && functions[lex.text] && functions[lex.text].infix) {
+            if (breakOnInfix && LatexFunctions.functions[lex.text]?.spec?.infix == true) {
                 break;
             }
-             */
             val atom = parseAtom(breakOnTokenText) ?: break
             body.add(atom)
         }

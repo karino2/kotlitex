@@ -11,10 +11,10 @@ open class VListElem(
     val wrapperStyle: CssStyle = CssStyle()) : VListChild()
 
 class VListElemAndShift(elem: RenderNode,
-                        marginLeft: String?,
-                        marginRight: String?,
-                        wrapperClasses: MutableSet<CssClass>,
-                        wrapperStyle: CssStyle, val shift: Double) : VListElem(elem, marginLeft, marginRight, wrapperClasses, wrapperStyle)
+                        marginLeft: String? = null,
+                        marginRight: String? = null,
+                        wrapperClasses: MutableSet<CssClass> = mutableSetOf(),
+                        wrapperStyle: CssStyle = CssStyle(), val shift: Double = 0.0) : VListElem(elem, marginLeft, marginRight, wrapperClasses, wrapperStyle)
 
 
 class VListKern(val size: Double) : VListChild()
@@ -31,6 +31,7 @@ data class VListParamIndividual(val children: List<VListElemAndShift>): VListPar
         get() = PositionType.IndividualShift
 }
 
+// Top, Bottom, Shift
 data class VListParamPositioned(override val positionType: PositionType, val positionData: Double, val children: List<VListChild>) : VListParam()
 
 data class VListParamFirstBaseLine(val children: List<VListChild>) : VListParam(){
@@ -56,7 +57,7 @@ object RenderBuilderVList {
                 // shifted to the correct specified shift
                 val depth = -oldChildren[0].shift - oldChildren[0].elem.depth;
                 var currPos = depth
-                for( (i, _) in oldChildren.withIndex()) {
+                for(i in 1 until oldChildren.size) {
                     val diff = -oldChildren[i].shift - currPos -
                             oldChildren[i].elem.depth;
                     val size = diff -

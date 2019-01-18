@@ -1,7 +1,9 @@
 package io.github.karino2.kotlitex
 
 enum class CssClass {
-    amsrm, base, mathdefault, mbin, mclose, minner, mop, mopen, mord, mpunct, mrel, mtight, msupsub, mspace,
+    amsrm, base, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
+    frac_line, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
+    msupsub, mspace, mult, nulldelimiter,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, sizing,  size3, struct,
     textbf, textit, textrm,
     EMPTY;
@@ -23,11 +25,13 @@ enum class CssClass {
     }
 }
 
-fun MutableSet<CssClass>.concat(target: Set<CssClass>) : MutableSet<CssClass>{
+fun Set<CssClass>.concat(target: Set<CssClass>) : MutableSet<CssClass>{
     val newone = target.toList().toMutableSet() // is this really cloned?
     newone.addAll(this)
     return newone.filter { it != CssClass.EMPTY }.toMutableSet()
 }
+
+
 
 data class CssStyle(
     // It seems always "double + em". may be it better be double
@@ -36,10 +40,10 @@ data class CssStyle(
 
     var color: String? = null,
     var marginLeft: String? = null,
-    var marginRight: String? = null
+    var marginRight: String? = null,
+    var borderBottomWidth: String? = null
 /*
     backgroundColor: string,
-    borderBottomWidth: string,
     borderColor: string,
     borderRightWidth: string,
     borderTopWidth: string,

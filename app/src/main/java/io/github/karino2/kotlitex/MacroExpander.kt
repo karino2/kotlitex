@@ -8,6 +8,15 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
     fun beginGroup() = {}
     fun endGroup() = {}
 
+    companion object {
+        val implicitCommands = setOf(
+            "\\relax",     // MacroExpander.js
+        "^",           // Parser.js
+        "_",           // Parser.js
+        "\\limits",    // Parser.js
+        "\\nolimits"  // Parser.js
+        )
+    }
 
     /**
      * Returns the topmost token on the stack, without expanding it.

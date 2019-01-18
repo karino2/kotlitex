@@ -28,6 +28,35 @@ data class Options(var style: Style, val _color: String?="", var size: Int = BAS
             FontMetrics.getGlobalMetrics(size)
         }
 
+
+    /**
+     * Return the CSS sizing classes required to switch to the base size. Like
+     * `this.havingSize(BASESIZE).sizingClasses(this)`.
+     */
+    val baseSizingClasses: Array<CssClass>
+    get() = if (size != BASESIZE) {
+            arrayOf(CssClass.sizing, CssClass.resetClass(size), CssClass.sizeClass(BASESIZE))
+        } else {
+            arrayOf()
+        }
+
+    /**
+     * Like `this.havingSize(BASESIZE).havingStyle(style)`. If `style` is omitted,
+     * changes to at least `\textstyle`.
+     */
+    fun havingBaseStyle(in_style: Style?): Options {
+        val style = in_style ?: this.style.text();
+        val wantSize = sizeAtStyle(BASESIZE, style);
+        return if (this.size == wantSize && this.textSize == BASESIZE
+            && this.style == style) {
+            this
+        } else {
+            this.copy(style=style, size=wantSize)
+        }
+    }
+
+
+
     /*
     sizingClasses
      */
