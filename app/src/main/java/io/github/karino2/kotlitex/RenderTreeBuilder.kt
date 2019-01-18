@@ -3,11 +3,23 @@ package io.github.karino2.kotlitex
 import android.util.Log
 import java.lang.IllegalArgumentException
 
-data class Measurement(val number: Int, val unit: String)
+data class Measurement(val number: Int, val unit: String) {
+    val isValidUnit: Boolean
+    get() {
+        return when(unit) {
+            "ex", "em", "mu" -> true
+            else -> false
+        }
+        /* TODO:
+        return (unit in ptPerUnit || unit in relativeUnit || unit === "ex");
+        */
+    }
+}
 
 
 object RenderTreeBuilder {
-    val groupBuilders = mutableMapOf<String, (ParseNode, Options)->RenderNode>()
+    val groupBuilders : MutableMap<String, RenderNodeHandlerType>
+        get()= LatexFunctions.renderGroupBuilders
 
     fun registerBuilder(nodeType: String, builder: (ParseNode, Options)->RenderNode) {
         groupBuilders[nodeType] = builder
@@ -31,11 +43,34 @@ object RenderTreeBuilder {
 
 
     fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : RNodeSpan {
-
         val span = RNodeSpan(klasses, children, options, style)
         sizeElementFromChildren(span);
         return span
     }
+
+    fun makeLineSpan(
+        className: CssClass,
+        options: Options,
+        thickness: Double? = null
+    ) : RNodeSpan {
+        val line = makeSpan(mutableSetOf(className), mutableListOf(), options);
+        line.height = thickness ?: options.fontMetrics.defaultRuleThickness;
+        line.style.borderBottomWidth = line.height.toString() + "em"
+        line.maxFontSize = 1.0;
+        return line;
+    }
+
+    fun makeNullDelimiter(
+        options: Options,
+        classes: MutableSet<CssClass>
+    ): RNodeSpan {
+
+        val moreClasses = mutableSetOf(CssClass.nulldelimiter, *options.baseSizingClasses)
+
+        return makeSpan(classes.concat(moreClasses))
+    }
+
+
 
     /**
      * buildGroup is the function that takes a group and calls the correct groupType
@@ -89,8 +124,8 @@ object RenderTreeBuilder {
         value: String,
         fontName: String,
         mode: Mode,
-        options: Options?,
-        classes: MutableSet<CssClass>
+        options: Options? = null,
+        classes: MutableSet<CssClass> = mutableSetOf()
     ): RNodeSymbol {
         val (value, metrics) = Symbols.lookupSymbol(value, fontName, mode);
 
