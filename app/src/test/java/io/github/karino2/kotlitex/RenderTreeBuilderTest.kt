@@ -34,6 +34,14 @@ class SpanAsserter(val node: RNodeSpan) {
         Span {children: Array(2), attributes: Object, classes: ["mord"],
          depth: 0, height: 0.8141079999999999, maxFontSize: 1, style:{}}
      */
+
+    // short cut of assertSpan(child(n)) {}
+    fun ac(childIndex: Int, body: SpanAsserter.()->Unit) {
+        val next = child(childIndex)
+        assertTrue(next is RNodeSpan)
+        val sym: RNodeSpan = next as RNodeSpan
+        SpanAsserter(sym).body()
+    }
 }
 
 fun assertSpan(node: RenderNode?, body: SpanAsserter.()->Unit) {
@@ -41,6 +49,8 @@ fun assertSpan(node: RenderNode?, body: SpanAsserter.()->Unit) {
     val sym: RNodeSpan = node as RNodeSpan
     SpanAsserter(sym).body()
 }
+
+
 
 class RenderTreeBuilderTest {
     fun parse(input: String) : List<ParseNode> {
@@ -199,37 +209,64 @@ class RenderTreeBuilderTest {
             depth(0.345)
             h(0.845108)
             maxFont(1.0)
-            assertSpan(child(0)) {
+            ac(0) {
                 knum(2)
                 kl(CssClass.mopen)
                 kl(CssClass.nulldelimiter)
             }
-            assertSpan(child(2)) {
+            ac(2) {
                 knum(2)
                 kl(CssClass.mclose)
                 kl(CssClass.nulldelimiter)
             }
-            assertSpan(child(1)) {
+            ac(1) {
                 cnum(1)
                 kl(CssClass.mfrac)
-                assertSpan(child(0)) {
+                ac(0) {
                     cnum(2)
                     kl(CssClass.vlist_t)
                     kl(CssClass.vlist_t2)
                     // give up write down tests...
 
-                    // something interesting at
-                    // target.children[1].children[0].children[0].children[0].children[1]
                     // here is target.children[1].children[0].
-                    assertSpan(child(0)) {
-                        assertSpan(child(0)) {
-                            assertSpan(child(1)) {
+
+                    // check something interesting
+                    ac(0) {
+                        ac(0) {// target.children[1].children[0].children[0].children[0]
+                            ac(0) {
+                                ac(1) {
+                                    ac(0) {
+                                        // target.children[1].children[0].children[0].children[0].children[0].children[1].children[0].children[0]
+                                        // symbol(2)
+                                        assertSymbol(child(0)) {
+                                            kl(CssClass.mord)
+                                            text("2")
+                                            w(0.5)
+                                            maxFont(0.7)
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                            // target.children[1].children[0].children[0].children[0].children[1]
+                            ac(1) {
                                 cnum(2)
                                 h(0.04)
                                 style(CssStyle(top="-3.23em"))
+
+                                // res[0].children[1].children[0].children[0].children[0].children[1].children[1]
+                                // frac-line
+                                ac(1) {
+                                    kl(CssClass.frac_line)
+                                    h(0.04)
+                                    style(CssStyle(borderBottomWidth = "0.04em"))
+                                }
                             }
                         }
                     }
+
                 }
 
             }
