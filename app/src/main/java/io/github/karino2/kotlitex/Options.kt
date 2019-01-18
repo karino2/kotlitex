@@ -10,7 +10,7 @@ val sizeMultipliers = listOf(
 // A font family applies to a group of fonts (i.e. SansSerif), while a font
 // represents a specific font (i.e. SansSerif Bold).
 // See: https://tex.stackexchange.com/questions/22350/difference-between-textrm-and-mathrm
-data class Options(var style: Style, val _color: String?="", var size: Int = BASESIZE, val font: String="",
+data class Options(var style: Style, val _color: String?=null, var size: Int = BASESIZE, val font: String="",
                    val fontFamily: String = "", val fontWeight : CssClass = CssClass.EMPTY, val fontShape: CssClass = CssClass.EMPTY,
                    val sizeMultiplier: Double = sizeMultipliers[size-1], val maxSize: Double = Double.POSITIVE_INFINITY) {
 
