@@ -58,7 +58,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
             getGlyphDataFromNode(node)
             when (node) {
                 is RNodeSpan -> {
-                    node.children.forEach { createRenderingState(it)}
+                    node.children.forEach { createRenderingState(it) }
                 }
             }
         }
