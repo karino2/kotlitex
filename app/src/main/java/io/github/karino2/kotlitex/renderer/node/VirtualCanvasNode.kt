@@ -51,18 +51,15 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
 
     override val bounds: Bounds
         get() {
-            var first = true
-            var b: Bounds = super.bounds
-
-            for (child in nodes) {
-                if (first) {
-                    b = child.bounds.copy()
-                    first = false
+            var bounds = super.bounds
+            nodes.withIndex().forEach {
+                if (it.index == 0) {
+                    bounds = it.value.bounds.copy()
                 } else {
-                    b.extend(child.bounds)
+                    bounds.extend(it.value.bounds)
                 }
             }
-            return b
+            return bounds
         }
 }
 
@@ -81,18 +78,11 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
      * Return the x coordinate of the next node to be placed into the List
      */
     fun getNextNodePlacement(): Double {
-        val lastRow = this.last()
-        if (lastRow != null) {
-            val lastNode = lastRow.last()
-            if (lastNode != null) {
-                val b = lastNode.bounds
-                return b.x + b.width + lastNode.margin.right
-            } else {
-                return this.rowStart + lastRow.margin.left
-            }
-        } else {
-            return this.rowStart + this.margin.left
-        }
+        val lastRow = this.last() ?: return this.rowStart + this.margin.left
+        val lastNode = lastRow.last() ?: return this.rowStart + lastRow.margin.left
+
+        val bounds = lastNode.bounds
+        return bounds.x + bounds.width + lastNode.margin.right
     }
 
     fun setStretchWidths() {
