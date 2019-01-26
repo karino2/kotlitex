@@ -38,24 +38,29 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
         }
     }
 
+    /**
+     * Keep its state while executing `body`. It replaces canvas-latex's resetState()
+     */
+    private fun withSaveState(body: () -> Unit) {
+        val original = state
+        body()
+        state = original
+    }
+
     private fun createRenderingState(children: List<RenderNode>) {
-        val parentState = this.state
-        children.forEach { createRenderingState(it) }
-        resetState(parentState)
+        withSaveState {
+            children.forEach { createRenderingState(it) }
+        }
     }
 
     private fun createRenderingState(node: RenderNode) {
-        val parentState = this.state
-        getGlyphDataFromNode(node)
-        when (node) {
-            is RNodeSpan -> {
-                node.children.forEach { createRenderingState(it)}
+        withSaveState {
+            getGlyphDataFromNode(node)
+            when (node) {
+                is RNodeSpan -> {
+                    node.children.forEach { createRenderingState(it)}
+                }
             }
         }
-        resetState(parentState)
-    }
-
-    private fun resetState(parentState: RenderingState) {
-        state = parentState
     }
 }
