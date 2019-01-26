@@ -3,6 +3,10 @@ package io.github.karino2.kotlitex.renderer.node
 import android.graphics.Paint
 import android.graphics.Typeface
 
+enum class Alignment {
+    LEFT, RIGHT, CENTER
+}
+
 /**
  * A Virtual Node represents the interface for a all sub Nodes.
  * They are simple models, which allow the data to be transplated to most
@@ -70,7 +74,7 @@ class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvas
  * The VerticalList class represents a 1D array of VerticalListRow's
  * which can be horizontally aliged left, right, or center.
  */
-class VerticalList(var alignment: String, var rowStart: Double, klasses: Set<String>) : VirtualContainerNode<VerticalListRow>(klasses) {
+class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<String>) : VirtualContainerNode<VerticalListRow>(klasses) {
     val structBounds = this.bounds.copy()
 
     /**
@@ -96,9 +100,9 @@ class VerticalList(var alignment: String, var rowStart: Double, klasses: Set<Str
 
     fun align() {
         when (this.alignment) {
-            "left" -> leftAlign()
-            "center" -> centerAlign()
-            "right" -> rightAlign()
+            Alignment.LEFT   -> leftAlign()
+            Alignment.CENTER -> centerAlign()
+            Alignment.RIGHT  -> rightAlign()
         }
     }
 

@@ -1,5 +1,6 @@
 package io.github.karino2.kotlitex.renderer
 
+import io.github.karino2.kotlitex.renderer.node.Alignment
 import io.github.karino2.kotlitex.renderer.node.VerticalList
 
 /**
@@ -34,7 +35,7 @@ data class RenderingState(val y: Double,
         family = "KaTeX_Main",
         variant = "normal",
         weight = "normal",
-        vlist = VerticalList("center", 0.0, emptySet()),
+        vlist = VerticalList(Alignment.CENTER, 0.0, emptySet()),
         textAlign = "",
         minWidth = 0.0,
         marginRight = 0.0,
