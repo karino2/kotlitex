@@ -1,3 +1,9 @@
+# KotoliTeX
+
+[![Build Status](https://travis-ci.org/karino2/kotlitex.svg?branch=master)](https://travis-ci.org/karino2/kotlitex)
+
+KotoliTeX is KaTeX's Android port, written in Kotlin.
+
 現状(2019/01/03)のメモ
 
 ### 作ろうとしているもの
