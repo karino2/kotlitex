@@ -6,47 +6,44 @@ import android.graphics.Paint.ANTI_ALIAS_FLAG
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import io.github.karino2.kotlitex.renderer.*
+import io.github.karino2.kotlitex.renderer.node.TextNode
+import io.github.karino2.kotlitex.renderer.node.VerticalList
+import io.github.karino2.kotlitex.renderer.node.VirtualCanvasNode
+import io.github.karino2.kotlitex.renderer.node.VirtualContainerNode
 
 class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet) {
-    val nodes: List<RenderNode>
+    var rootNode: VerticalList
     init {
         val options = Options(Style.TEXT)
         val parser = Parser("x^2")
         val parsed =  parser.parse()
-        nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
+        val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
+        val builder = VirtualNodeBuilder(nodes)
+        rootNode = builder.build()
     }
-    var point: PointF = PointF(0f, 0f)
-
-    val BaseTextSize: Double = 50.0;
 
     val textPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
-        typeface = Typeface.create("serif", Typeface.NORMAL)
+        typeface = Typeface.SERIF
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        // The way it keeps the current cursor here doesn't look right. Maybe introducing Renderer later?
-        point.x = 100f
-        point.y = 100f
-
-        drawRenderNodes(canvas, nodes)
+        drawRenderNodes(canvas, rootNode)
     }
 
-    private fun drawRenderNodes(canvas: Canvas, nodes: List<RenderNode>) {
-        for (parent in nodes) {
-            when (parent) {
-                is RNodeSpan -> {
-                    drawRenderNodes(canvas, parent.children)
+    private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
+        when (parent) {
+            is VirtualContainerNode<*> -> {
+                parent.nodes.forEach {
+                    drawRenderNodes(canvas, it)
                 }
-                is RNodeSymbol -> {
-                    textPaint.textSize = (BaseTextSize * parent.maxFontSize).toFloat()
-                    canvas.drawText(parent.text, point.x, point.y, textPaint)
-
-                    // Assuming that the whole rendering process is Left-to-Right, which would not be true
-                    point.x += (BaseTextSize * parent.width).toFloat()
-                }
+            }
+            is TextNode -> {
+                textPaint.typeface = parent.typeface
+                textPaint.textSize = parent.textSize.toFloat()
+                canvas.drawText(parent.text, 100 + parent.bounds.x.toFloat(), 100 + parent.bounds.y.toFloat(), textPaint)
             }
         }
     }
