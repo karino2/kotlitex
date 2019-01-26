@@ -40,9 +40,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
 
     private fun createRenderingState(children: List<RenderNode>) {
         val parentState = this.state
-        for (child in children) {
-            createRenderingState(child)
-        }
+        children.forEach { createRenderingState(it) }
         resetState(parentState)
     }
 
@@ -51,9 +49,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
         getGlyphDataFromNode(node)
         when (node) {
             is RNodeSpan -> {
-                for (child in node.children) {
-                    createRenderingState(child)
-                }
+                node.children.forEach { createRenderingState(it)}
             }
         }
         resetState(parentState)

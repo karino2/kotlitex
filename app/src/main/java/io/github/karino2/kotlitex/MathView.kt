@@ -36,8 +36,8 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
         when (parent) {
             is VirtualContainerNode<*> -> {
-                for (node in parent.nodes) {
-                    drawRenderNodes(canvas, node)
+                parent.nodes.forEach {
+                    drawRenderNodes(canvas, it)
                 }
             }
             is TextNode -> {
