@@ -123,7 +123,7 @@ object RenderBuilderDelimiter {
     ): CharacterMetrics {
         val replace = Symbols.mathMap[symbol]?.replace ?: symbol
         return Symbols.getCharacterMetrics(replace, font, mode) ?:
-            throw Error("Unsupported symbol ${symbol} and font size ${font}.");
+            throw Error("Unsupported symbol $symbol and font size $font.");
     };
 
 
@@ -154,7 +154,7 @@ object RenderBuilderDelimiter {
         // in the sequence. Thus, scriptscript starts at index 3-3=0, script starts
         // at index 3-2=1, text starts at 3-1=2, and display starts at min(2,3-0)=2
         val start = Math.min(2, 3 - options.style.size);
-        for(seq in sequence) {
+        for(seq in sequence.drop(start)) {
             if (seq is StackDelimiter) {
                 // This is always the last delimiter, so we just break the loop now.
                 break
@@ -323,7 +323,7 @@ object RenderBuilderDelimiter {
         // There are four parts, the top, an optional middle, a repeated part, and a
         // bottom.
         var top = delim
-        var middle : String? = null
+        var middle : String?
         var repeat = delim
         var bottom = delim
         middle = null;
