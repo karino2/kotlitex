@@ -17,8 +17,8 @@ data class SourceLocation(val lexer: Lexer?, val start:Int, val end: Int) {
         fun range(first: Token?, second: Token? = null) : SourceLocation? {
             return if (second == null) {
                 first?.loc
-            } else if (first?.loc == null || second.loc == null ||
-                first.loc?.lexer != second.loc?.lexer) {
+            } else if (first?.loc == null || second.loc == null
+                || first.loc.lexer != second.loc.lexer) {
                 null
             } else {
                 SourceLocation(
@@ -295,7 +295,7 @@ class Parser(val input: String) {
         greediness: Int?
        ): ParseNode? {
         val token = this.nextToken;
-        val func = token!!.text
+        val func = token.text
         val funcData = LatexFunctions.functions[func] ?: return null
 
         if (greediness != null && funcData.spec.greediness <= greediness) {
@@ -536,7 +536,7 @@ class Parser(val input: String) {
             switchMode(in_mode)
         }
 
-        var result: ParseNode? = null
+        var result: ParseNode?
 
         // Try to parse an open brace
         val openBrace = if (optional) "[" else "{"
@@ -581,8 +581,7 @@ class Parser(val input: String) {
         return result;
     }
 
-    // TODO:
-    fun supportedCodepoint(ch : Int) = true
+    fun supportedCodepoint(ch : Int) = Symbols.supportedCodepoint(ch)
 
 
     /**
@@ -728,7 +727,7 @@ class Parser(val input: String) {
 
             if (lex.text === "\\limits" || lex.text === "\\nolimits") {
                 // We got a limit control
-                val opNode = base as PNodeOp ?:
+                val opNode = base as? PNodeOp ?:
                                throw ParseError("Limit controls must follow a math operator", lex)
 
                 val limits = lex.text == "\\limits";

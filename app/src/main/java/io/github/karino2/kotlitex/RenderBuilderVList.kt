@@ -89,7 +89,6 @@ object RenderBuilderVList {
                             bottom -= when(child) {
                                 is VListKern -> child.size
                                 is VListElem -> child.elem.height + child.elem.depth
-                                else -> throw Exception("Never reached here")
                             }
                         }
                         bottom
@@ -166,7 +165,6 @@ object RenderBuilderVList {
                     realChildren.add(childWrap)
                     currPos += elem.height + elem.depth;
                 }
-                else -> throw Exception("Never reached here")
             }
             minPos = Math.min(minPos, currPos);
             maxPos = Math.max(maxPos, currPos);

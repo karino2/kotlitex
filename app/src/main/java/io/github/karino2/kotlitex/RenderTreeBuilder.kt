@@ -121,13 +121,13 @@ object RenderTreeBuilder {
      * TODO(#953): Make `options` mandatory and always pass it in.
      */
     fun makeSymbol(
-        value: String,
+        in_value: String,
         fontName: String,
         mode: Mode,
         options: Options? = null,
         classes: MutableSet<CssClass> = mutableSetOf()
     ): RNodeSymbol {
-        val (value, metrics) = Symbols.lookupSymbol(value, fontName, mode);
+        val (value, metrics) = Symbols.lookupSymbol(in_value, fontName, mode);
 
         var symbolNode = if (metrics != null) {
             var italic = metrics.italic;
@@ -234,7 +234,7 @@ object RenderTreeBuilder {
         val classes = mutableSetOf(CssClass.mord)
 
         // Math mode or Old font (i.e. \rm)
-        val isFont = mode == Mode.MATH || (mode == Mode.TEXT && options.font != null);
+        val isFont = mode == Mode.MATH || (mode == Mode.TEXT && options.font != "");
         /*
         val fontOrFamily = if(isFont)  options.font else options.fontFamily
         TODO:
@@ -464,6 +464,7 @@ object RenderTreeBuilder {
     fun getTightSpacings(leftType: CssClass, rightType: CssClass) : Measurement? {
         when(leftType) {
             CssClass.mbin, CssClass.mrel, CssClass.mopen, CssClass.mpunct -> return null
+            else -> {}
         }
 
         return when(Pair(leftType, rightType)) {

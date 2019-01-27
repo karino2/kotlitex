@@ -62,7 +62,7 @@ object FunctionFrac {
         let denomShift;
         */
         var (numShift, clearance, denomShift) =
-        if (style.size === Style.DISPLAY.size) {
+        if (style.size == Style.DISPLAY.size) {
             Triple(options.fontMetrics.num1,
                 if (ruleWidth > 0) {
                     3 * ruleSpacing;
@@ -134,7 +134,7 @@ object FunctionFrac {
 
         // Rule 15e
         val delimSize =
-        if (style.size === Style.DISPLAY.size) {
+        if (style.size == Style.DISPLAY.size) {
             options.fontMetrics.delim1
         } else {
             options.fontMetrics.delim2
@@ -183,7 +183,7 @@ object FunctionFrac {
                 val (funcName, parser) = context
                 val numer = args[0]
                 val denom = args[1]
-                var hasBarLine = false
+                var hasBarLine : Boolean
                 var leftDelim :String?= null
                 var rightDelim :String? = null
                 var size = SizeStyle.AUTO

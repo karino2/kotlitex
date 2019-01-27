@@ -100,18 +100,19 @@ object Symbols {
     'я' to  'r'
     )
 
+    // TODO:
+    fun supportedCodepoint(ch : Int) = true
 
 
-    fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics {
+    fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics? {
         val metmap = MetricMap.metricMap[font] ?: throw Exception("Font metrics not found for font: ${font}.")
 
 
-        val ch = (extraCharacterMap[character[0]] ?: character[0]).toInt().toString()
-        val metric = metmap[ch]
+        val chInt = (extraCharacterMap[character[0]] ?: character[0]).toInt()
+        val ch = chInt.toString()
+        var metric = metmap[ch]
 
-        /*
-        TODO:
-        if (!metrics && mode === 'text') {
+        if (metric == null && mode == Mode.TEXT) {
             // We don't typically have font metrics for Asian scripts.
             // But since we support them in text mode, we need to return
             // some sort of metrics.
@@ -120,13 +121,14 @@ object Symbols {
             // the Latin capital letter M. This is close enough because
             // we (currently) only care about the height of the glpyh
             // not its width.
-            if (supportedCodepoint(ch)) {
-                metrics = metricMap[font][77]; // 77 is the charcode for 'M'
+            if (supportedCodepoint(chInt)) {
+                metric = metmap["77"] // 77 is the charcode for 'M'
             }
         }
-         */
+
+
         if(metric == null) {
-            return CharacterMetrics(0.0, 0.0, 0.0, 0.0, 0.0)
+            return null
         }
 
         return CharacterMetrics(metric[0], metric[1], metric[2], metric[3], metric[4])

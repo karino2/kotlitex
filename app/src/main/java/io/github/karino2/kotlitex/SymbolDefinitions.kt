@@ -751,7 +751,7 @@ object SymbolDefinitions {
         // Mathematical Alphanumeric Symbols.
         // Some editors do not deal well with wide characters. So don't write the
         // string into this file. Instead, create the string from the surrogate pair.
-        var wideChar = ""
+        var wideChar: String
         for ((i, cha) in letters.withIndex()) {
             val ch = cha.toString()
 
