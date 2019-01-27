@@ -2,20 +2,21 @@
 
 [![Build Status](https://travis-ci.org/karino2/kotlitex.svg?branch=master)](https://travis-ci.org/karino2/kotlitex)
 
-KotoliTeX is KaTeX's Android port, written in Kotlin.
+KotoliTeX is [KaTeX](https://katex.org)'s Android port, written in Kotlin.
 
-現状(2019/01/03)のメモ
+This library currently provides `com.karino2.kotlitex.MathView`, but ultimately we'd like to provide a DynamicDrawableSpan instead.
 
-### 作ろうとしているもの
+## Porting Guidelines
 
-katexのkotlin移植。
-最終的にはDynamicDrawableSpanにしたいと思っている（ただ、最初はCustomViewかも）。
+Currently we are porting [KaTeX 0.10.0](https://github.com/KaTeX/KaTeX/releases/tag/v0.10.0) and [canvas-latex](https://github.com/CurriculumAssociates/canvas-latex) (which doesn't have releases) mostly as is, while marging the 2 parts may be technically possible.
 
-[github: KaTeX](https://github.com/KaTeX/KaTeX)
+We believe that keeping the original structure makes future updates easier.
 
-### ベースのバージョン
+## Coding Style
 
-v.0.10.0
+Use [ktlint](https://ktlint.github.io). `./gradlew format` format all .kt files with ktlint.
+
+# 現状(2019/01/03)のメモ
 
 ### 基本的な考え
 

@@ -13,7 +13,7 @@ enum class Alignment {
  * rendering platforms.
  */
 sealed class VirtualCanvasNode(var klasses: Set<String>) {
-    var margin = Margin(0.0, 0.0);
+    var margin = Margin(0.0, 0.0)
     open val bounds = Bounds(0.0, 0.0)
 
     open fun setPosition(x: Double, y: Double) {
@@ -63,9 +63,7 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
         }
 }
 
-class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvasNode>(klasses) {
-}
-
+class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvasNode>(klasses)
 
 /**
  * The VerticalList class represents a 1D array of VerticalListRow's
@@ -90,9 +88,9 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
 
     fun align() {
         when (this.alignment) {
-            Alignment.LEFT   -> leftAlign()
+            Alignment.LEFT -> leftAlign()
             Alignment.CENTER -> centerAlign()
-            Alignment.RIGHT  -> rightAlign()
+            Alignment.RIGHT -> rightAlign()
         }
     }
 
@@ -114,11 +112,13 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
     }
 }
 
-class TextNode(val text: String,
-               val typeface: Typeface,
-               val textSize: Double,
-               val color: String,
-               klasses: Set<String>) : VirtualCanvasNode(klasses) {
+class TextNode(
+    val text: String,
+    val typeface: Typeface,
+    val textSize: Double,
+    val color: String,
+    klasses: Set<String>
+) : VirtualCanvasNode(klasses) {
     init {
         val paint = Paint()
         paint.typeface = typeface
