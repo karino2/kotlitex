@@ -1,8 +1,10 @@
 package io.github.karino2.kotlitex.renderer
 
+import io.github.karino2.kotlitex.CssClass
 import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RNodeSymbol
 import io.github.karino2.kotlitex.RenderNode
+import io.github.karino2.kotlitex.renderer.node.Alignment
 import io.github.karino2.kotlitex.renderer.node.CssFont
 import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.TextNode
@@ -30,7 +32,28 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
         createItalicNode(node)
     }
 
-    private fun extractClassDataFromNode(node: RenderNode) {}
+    private fun extractClassDataFromNode(node: RenderNode) {
+        node.klasses.forEach {
+            when (it) {
+                CssClass.size3 -> state = state.copy(size = 3)
+                CssClass.vlist -> {
+                    val vlist = VerticalList(Alignment.CENTER, state.nextX(), state.klasses)
+                    state = state.copy(vlist = vlist)
+                }
+                CssClass.pstruct -> {
+                    val height = 0.0 // ((+node.style.height.replace('em', '')) * state.em)
+                    val tableRow = VerticalListRow(state.klasses)
+                    state.vlist.addRow(tableRow)
+                    tableRow.setPosition(state.nextX(), state.y + height)
+                    tableRow.bounds.height = height
+                    tableRow.margin.left = state.marginLeft
+                    tableRow.margin.right = state.marginRight
+                    // return state.withPstrut(height)
+                }
+                else -> {}
+            }
+        }
+    }
 
     private fun extractStyleDataFromNode(node: RenderNode) {}
 
@@ -66,7 +89,24 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
     private fun withSaveState(body: () -> Unit) {
         val original = state
         body()
-        state = original
+        resetState(original)
+    }
+
+    private fun resetState(parentState: RenderingState) {
+        val vlist = state.vlist
+        val parentVlist = parentState.vlist
+        if (vlist != parentVlist) {
+            vlist.setStretchWidths()
+            vlist.align()
+            parentVlist.addCell(vlist)
+        }
+        if (state.klasses != parentState.klasses) {
+            // TODO
+        }
+        if (state.pstruct.isNotBlank()) {
+            // TODO
+        }
+        state = parentState
     }
 
     private fun createRenderingState(children: List<RenderNode>) {

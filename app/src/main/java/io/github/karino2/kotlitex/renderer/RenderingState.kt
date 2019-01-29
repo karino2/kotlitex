@@ -11,7 +11,7 @@ import io.github.karino2.kotlitex.renderer.node.VerticalList
 data class RenderingState(
     val y: Double,
     val baseSize: Double,
-    val sizeIndex: Int,
+    val size: Int,
 
     val family: String,
     val variant: String,
@@ -33,7 +33,7 @@ data class RenderingState(
     constructor() : this(
         y = 0.0,
         baseSize = 44.0,
-        sizeIndex = 6,
+        size = 6,
         family = "KaTeX_Main",
         variant = "normal",
         weight = "normal",
@@ -58,6 +58,6 @@ data class RenderingState(
     }
 
     fun fontSize(): Double {
-        return baseSize * SIZES[this.sizeIndex]
+        return baseSize * SIZES[this.size]
     }
 }

@@ -106,7 +106,7 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
     }
 
     fun addCell(node: VirtualCanvasNode) {
-        this.last()?.addNode(node)
+        this.last()!!.addNode(node)
     }
 
     fun leftAlign() {
