@@ -70,7 +70,21 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
         }
 }
 
-class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvasNode>(klasses)
+class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvasNode>(klasses) {
+    fun setPositionX(x : Double) = setPosition(x, bounds.y)
+
+    fun leftAlign(tableLeft: Double) = setPositionX(tableLeft)
+    fun centerAlign(tableCenter: Double) {
+        val width = bounds.width
+        val center = tableCenter-width/2
+        setPositionX(center)
+    }
+    fun rightAlign(tableRight: Double) {
+        val width = bounds.width
+        val right = tableRight -width
+        setPositionX(right)
+    }
+}
 
 /**
  * The VerticalList class represents a 1D array of VerticalListRow's
@@ -91,6 +105,8 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
     }
 
     fun setStretchWidths() {
+        // TODO:
+        // implement here after StretchyNode come.
     }
 
     fun align() {
@@ -109,14 +125,21 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
         this.last()!!.addNode(node)
     }
 
-    fun leftAlign() {
-    }
-
     fun centerAlign() {
+        val center = bounds.x + bounds.width/2
+        nodes.forEach { it.centerAlign(center) }
     }
 
     fun rightAlign() {
+        val right = bounds.x + bounds.width
+        nodes.forEach { it.rightAlign(right) }
     }
+
+    fun leftAlign() {
+        val left = bounds.x
+        nodes.forEach { it.leftAlign(left) }
+    }
+
 }
 
 class TextNode(
