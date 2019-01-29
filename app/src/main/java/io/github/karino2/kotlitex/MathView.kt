@@ -41,8 +41,8 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
                 }
             }
             is TextNode -> {
-                textPaint.typeface = parent.typeface
-                textPaint.textSize = parent.textSize.toFloat()
+                textPaint.typeface = parent.font.getTypeface()
+                textPaint.textSize = parent.font.size.toFloat()
                 canvas.drawText(parent.text, 100 + parent.bounds.x.toFloat(), 100 + parent.bounds.y.toFloat(), textPaint)
             }
         }

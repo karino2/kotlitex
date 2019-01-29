@@ -1,7 +1,6 @@
 package io.github.karino2.kotlitex.renderer.node
 
 import android.graphics.Paint
-import android.graphics.Typeface
 
 enum class Alignment {
     LEFT, RIGHT, CENTER
@@ -19,6 +18,9 @@ sealed class VirtualCanvasNode(var klasses: Set<String>) {
     open fun setPosition(x: Double, y: Double) {
         bounds.x = x
         bounds.y = y
+    }
+
+    open fun updateSize() {
     }
 }
 
@@ -47,6 +49,11 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
             val newX = child.bounds.x + delta
             child.setPosition(newX, child.bounds.y)
         }
+    }
+
+    override fun toString(): String {
+        val nodes = this.nodes.map { it.toString() }.joinToString(", ", "[", "]")
+        return this.javaClass.simpleName + " { nodes = " + nodes + " }"
     }
 
     override val bounds: Bounds
@@ -114,15 +121,18 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
 
 class TextNode(
     val text: String,
-    val typeface: Typeface,
-    val textSize: Double,
+    val font: CssFont,
     val color: String,
     klasses: Set<String>
 ) : VirtualCanvasNode(klasses) {
-    init {
+    override fun updateSize() {
         val paint = Paint()
-        paint.typeface = typeface
-        paint.textSize = textSize.toFloat()
+        paint.typeface = font.getTypeface()
+        paint.textSize = font.size.toFloat()
         bounds.width = paint.measureText(text).toDouble()
+    }
+
+    override fun toString(): String {
+        return this.javaClass.simpleName + " { text = " + text + " }"
     }
 }
