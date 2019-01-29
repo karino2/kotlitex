@@ -4,7 +4,7 @@ import io.github.karino2.kotlitex.CssClass
 import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RNodeSymbol
 import io.github.karino2.kotlitex.RenderNode
-import io.github.karino2.kotlitex.renderer.node.Alignment
+import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
 import io.github.karino2.kotlitex.renderer.node.CssFont
 import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.TextNode
@@ -33,24 +33,15 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
     }
 
     private fun extractClassDataFromNode(node: RenderNode) {
+        var nextClassIsLatexClass = false
         node.klasses.forEach {
-            when (it) {
-                CssClass.size3 -> state = state.copy(size = 3)
-                CssClass.vlist -> {
-                    val vlist = VerticalList(Alignment.CENTER, state.nextX(), state.klasses)
-                    state = state.copy(vlist = vlist)
-                }
-                CssClass.pstruct -> {
-                    val height = 0.0 // ((+node.style.height.replace('em', '')) * state.em)
-                    val tableRow = VerticalListRow(state.klasses)
-                    state.vlist.addRow(tableRow)
-                    tableRow.setPosition(state.nextX(), state.y + height)
-                    tableRow.bounds.height = height
-                    tableRow.margin.left = state.marginLeft
-                    tableRow.margin.right = state.marginRight
-                    // return state.withPstrut(height)
-                }
-                else -> {}
+            if (it == CssClass.enclosing) {
+                nextClassIsLatexClass = true
+            } else if (nextClassIsLatexClass) {
+                nextClassIsLatexClass = false
+                // TODO
+            } else {
+                state = ClassStateMapping.createState(it, state, node)
             }
         }
     }
@@ -103,7 +94,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
         if (state.klasses != parentState.klasses) {
             // TODO
         }
-        if (state.pstruct.isNotBlank()) {
+        if (state.pstruct != 0.0) {
             // TODO
         }
         state = parentState

@@ -25,7 +25,7 @@ data class RenderingState(
     val delimSizing: Boolean,
     val klasses: Set<String>,
     val mspace: Double,
-    val pstruct: String, // TODO: type
+    val pstruct: Double,
     val color: String
 ) {
     private val SIZES = listOf(0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.44, 1.728, 2.074, 2.488)
@@ -45,7 +45,7 @@ data class RenderingState(
         delimSizing = false,
         klasses = emptySet(),
         mspace = 0.0,
-        pstruct = "",
+        pstruct = 0.0,
         color = "black"
     )
 
@@ -58,6 +58,10 @@ data class RenderingState(
     }
 
     fun fontSize(): Double {
+        return baseSize * SIZES[this.size]
+    }
+
+    val em: Double get() {
         return baseSize * SIZES[this.size]
     }
 }

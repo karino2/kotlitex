@@ -2,6 +2,7 @@ package io.github.karino2.kotlitex
 
 enum class CssClass {
     amsrm, base, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
+    enclosing,
     frac_line, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, sizing,  size3, struct,
