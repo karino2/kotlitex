@@ -1,8 +1,10 @@
 package io.github.karino2.kotlitex.renderer
 
+import io.github.karino2.kotlitex.CssClass
 import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RNodeSymbol
 import io.github.karino2.kotlitex.RenderNode
+import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
 import io.github.karino2.kotlitex.renderer.node.CssFont
 import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.TextNode
@@ -30,7 +32,19 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
         createItalicNode(node)
     }
 
-    private fun extractClassDataFromNode(node: RenderNode) {}
+    private fun extractClassDataFromNode(node: RenderNode) {
+        var nextClassIsLatexClass = false
+        node.klasses.forEach {
+            if (it == CssClass.enclosing) {
+                nextClassIsLatexClass = true
+            } else if (nextClassIsLatexClass) {
+                nextClassIsLatexClass = false
+                // TODO
+            } else {
+                state = ClassStateMapping.createState(it, state, node)
+            }
+        }
+    }
 
     private fun extractStyleDataFromNode(node: RenderNode) {}
 
@@ -66,7 +80,24 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
     private fun withSaveState(body: () -> Unit) {
         val original = state
         body()
-        state = original
+        resetState(original)
+    }
+
+    private fun resetState(parentState: RenderingState) {
+        val vlist = state.vlist
+        val parentVlist = parentState.vlist
+        if (vlist != parentVlist) {
+            vlist.setStretchWidths()
+            vlist.align()
+            parentVlist.addCell(vlist)
+        }
+        if (state.klasses != parentState.klasses) {
+            // TODO
+        }
+        if (state.pstruct != 0.0) {
+            // TODO
+        }
+        state = parentState
     }
 
     private fun createRenderingState(children: List<RenderNode>) {

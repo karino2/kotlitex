@@ -53,7 +53,7 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
 
     override fun toString(): String {
         val nodes = this.nodes.map { it.toString() }.joinToString(", ", "[", "]")
-        return this.javaClass.simpleName + " { nodes = " + nodes + " }"
+        return this.javaClass.simpleName + " { nodes = " + nodes + ", klasses = " + this.klasses + " }"
     }
 
     override val bounds: Bounds
@@ -106,7 +106,7 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
     }
 
     fun addCell(node: VirtualCanvasNode) {
-        this.last()?.addNode(node)
+        this.last()!!.addNode(node)
     }
 
     fun leftAlign() {
@@ -133,6 +133,6 @@ class TextNode(
     }
 
     override fun toString(): String {
-        return this.javaClass.simpleName + " { text = " + text + " }"
+        return this.javaClass.simpleName + " { text = " + text + ", klasses = " + this.klasses + " }"
     }
 }

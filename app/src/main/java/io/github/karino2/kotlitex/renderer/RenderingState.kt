@@ -11,21 +11,21 @@ import io.github.karino2.kotlitex.renderer.node.VerticalList
 data class RenderingState(
     val y: Double,
     val baseSize: Double,
-    val sizeIndex: Int,
+    val size: Int,
 
     val family: String,
     val variant: String,
     val weight: String,
 
     val vlist: VerticalList,
-    val textAlign: String, // TODO: type
+    val textAlign: Alignment,
     val minWidth: Double,
     val marginRight: Double,
     val marginLeft: Double,
     val delimSizing: Boolean,
     val klasses: Set<String>,
     val mspace: Double,
-    val pstruct: String, // TODO: type
+    val pstruct: Double,
     val color: String
 ) {
     private val SIZES = listOf(0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.44, 1.728, 2.074, 2.488)
@@ -33,19 +33,19 @@ data class RenderingState(
     constructor() : this(
         y = 0.0,
         baseSize = 44.0,
-        sizeIndex = 6,
+        size = 6,
         family = "KaTeX_Main",
         variant = "normal",
         weight = "normal",
         vlist = VerticalList(Alignment.CENTER, 0.0, emptySet()),
-        textAlign = "",
+        textAlign = Alignment.CENTER,
         minWidth = 0.0,
         marginRight = 0.0,
         marginLeft = 0.0,
         delimSizing = false,
         klasses = emptySet(),
         mspace = 0.0,
-        pstruct = "",
+        pstruct = 0.0,
         color = "black"
     )
 
@@ -58,6 +58,10 @@ data class RenderingState(
     }
 
     fun fontSize(): Double {
-        return baseSize * SIZES[this.sizeIndex]
+        return baseSize * SIZES[this.size]
+    }
+
+    val em: Double get() {
+        return baseSize * SIZES[this.size]
     }
 }
