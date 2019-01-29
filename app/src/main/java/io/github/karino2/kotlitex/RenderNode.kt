@@ -80,6 +80,11 @@ class RNodeSpan(var children: MutableList<RenderNode> = mutableListOf(), var wid
         }
 
     }
+
+    override fun toString(): String {
+        val children = children.map { it.toString() }.joinToString(", ", "[", "]")
+        return this.javaClass.simpleName + " { klasses = " + klasses + ", children = " + children + " }"
+    }
 }
 
 class RNodeSymbol(val text: String,
@@ -88,4 +93,8 @@ class RNodeSymbol(val text: String,
                   val width: Double = 0.0,
                   klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
                   depth: Double = 0.0, style: CssStyle = CssStyle())
-    : RenderNode(klasses, height, depth, 0.0, style)
+    : RenderNode(klasses, height, depth, 0.0, style) {
+    override fun toString(): String {
+        return this.javaClass.simpleName + " { klasses = " + klasses + ", text = " + text + " }"
+    }
+}
