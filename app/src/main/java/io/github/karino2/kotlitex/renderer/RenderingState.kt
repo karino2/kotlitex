@@ -18,7 +18,7 @@ data class RenderingState(
     val weight: String,
 
     val vlist: VerticalList,
-    val textAlign: String, // TODO: type
+    val textAlign: Alignment,
     val minWidth: Double,
     val marginRight: Double,
     val marginLeft: Double,
@@ -38,7 +38,7 @@ data class RenderingState(
         variant = "normal",
         weight = "normal",
         vlist = VerticalList(Alignment.CENTER, 0.0, emptySet()),
-        textAlign = "",
+        textAlign = Alignment.CENTER,
         minWidth = 0.0,
         marginRight = 0.0,
         marginLeft = 0.0,

@@ -1,6 +1,7 @@
 package io.github.karino2.kotlitex.renderer.node
 
 import io.github.karino2.kotlitex.CssClass
+import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RenderNode
 import io.github.karino2.kotlitex.renderer.RenderingState
 
@@ -9,8 +10,14 @@ object ClassStateMapping {
         return when (klass) {
             CssClass.size3 -> state.copy(size = 3)
             CssClass.vlist -> {
-                val vlist = VerticalList(Alignment.CENTER, state.nextX(), state.klasses)
-                state.copy(vlist = vlist)
+                if (! isTrueVlist(node)) {
+                    return state
+                }
+                val vlist = VerticalList(state.textAlign, state.nextX(), state.klasses)
+                vlist.setPosition(state.nextX(), state.y)
+                vlist.margin.left = state.marginLeft
+                vlist.margin.right = state.marginRight
+                state.copy(vlist = vlist).withResetMargin()
             }
             CssClass.pstruct -> {
                 val height = node.style.height!!.replace("em", "").toDouble() * state.em
@@ -24,5 +31,15 @@ object ClassStateMapping {
             }
             else -> state
         }
+    }
+
+    private fun isTrueVlist(node: RenderNode): Boolean {
+        if (node is RNodeSpan) {
+            val firstChild = node.children[0]
+            if (firstChild is RNodeSpan) {
+                return firstChild.children.size > 0
+            }
+        }
+        return false
     }
 }
