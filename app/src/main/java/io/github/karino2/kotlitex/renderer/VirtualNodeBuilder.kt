@@ -21,8 +21,21 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
     }
 
     private fun getGlyphDataFromNode(node: RenderNode) {
+        extractClassDataFromNode(node)
+        extractStyleDataFromNode(node)
+        createMSpace()
+        createSvgNode(node)
         createTextNode(node)
+        createItalicNode(node)
     }
+
+    private fun extractClassDataFromNode(node: RenderNode) {}
+
+    private fun extractStyleDataFromNode(node: RenderNode) {}
+
+    private fun createMSpace() {}
+
+    private fun createSvgNode(node: RenderNode) {}
 
     private fun createTextNode(node: RenderNode) {
         if (node is RNodeSymbol) {
@@ -37,6 +50,8 @@ class VirtualNodeBuilder(val children: List<RenderNode>) {
             }
         }
     }
+
+    private fun createItalicNode(node: RenderNode) {}
 
     /**
      * Keep its state while executing `body`. It replaces canvas-latex's resetState()
