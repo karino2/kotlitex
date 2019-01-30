@@ -7,19 +7,16 @@ object StyleStateMapping {
     fun createState(original: RenderingState, node: RenderNode): RenderingState {
         var state = original.copy()
 
-        val color = node.style.color
-        if (color != null) {
-            state = state.copy(color = color)
+        node.style.color?.let {
+            state = state.copy(color = it)
         }
 
-        val top = node.style.top
-        if (top != null) {
-            state = state.copy(y = state.y + parseEm(top, state.fontSize()))
+        node.style.top?.let {
+            state = state.copy(y = state.y + state.parseEm(it))
         }
 
-        val paddingLeft = node.style.paddingLeft
-        if (paddingLeft != null) {
-            val spacingLeft = parseEm(paddingLeft, state.fontSize())
+        node.style.paddingLeft?.let {
+            val spacingLeft = state.parseEm(it)
             val padLeftNode = HPaddingNode(state.klasses)
             padLeftNode.setPosition(state.nextX(), state.y)
             padLeftNode.bounds.width = spacingLeft
@@ -27,25 +24,18 @@ object StyleStateMapping {
             state = state.withResetMargin()
         }
 
-        val marginLeft = node.style.marginLeft
-        if (marginLeft != null) {
-            state = state.copy(marginLeft = parseEm(marginLeft, state.fontSize()))
+        node.style.marginLeft?.let {
+            state = state.copy(marginLeft = state.parseEm(it))
         }
 
-        val marginRight = node.style.marginRight
-        if (marginRight != null) {
-            state = state.copy(marginRight = parseEm(marginRight, state.fontSize()))
+        node.style.marginRight?.let {
+            state = state.copy(marginRight = state.parseEm(it))
         }
 
-        val minWidth = node.style.minWidth
-        if (minWidth != null) {
-            state = state.copy(minWidth = parseEm(minWidth, state.fontSize()))
+        node.style.minWidth?.let {
+            state = state.copy(minWidth = state.parseEm(it))
         }
 
         return state
-    }
-
-    private fun parseEm(str: String, fontSize: Double): Double {
-        return str.replace("em", "").toDouble() * fontSize
     }
 }

@@ -69,4 +69,8 @@ data class RenderingState(
     val em: Double get() {
         return baseSize * SIZES[this.size]
     }
+
+    fun parseEm(str: String): Double {
+        return str.replace("em", "").toDouble() * fontSize()
+    }
 }
