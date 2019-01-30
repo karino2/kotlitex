@@ -27,7 +27,7 @@ object ClassStateMapping {
                 tableRow.bounds.height = height
                 tableRow.margin.left = state.marginLeft
                 tableRow.margin.right = state.marginRight
-                state.copy(pstruct = height)
+                state.copy(pstrut = height)
             }
             else -> state
         }
