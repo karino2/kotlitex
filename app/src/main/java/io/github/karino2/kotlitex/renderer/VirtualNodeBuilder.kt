@@ -10,6 +10,7 @@ import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.TextNode
 import io.github.karino2.kotlitex.renderer.node.VerticalList
 import io.github.karino2.kotlitex.renderer.node.VerticalListRow
+import io.github.karino2.kotlitex.renderer.node.StyleStateMapping
 
 class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean = false) {
     var state: RenderingState = RenderingState()
@@ -46,7 +47,9 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
         }
     }
 
-    private fun extractStyleDataFromNode(node: RenderNode) {}
+    private fun extractStyleDataFromNode(node: RenderNode) {
+        state = StyleStateMapping.createState(state, node)
+    }
 
     private fun createMSpace() {}
 
@@ -94,10 +97,11 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
         if (state.klasses != parentState.klasses) {
             // TODO
         }
-        if (state.pstruct != 0.0) {
-            // TODO
+        if (state.pstrut != 0.0) {
+            state = parentState.copy(y = parentState.y + state.pstrut)
+        } else {
+            state = parentState
         }
-        state = parentState
     }
 
     private fun createRenderingState(children: List<RenderNode>) {
