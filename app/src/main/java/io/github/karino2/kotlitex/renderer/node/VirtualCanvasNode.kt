@@ -71,28 +71,43 @@ abstract class VirtualContainerNode<T : VirtualCanvasNode>(klasses: Set<String>)
 }
 
 class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvasNode>(klasses) {
-    fun setPositionX(x : Double) = setPosition(x, bounds.y)
+    var strutBounds: Bounds? = null
+
+    fun addBaseStrut(padNode: VirtualCanvasNode) {
+        if (strutBounds == null) {
+            strutBounds = padNode.bounds.copy()
+        } else {
+            strutBounds?.extend(padNode.bounds)
+        }
+    }
+
+    fun setPositionX(x: Double) = setPosition(x, bounds.y)
 
     fun leftAlign(tableLeft: Double) = setPositionX(tableLeft)
+
     fun centerAlign(tableCenter: Double) {
         val width = bounds.width
-        val center = tableCenter-width/2
+        val center = tableCenter - width / 2
         setPositionX(center)
     }
     fun rightAlign(tableRight: Double) {
         val width = bounds.width
-        val right = tableRight -width
+        val right = tableRight - width
         setPositionX(right)
+    }
+}
+
+class StretchyNode(val minWidth: Double, klasses: Set<String>) : VirtualCanvasNode(klasses) {
+    fun setListWidth(width: Double) {
+        bounds.width = width + this.minWidth
     }
 }
 
 /**
  * The VerticalList class represents a 1D array of VerticalListRow's
- * which can be horizontally aliged left, right, or center.
+ * which can be horizontally aligned left, right, or center.
  */
 class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<String>) : VirtualContainerNode<VerticalListRow>(klasses) {
-    val structBounds = this.bounds.copy()
-
     /**
      * Return the x coordinate of the next node to be placed into the List
      */
@@ -104,11 +119,23 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
         return bounds.x + bounds.width + lastNode.margin.right
     }
 
+    /**
+     * Sets the width of the stretchy nodes contained within.
+     */
     fun setStretchWidths() {
-        // TODO:
-        // implement here after StretchyNode come.
+        val width = bounds.width
+        nodes.forEach { rowNode ->
+            rowNode.nodes.forEach { node ->
+                if (node is StretchyNode) {
+                    node.setListWidth(width)
+                }
+            }
+        }
     }
 
+    /**
+     * Aligns the List based on the specified alignment
+     */
     fun align() {
         when (this.alignment) {
             Alignment.LEFT -> leftAlign()
@@ -117,16 +144,34 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
         }
     }
 
+    /**
+     * Adds a row to the List.
+     */
     fun addRow(row: VerticalListRow) {
         addNode(row)
     }
 
+    /**
+     * Adds a VirtualCanvasNode to current row
+     */
     fun addCell(node: VirtualCanvasNode) {
         this.last()!!.addNode(node)
     }
 
+    val strutBounds: Bounds
+        get() {
+            val result = this.bounds
+            nodes.forEach { row ->
+                val b = row.strutBounds
+                if (b != null) {
+                    result.extend(b)
+                }
+            }
+            return result
+        }
+
     fun centerAlign() {
-        val center = bounds.x + bounds.width/2
+        val center = bounds.x + bounds.width / 2
         nodes.forEach { it.centerAlign(center) }
     }
 
@@ -139,7 +184,6 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
         val left = bounds.x
         nodes.forEach { it.leftAlign(left) }
     }
-
 }
 
 class TextNode(
