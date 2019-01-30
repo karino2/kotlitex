@@ -4,7 +4,7 @@
 
 KotliTeX is [KaTeX](https://katex.org)'s Android port, written in Kotlin.
 
-This library currently provides `com.karino2.kotlitex.MathView`, but ultimately we'd like to provide a DynamicDrawableSpan instead.
+This library provides `com.karino2.kotlitex.MathExpressionSpan`.
 
 ## Porting Guidelines
 

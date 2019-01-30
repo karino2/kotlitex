@@ -1,22 +1,17 @@
 package io.github.karino2.kotlitex
 
-import android.content.Context
 import android.graphics.*
-import android.graphics.Paint.ANTI_ALIAS_FLAG
+import android.graphics.drawable.Drawable
 import android.text.TextPaint
-import android.util.AttributeSet
-import android.view.View
-import io.github.karino2.kotlitex.renderer.*
+import android.text.style.DynamicDrawableSpan
+import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
 
-class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet) {
-    private val BASE_X = 100.0f
-    private val BASE_Y = 100.0f
-
+private class MathExpressionDrawable(expr: String) : Drawable() {
     var rootNode: VerticalList
     init {
         val options = Options(Style.TEXT)
-        val parser = Parser("\\frac{1}{2000}")
+        val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
         val builder = VirtualNodeBuilder(nodes)
@@ -24,22 +19,31 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
     }
 
     val paint = Paint()
-    val textPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
+    val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         typeface = Typeface.SERIF
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    override fun setAlpha(alpha: Int) {
+    }
+
+    override fun getOpacity(): Int = PixelFormat.OPAQUE
+
+    override fun setColorFilter(colorFilter: ColorFilter?) {
+    }
+
+    override fun draw(canvas: Canvas) {
         drawRenderNodes(canvas, rootNode)
     }
 
+    // TODO
+    override fun getIntrinsicWidth(): Int = 200
+    override fun getIntrinsicHeight(): Int = 200
     private fun translateX(x: Double): Float {
-        return x.toFloat() + BASE_X
+        return x.toFloat() + 100
     }
-
     private fun translateY(y: Double): Float {
-        return y.toFloat() + BASE_Y
+        return y.toFloat() + 100
     }
 
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
@@ -64,5 +68,14 @@ class MathView(context: Context, attrSet: AttributeSet) : View(context, attrSet)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat(), y, paint)
             }
         }
+    }
+
+}
+
+class MathExpressionSpan(val expr: String) : DynamicDrawableSpan() {
+    override fun getDrawable(): Drawable {
+        val drawable = MathExpressionDrawable(expr)
+        drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        return drawable
     }
 }
