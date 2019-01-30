@@ -29,6 +29,16 @@ object ClassStateMapping {
                 tableRow.margin.right = state.marginRight
                 state.copy(pstrut = height)
             }
+            CssClass.frac_line -> {
+                val lineHeight = state.parseEm(node.style.borderBottomWidth!!)
+                val lineNode = HorizontalLineNode(state.color, state.minWidth, state.klasses)
+                lineNode.setPosition(state.nextX(), state.y)
+                lineNode.bounds.height = lineHeight
+                lineNode.margin.left = state.marginLeft
+                lineNode.margin.right = state.marginRight
+                state.vlist.addCell(lineNode)
+                return state.withResetMargin()
+            }
             else -> state
         }
     }

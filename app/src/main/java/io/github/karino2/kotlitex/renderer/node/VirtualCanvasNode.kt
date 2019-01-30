@@ -97,7 +97,7 @@ class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvas
     }
 }
 
-class StretchyNode(val minWidth: Double, klasses: Set<String>) : VirtualCanvasNode(klasses) {
+abstract class StretchyNode(val minWidth: Double, klasses: Set<String>) : VirtualCanvasNode(klasses) {
     fun setListWidth(width: Double) {
         bounds.width = width + this.minWidth
     }
@@ -208,3 +208,5 @@ class TextNode(
  * An HPaddingNode represents an invisible node (not drawn) with a specific width/x.
  */
 class HPaddingNode(klasses: Set<String>) : VirtualCanvasNode(klasses)
+
+class HorizontalLineNode(val color: String, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
