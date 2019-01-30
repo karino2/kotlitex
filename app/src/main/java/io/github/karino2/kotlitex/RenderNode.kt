@@ -42,7 +42,9 @@ data class CssStyle(
     var color: String? = null,
     var marginLeft: String? = null,
     var marginRight: String? = null,
-    var borderBottomWidth: String? = null
+    var borderBottomWidth: String? = null,
+    var minWidth: String? = null,
+    var paddingLeft: String? = null
 /*
     backgroundColor: string,
     borderColor: string,
@@ -51,8 +53,7 @@ data class CssStyle(
     bottom: string,
     left: string,
     marginTop: string,
-    minWidth: string,
-    paddingLeft: string,
+
     position: string,
     width: string,
     verticalAlign: string,

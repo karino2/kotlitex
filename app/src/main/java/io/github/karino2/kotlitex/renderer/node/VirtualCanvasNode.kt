@@ -203,3 +203,8 @@ class TextNode(
         return this.javaClass.simpleName + " { text = " + text + ", klasses = " + this.klasses + " }"
     }
 }
+
+/**
+ * An HPaddingNode represents an invisible node (not drawn) with a specific width/x.
+ */
+class HPaddingNode(klasses: Set<String>) : VirtualCanvasNode(klasses)
