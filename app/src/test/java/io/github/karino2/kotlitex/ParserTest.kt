@@ -48,6 +48,7 @@ class ParserTest {
             mode(Mode.MATH)
         }
     }
+
     @Test
     fun parseY() {
         val parser = Parser("y")
@@ -65,7 +66,7 @@ class ParserTest {
         val actual = parser.parse()
         assertEquals(1, actual.size)
         val supsub = actual[0]
-        when(supsub) {
+        when (supsub) {
             is PNodeSupSub -> {
                 assertMathOrd(supsub.base) {
                     text("x")
@@ -80,6 +81,13 @@ class ParserTest {
                 assertNull(supsub.sub)
             }
             else -> assertTrue(false)
+        }
+        @Test
+        fun parsePlus() {
+            val parser = Parser("x+y")
+
+            val actual = parser.parse()
+            assertTrue(actual.isNotEmpty())
         }
     }
 }

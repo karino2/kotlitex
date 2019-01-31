@@ -13,10 +13,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val textView = findViewById<TextView>(R.id.textView)
-        val spannable = SpannableStringBuilder("012345 and the remaining text.")
+        val spannable = SpannableStringBuilder("01234567 and the remaining text.")
         spannable.setSpan(MathExpressionSpan("x^2"), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(MathExpressionSpan("\\frac{1}{2}"), 2, 4, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(MathExpressionSpan("\\sqrt{3}"), 4, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        spannable.setSpan(MathExpressionSpan("\\frac{1}{1+\\frac{1}{x^2}}"), 6, 8, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
     }
 }
