@@ -1,11 +1,15 @@
 package io.github.karino2.kotlitex
 
+import android.graphics.Path
+import io.github.karino2.kotlitex.functions.SvgGeometry
+
 enum class CssClass {
     amsrm, base, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
-    enclosing,
-    frac_line, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
+    enclosing, frac_line, hide_tail,
+    mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
-    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, sizing,  size3, struct,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, root,
+    sizing,  size3, sqrt, struct, svg_align,
     textbf, textit, textrm,
     EMPTY;
 
@@ -88,6 +92,48 @@ class RNodeSpan(var children: MutableList<RenderNode> = mutableListOf(), var wid
         return this.javaClass.simpleName + " { klasses = " + klasses + ", children = " + children + " }"
     }
 }
+
+// PathNode in js.
+class RNodePath(path: Path) : RenderNode() {
+    // TODO: support other pathName
+    constructor(pathName: String) : this(SvgGeometry.sqrtMain) {
+        if(pathName != "sqrtMain")
+            throw NotImplementedError("TODO: RNodePath other than sqrtMain is NYI")
+    }
+}
+
+data class ViewBox(val minX: Double, val minY: Double, val width: Double, val height: Double)
+
+// SvgNode in js.
+class RNodePathHolder(children: MutableList<RNodePath>, val widthStr: String, val heightStr: String,
+                      val viewBox: ViewBox, val preserveAspectRatio: String,
+                      val styleStr: String?=null) : RenderNode()
+
+// SvgSpan in js.
+// temporary copy past RNodeSpan. We'll update this later.
+class RNodePathSpan(var children: MutableList<RenderNode> = mutableListOf(), var width: Double? = null,
+                klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
+                depth: Double = 0.0, maxFontSize: Double = 0.0, style: CssStyle = CssStyle())
+    : RenderNode(klasses, height, depth, maxFontSize, style) {
+
+    constructor(klasses : MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options?, style: CssStyle = CssStyle() )
+            : this(children, null, klasses, style=style) {
+        if(options?.style?.isTight == true) {
+            klasses.add(CssClass.mtight)
+        }
+        if(options?.color != null) {
+            this.style.color = options.color
+        }
+
+    }
+
+    override fun toString(): String {
+        val children = children.map { it.toString() }.joinToString(", ", "[", "]")
+        return this.javaClass.simpleName + " { klasses = " + klasses + ", children = " + children + " }"
+    }
+}
+
+
 
 class RNodeSymbol(val text: String,
                   val italic: Double = 0.0,

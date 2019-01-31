@@ -629,6 +629,16 @@ object RenderTreeBuilder {
         return groups;
     }
 
+    fun wrapFragment(group: RenderNode, options: Options): RenderNode {
+        /*
+        TODO:
+            if (group instanceof DocumentFragment) {
+                return makeSpan([], [group], options);
+            }
+         */
+        return group
+    }
+
 
     init {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }

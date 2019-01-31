@@ -78,7 +78,7 @@ object RenderBuilderDelimiter {
     // Metrics of the different sizes. Found by looking at TeX's output of
     // $\bigl| // \Bigl| \biggl| \Biggl| \showlists$
     // Used to create stacked delimiters of appropriate sizes in makeSizedDelim.
-    val sizeToMaxHeight = listOf(0, 1.2, 1.8, 2.4, 3.0)
+    val sizeToMaxHeight = listOf(0.0, 1.2, 1.8, 2.4, 3.0)
 
 
 
@@ -111,6 +111,12 @@ object RenderBuilderDelimiter {
     LargeDelimiter(DelimiterSize.THREE),
     LargeDelimiter(DelimiterSize.FOUR),
     StackDelimiter)
+
+    // All surds have 0.08em padding above the viniculum inside the SVG.
+    // That keeps browser span height rounding error from pinching the line.
+    val vbPad = 80   // padding above the surd, measured inside the viewBox.
+    val emPad = 0.08 // padding, in ems, measured in the document.
+
 
     /**
      * Get the metrics for a given symbol and font, after transformation (i.e.
@@ -549,5 +555,119 @@ object RenderBuilderDelimiter {
                 classes)
         }
     }
+
+    fun sqrtSvg(sqrtName: String,
+                    height: Double,
+                    viewBoxHeight: Double,
+                    options: Options
+                    ): RNodePathSpan {
+        // TODO: support sqrtTail
+        /*
+    let alternate;
+    if (sqrtName === "sqrtTall") {
+        // sqrtTall is from glyph U23B7 in the font KaTeX_Size4-Regular
+        // One path edge has a variable length. It runs from the viniculumn
+        // to a point near (14 units) the bottom of the surd. The viniculum
+        // is 40 units thick. So the length of the line in question is:
+        const vertSegment = viewBoxHeight - 54 - vbPad;
+        alternate = `M702 ${vbPad}H400000v40H742v${vertSegment}l-4 4-4 4c-.667.7
+-2 1.5-4 2.5s-4.167 1.833-6.5 2.5-5.5 1-9.5 1h-12l-28-84c-16.667-52-96.667
+-294.333-240-727l-212 -643 -85 170c-4-3.333-8.333-7.667-13 -13l-13-13l77-155
+ 77-156c66 199.333 139 419.667 219 661 l218 661zM702 ${vbPad}H400000v40H742z`;
+    }
+    */
+
+        val pathNode = RNodePath(sqrtName)
+
+        // Note: 1000:1 ratio of viewBox to document em width.
+        val svg  : RenderNode =  RNodePathHolder(mutableListOf(pathNode),
+            "400em",
+            height.toString() + "em",
+            ViewBox(0.0, 0.0, 400000.0, viewBoxHeight),
+            "xMinYMin slice")
+
+        return RNodePathSpan(mutableSetOf(CssClass.hide_tail), mutableListOf(svg), options)
+    }
+
+
+    /**
+     * Make a sqrt image of the given height,
+     */
+    fun makeSqrtImage(height: Double, options: Options) : Triple<RNodePathSpan, /*ruleWidth*/ Double, /*advancedWidth*/ Double> {
+        // Define a newOptions that removes the effect of size changes such as \Huge.
+        // We don't pick different a height surd for \Huge. For it, we scale up.
+        val newOptions = options.havingBaseSizing()
+
+        // Pick the desired surd glyph from a sequence of surds.
+        val delim = traverseSequence("\\surd", height * newOptions.sizeMultiplier, stackLargeDelimiterSequence, newOptions)
+
+        var sizeMultiplier = newOptions.sizeMultiplier  // default
+
+        // Create a span containing an SVG image of a sqrt symbol.
+        var span : RNodePathSpan
+        var spanHeight = 0.0
+        var texHeight = 0.0
+        var viewBoxHeight = 0.0
+        var advanceWidth : Double
+
+        // We create viewBoxes with 80 units of "padding" above each surd.
+        // Then browser rounding error on the parent span height will not
+        // encroach on the ink of the viniculum. But that padding is not
+        // included in the TeX-like `height` used for calculation of
+        // vertical alignment. So texHeight = span.height < span.style.height.
+
+        when(delim) {
+            is SmallDelimiter -> {
+                // Get an SVG that is derived from glyph U+221A in font KaTeX-Main.
+                viewBoxHeight = (1000 + vbPad).toDouble()  // 1000 unit glyph height.
+                if (height < 1.0) {
+                    sizeMultiplier = 1.0;   // mimic a \textfont radical
+                } else if (height < 1.4) {
+                    sizeMultiplier = 0.7;   // mimic a \scriptfont radical
+                }
+                spanHeight = (1.0 + emPad) / sizeMultiplier;
+                texHeight = 1.00 / sizeMultiplier;
+                span = sqrtSvg("sqrtMain", spanHeight, viewBoxHeight, options);
+                span.style.minWidth = "0.853em";
+                advanceWidth = 0.833 / sizeMultiplier;  // from the font.
+            }
+            is LargeDelimiter -> {
+                // These SVGs come from fonts: KaTeX_Size1, _Size2, etc.
+                viewBoxHeight = (1000 + vbPad).toDouble() * sizeToMaxHeight[delim.size.size];
+                texHeight = sizeToMaxHeight[delim.size.size] / sizeMultiplier;
+                spanHeight = (sizeToMaxHeight[delim.size.size] + emPad) / sizeMultiplier;
+                span = sqrtSvg("sqrtSize" + delim.size, spanHeight, viewBoxHeight, options);
+                span.style.minWidth = "1.02em";
+                advanceWidth = 1.0 / sizeMultiplier; // 1.0 from the font.
+
+            }
+            else -> {
+                // Tall sqrt. In TeX, this would be stacked using multiple glyphs.
+                // We'll use a single SVG to accomplish the same thing.
+                spanHeight = height + emPad;
+                texHeight = height;
+                viewBoxHeight = Math.floor(1000 * height) + vbPad;
+                span = sqrtSvg("sqrtTall", spanHeight, viewBoxHeight, options);
+                span.style.minWidth = "0.742em";
+                advanceWidth = 1.056;
+            }
+        }
+
+
+        span.height = texHeight;
+        span.style.height = spanHeight.toString() + "em";
+
+        return Triple(
+            span,
+            advanceWidth,
+            // Calculate the actual line width.
+            // This actually should depend on the chosen font -- e.g. \boldmath
+            // should use the thicker surd symbols from e.g. KaTeX_Main-Bold, and
+            // have thicker rules.
+            options.fontMetrics.sqrtRuleThickness * sizeMultiplier
+        )
+
+    }
+
 
 }
