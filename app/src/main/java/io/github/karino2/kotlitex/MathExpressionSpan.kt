@@ -77,16 +77,15 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
                 val mat = Matrix()
 
                 val (minx, miny, widthvb, heightvb) = parent.rnode.viewBox
-                val viewBoxF = RectF(minx.toFloat(), miny.toFloat(), (minx+widthvb).toFloat(), (miny+heightvb).toFloat())
                 val (_, _, wb, hb) = parent.bounds
-                val dstBox = RectF(x, y, (x+wb).toFloat(), (y+hb).toFloat())
 
                 // this is preserveAspectRatio = meet
-                // mat.setRectToRect(viewBoxF, dstBox, Matrix.ScaleToFit.START)
+                /*
+                    val viewBoxF = RectF(minx.toFloat(), miny.toFloat(), (minx+widthvb).toFloat(), (miny+heightvb).toFloat())
+                    val dstBox = RectF(x, y, (x+wb).toFloat(), (y+hb).toFloat())
+                    mat.setRectToRect(viewBoxF, dstBox, Matrix.ScaleToFit.START)
+                 */
 
-                // mat.setRectToRect(viewBoxF, dstBox, Matrix.ScaleToFit.FILL)
-
-                // temp scaling
                 /*
                 Basically, width is far larger than height.
                 So we scale to fit to height, then clip.
