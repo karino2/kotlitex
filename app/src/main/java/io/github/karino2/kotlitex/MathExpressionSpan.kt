@@ -67,6 +67,82 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
                 val y = translateY(parent.bounds.y)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat(), y, paint)
             }
+            is PathNode -> {
+                val x = translateX(parent.bounds.x)
+                val y = translateY(parent.bounds.y)
+
+
+                // TODO: support other preserve aspect ratio.
+                // "xMinYMin slice"
+                val mat = Matrix()
+
+                val (minx, miny, widthvb, heightvb) = parent.rnode.viewBox
+                val viewBoxF = RectF(minx.toFloat(), miny.toFloat(), (minx+widthvb).toFloat(), (miny+heightvb).toFloat())
+                val (_, _, wb, hb) = parent.bounds
+                val dstBox = RectF(x, y, (x+wb).toFloat(), (y+hb).toFloat())
+
+                mat.setRectToRect(viewBoxF, dstBox, Matrix.ScaleToFit.START)
+
+                /* trial code. Please remove once we reach to correct rendering.
+
+                val inPath = parent.rnode.children[0]!!.path
+
+                // OK
+                val inPath = Path()
+                inPath.moveTo(95f, 702f)
+                inPath.lineTo(400000f, 702f)
+
+
+                // NG
+                val inPath = Path()
+                inPath.moveTo(95f, 702f)
+                //             c(-2.7,0.0,-7.17,-2.7,-13.5,-8.0)
+                inPath.rCubicTo(-2.7f, 0.0f,-7.17f,-2.7f,-13.5f,-8.0f)
+                inPath.close()
+
+                // draw something (streight line)
+                // inPath.rCubicTo(0f, -0f, 200000f, -440.3f, 400000f, 0f)
+
+                val tmppaint =Paint()
+                tmppaint.setColor(Color.BLUE)
+                tmppaint.setAntiAlias(true)
+                tmppaint.setStrokeWidth(5f)
+                tmppaint.setStyle(Paint.Style.STROKE)
+
+                val path = Path()
+
+                // OK.
+                val rf = RectF(x, y, x+50f, y+50f)
+                path.arcTo(rf, 0f, 180f)
+
+                // OK
+                path.moveTo(x, y)
+                path.lineTo(x+100f, y)
+
+                path.addPath(inPath, mat)
+
+                paint.color = Color.BLACK
+                paint.strokeWidth = 2.0f
+                paint.style = Paint.Style.FILL_AND_STROKE
+
+
+                canvas.drawPath(path, paint)
+                */
+
+
+                // TODO: more suitable handling.
+                paint.color = Color.BLACK
+                paint.strokeWidth = 2.0f
+                paint.style = Paint.Style.FILL_AND_STROKE
+
+                val path = Path()
+
+                parent.rnode.children.forEach{
+                    path.reset()
+                    path.addPath(it.path, mat)
+                    canvas.drawPath(path, paint)
+                }
+            }
         }
     }
 

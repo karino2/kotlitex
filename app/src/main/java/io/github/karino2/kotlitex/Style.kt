@@ -1,5 +1,18 @@
 package io.github.karino2.kotlitex
 
+// This file is from Style.js
+/**
+ * This file contains information and classes for the various kinds of styles
+ * used in TeX. It provides a generic `Style` class, which holds information
+ * about a specific style. It then provides instances of all the different kinds
+ * of styles possible, and provides functions to move between them and get
+ * information about them.
+ */
+
+/**
+ * The main style class. Contains a unique id for the style, a size (which is
+ * the same for cramped and uncramped version of a style), and a cramped flag.
+ */
 data class Style(val id: Int, val size: Int, val cramped : Boolean) {
     val isTight : Boolean
     get() = size >= 2
@@ -78,11 +91,9 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
      * Get the cramped version of a style (in particular, cramping a cramped style
      * doesn't change the style).
      */
-    /*
-    cramp(): Style {
-        return styles[cramp[this.id]];
+    fun cramp(): Style {
+        return styles[_cramp[this.id]];
     }
-    */
 
     /**
      * Get a text or display version of this style.

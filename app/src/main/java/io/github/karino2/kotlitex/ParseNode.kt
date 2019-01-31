@@ -116,3 +116,12 @@ data class PNodeColor(
     val body: List<ParseNode>): ParseNode() {
     override val type = "color"
 }
+
+data class PNodeSqrt (
+    override val mode: Mode,
+    override val loc: SourceLocation?,
+    val body: ParseNode,
+    val index: ParseNode?
+): ParseNode() {
+    override val type = "sqrt"
+}

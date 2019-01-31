@@ -1,6 +1,7 @@
 package io.github.karino2.kotlitex.renderer.node
 
 import android.graphics.Paint
+import io.github.karino2.kotlitex.RNodePathHolder
 
 enum class Alignment {
     LEFT, RIGHT, CENTER
@@ -210,3 +211,6 @@ class TextNode(
 class HPaddingNode(klasses: Set<String>) : VirtualCanvasNode(klasses)
 
 class HorizontalLineNode(val color: String, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
+
+// SvgNode in canvas-latex. Note that there is the same class-name in katex (but this class is counter-part of canvas-latex, not katex).
+class PathNode(val rnode : RNodePathHolder, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)

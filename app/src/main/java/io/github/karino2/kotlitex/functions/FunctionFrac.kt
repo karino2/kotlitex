@@ -1,7 +1,13 @@
-package io.github.karino2.kotlitex
+package io.github.karino2.kotlitex.functions
 
+import io.github.karino2.kotlitex.*
 import io.github.karino2.kotlitex.RenderTreeBuilder.calculateSize
 import java.lang.IllegalArgumentException
+
+/*
+  This file is the port of functions/genfrac.js
+ */
+
 
 object FunctionFrac {
     fun renderNodeBuilder(group: ParseNode, options: Options) : RNodeSpan {
@@ -46,9 +52,16 @@ object FunctionFrac {
         if (group.hasBarLine) {
             val rule = if (group.barSize != null) {
                 val ruleWidth2 = calculateSize(group.barSize, options);
-                RenderTreeBuilder.makeLineSpan(CssClass.frac_line, options, ruleWidth2)
+                RenderTreeBuilder.makeLineSpan(
+                    CssClass.frac_line,
+                    options,
+                    ruleWidth2
+                )
             } else {
-                RenderTreeBuilder.makeLineSpan(CssClass.frac_line, options)
+                RenderTreeBuilder.makeLineSpan(
+                    CssClass.frac_line,
+                    options
+                )
             }
             Triple(rule, rule.height, rule.height)
         } else {
@@ -92,10 +105,11 @@ object FunctionFrac {
             RenderBuilderVList.makeVList(
                 VListParamIndividual(
                     mutableListOf(
-                        VListElemAndShift(denomm, shift= denomShift),
-                        VListElemAndShift(numerm, shift= -numShift)
+                        VListElemAndShift(denomm, shift = denomShift),
+                        VListElemAndShift(numerm, shift = -numShift)
                     )
-                ), options)
+                ), options
+            )
         } else {
             // Rule 15d
             val axisHeight = options.fontMetrics.axisHeight;
@@ -119,11 +133,12 @@ object FunctionFrac {
             RenderBuilderVList.makeVList(
                 VListParamIndividual(
                     mutableListOf(
-                        VListElemAndShift(denomm, shift= denomShift),
-                        VListElemAndShift(rule, shift= midShift),
-                        VListElemAndShift(numerm, shift= -numShift)
+                        VListElemAndShift(denomm, shift = denomShift),
+                        VListElemAndShift(rule, shift = midShift),
+                        VListElemAndShift(numerm, shift = -numShift)
                     )
-                ), options)
+                ), options
+            )
         }
 
         // Since we manually change the style sometimes (with \dfrac or \tfrac),
@@ -142,57 +157,74 @@ object FunctionFrac {
 
         val leftDelim =
         if (group.leftDelim == null) {
-             RenderTreeBuilder.makeNullDelimiter(options, mutableSetOf(CssClass.mopen));
+            RenderTreeBuilder.makeNullDelimiter(
+                options,
+                mutableSetOf(CssClass.mopen)
+            );
         } else {
             RenderBuilderDelimiter.makeCustomSizedDelim(
                 group.leftDelim, delimSize, true,
-                options.havingStyle(style), group.mode, mutableSetOf(CssClass.mopen));
+                options.havingStyle(style), group.mode, mutableSetOf(CssClass.mopen)
+            );
         }
 
         val rightDelim =
         if (group.continued) {
             RenderTreeBuilder.makeSpan() // zero width for \cfrac
         } else if (group.rightDelim == null) {
-            RenderTreeBuilder.makeNullDelimiter(options, mutableSetOf(CssClass.mclose));
+            RenderTreeBuilder.makeNullDelimiter(
+                options,
+                mutableSetOf(CssClass.mclose)
+            );
         } else {
             RenderBuilderDelimiter.makeCustomSizedDelim(
                 group.rightDelim, delimSize, true,
-                options.havingStyle(style), group.mode, mutableSetOf(CssClass.mclose));
+                options.havingStyle(style), group.mode, mutableSetOf(CssClass.mclose)
+            );
         }
 
         return RenderTreeBuilder.makeSpan(
             mutableSetOf(CssClass.mord).concat(newOptions.sizingClasses(options)),
-            mutableListOf(leftDelim,
-                RenderTreeBuilder.makeSpan(mutableSetOf(CssClass.mfrac), mutableListOf(frac)),
-                rightDelim),
-            options);
+            mutableListOf(
+                leftDelim,
+                RenderTreeBuilder.makeSpan(
+                    mutableSetOf(CssClass.mfrac),
+                    mutableListOf(frac)
+                ),
+                rightDelim
+            ),
+            options
+        );
     }
 
     fun defineAll() {
         LatexFunctions.defineFunction(
-            FunctionSpec("genfrac",
+            FunctionSpec(
+                "genfrac",
                 2,
                 null,
-                2),
-            listOf("\\cfrac", "\\dfrac", "\\frac", "\\tfrac",
+                2
+            ),
+            listOf(
+                "\\cfrac", "\\dfrac", "\\frac", "\\tfrac",
                 "\\dbinom", "\\binom", "\\tbinom",
                 "\\\\atopfrac", // can’t be entered directly
                 "\\\\bracefrac", "\\\\brackfrac"   // ditto
             ),
-            {context:FunctionContext, args: List<ParseNode>, _:List<ParseNode?> ->
+            { context: FunctionContext, args: List<ParseNode>, _: List<ParseNode?> ->
                 val (funcName, parser) = context
                 val numer = args[0]
                 val denom = args[1]
-                var hasBarLine : Boolean
-                var leftDelim :String?= null
-                var rightDelim :String? = null
+                var hasBarLine: Boolean
+                var leftDelim: String? = null
+                var rightDelim: String? = null
                 var size = SizeStyle.AUTO
 
                 when (funcName) {
-                    "\\cfrac","\\dfrac","\\frac","\\tfrac" -> hasBarLine = true;
+                    "\\cfrac", "\\dfrac", "\\frac", "\\tfrac" -> hasBarLine = true;
                     "\\\\atopfrac" -> hasBarLine = false
 
-                    "\\dbinom","\\binom","\\tbinom" -> {
+                    "\\dbinom", "\\binom", "\\tbinom" -> {
                         hasBarLine = false
                         leftDelim = "("
                         rightDelim = ")"
@@ -211,8 +243,8 @@ object FunctionFrac {
                 }
 
                 when (funcName) {
-                    "\\cfrac" ,"\\dfrac","\\dbinom" -> size = SizeStyle.DISPLAY
-                    "\\tfrac","\\tbinom" -> size = SizeStyle.TEXT
+                    "\\cfrac", "\\dfrac", "\\dbinom" -> size = SizeStyle.DISPLAY
+                    "\\tfrac", "\\tbinom" -> size = SizeStyle.TEXT
                 }
 
                 PNodeGenFrac(
@@ -227,17 +259,20 @@ object FunctionFrac {
                     size,
                     null
                 )
-        },
-        ::renderNodeBuilder)
+            },
+            FunctionFrac::renderNodeBuilder
+        )
 
         // temporary put here.
-        LatexFunctions.defineFunctionBuilder("ordgroup") {group, options->
-            if(group !is PNodeOrdGroup)
+        LatexFunctions.defineFunctionBuilder("ordgroup") { group, options ->
+            if (group !is PNodeOrdGroup)
                 throw IllegalArgumentException("unexpected type in ordgroup RNodeBuilder.")
 
             RenderTreeBuilder.makeSpan(
                 mutableSetOf(CssClass.mord),
-                RenderTreeBuilder.buildExpression(group.body, options, true).toMutableList(), options)
+                RenderTreeBuilder.buildExpression(group.body, options, true).toMutableList(),
+                options
+            )
         }
 
 

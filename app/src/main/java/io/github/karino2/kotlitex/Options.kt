@@ -110,5 +110,27 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
         }
     }
 
+    /**
+     * Return an options object with a cramped version of the current style. If
+     * the current style is cramped, returns `this`.
+     */
+    fun havingCrampedStyle(): Options {
+        return havingStyle(style.cramp())
+    }
+
+
+    /**
+     * Remove the effect of sizing changes such as \Huge.
+     * Keep the effect of the current style, such as \scriptstyle.
+     */
+    fun havingBaseSizing(): Options {
+        val newSize = when (this.style.id) {
+            4,5 -> 3  // normalsize in scriptstyle
+            6, 7-> 1 // normalsize in scriptscriptstyle
+            else -> 6// normalsize in textstyle or displaystyle
+        }
+        return copy(style = this.style, size=newSize)
+    }
+
 
 }

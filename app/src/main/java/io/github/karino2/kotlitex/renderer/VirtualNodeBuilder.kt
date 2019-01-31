@@ -1,16 +1,7 @@
 package io.github.karino2.kotlitex.renderer
 
-import io.github.karino2.kotlitex.CssClass
-import io.github.karino2.kotlitex.RNodeSpan
-import io.github.karino2.kotlitex.RNodeSymbol
-import io.github.karino2.kotlitex.RenderNode
-import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
-import io.github.karino2.kotlitex.renderer.node.CssFont
-import io.github.karino2.kotlitex.renderer.node.CssFontFamily
-import io.github.karino2.kotlitex.renderer.node.TextNode
-import io.github.karino2.kotlitex.renderer.node.VerticalList
-import io.github.karino2.kotlitex.renderer.node.VerticalListRow
-import io.github.karino2.kotlitex.renderer.node.StyleStateMapping
+import io.github.karino2.kotlitex.*
+import io.github.karino2.kotlitex.renderer.node.*
 
 class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean = false) {
     var state: RenderingState = RenderingState()
@@ -53,7 +44,21 @@ class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean =
 
     private fun createMSpace() {}
 
-    private fun createSvgNode(node: RenderNode) {}
+    private fun createSvgNode(node: RenderNode) {
+        if(node is RNodePathHolder) {
+            val height = (+node.heightStr.replace("em", "").toDouble()) * state.em
+            node.height = height
+            // TODO: support fill.
+            // node.attributes.fill = this._state.color
+            val pathNode = PathNode(node, state.minWidth, state.klasses)
+            pathNode.setPosition(state.nextX(), state.y)
+            pathNode.bounds.height = height
+            pathNode.margin.left = state.marginLeft
+            pathNode.margin.right = state.marginRight
+            state.vlist.addCell(pathNode)
+            state = state.withResetMargin()
+        }
+    }
 
     private fun createTextNode(node: RenderNode) {
         if (node is RNodeSymbol) {
