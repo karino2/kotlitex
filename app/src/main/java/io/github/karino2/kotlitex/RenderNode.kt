@@ -110,29 +110,8 @@ class RNodePathHolder(val children: MutableList<RNodePath>, val widthStr: String
                       val styleStr: String?=null) : RenderNode()
 
 // SvgSpan in js.
-// temporary copy past RNodeSpan. We'll update this later.
-class RNodePathSpan(var children: MutableList<RenderNode> = mutableListOf(), var width: Double? = null,
-                klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,
-                depth: Double = 0.0, maxFontSize: Double = 0.0, style: CssStyle = CssStyle())
-    : RenderNode(klasses, height, depth, maxFontSize, style) {
-
-    constructor(klasses : MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options?, style: CssStyle = CssStyle() )
-            : this(children, null, klasses, style=style) {
-        if(options?.style?.isTight == true) {
-            klasses.add(CssClass.mtight)
-        }
-        if(options?.color != null) {
-            this.style.color = options.color
-        }
-
-    }
-
-    override fun toString(): String {
-        val children = children.map { it.toString() }.joinToString(", ", "[", "]")
-        return this.javaClass.simpleName + " { klasses = " + klasses + ", children = " + children + " }"
-    }
-}
-
+// Use RNodeSpan as SvgSpan until we need to separate them.
+typealias RNodePathSpan = RNodeSpan
 
 
 class RNodeSymbol(val text: String,

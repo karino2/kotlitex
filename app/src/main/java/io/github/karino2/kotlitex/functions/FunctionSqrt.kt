@@ -120,6 +120,64 @@ object FunctionSqrt {
     }
 }
 
+class PathBuilder {
+    val path = Path()
+
+    var lastX = 0.0
+    var lastY = 0.0
+    var secondLastX = 0.0
+    var secondLastY = 0.0
+
+
+    fun M(x: Double, y:Double) {
+        path.moveTo(x.toFloat(), y.toFloat())
+        lastX += x
+        lastY += y
+        secondLastX = 0.0
+        secondLastY = 0.0
+    }
+    fun c(x1: Double, y1: Double, x2:Double, y2:Double, x3:Double, y3:Double) {
+        path.rCubicTo(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat(), x3.toFloat(), y3.toFloat())
+        secondLastX =lastX+x2
+        secondLastY = lastY+y2
+        lastX += x3
+        lastY += y3
+    }
+    fun s(x1: Double, y1:Double, x2:Double, y2:Double) {
+        // (a+secl)/2 = l
+        // a = 2l-secl
+        val firstCtrlX = 2*lastX-secondLastX
+        val firstCtrlY = 2*lastY-secondLastY
+        path.rCubicTo(firstCtrlX.toFloat(), firstCtrlY.toFloat(), x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
+
+        secondLastX = lastX+x1
+        secondLastY = lastY+y1
+        lastX += x2
+        lastY += y2
+
+    }
+
+    fun z() {
+        path.close()
+        secondLastX = 0.0
+        secondLastY = 0.0
+    }
+    fun H(x : Double){
+        path.lineTo(x.toFloat(), lastY.toFloat())
+        lastX = x
+        secondLastX = 0.0
+        secondLastY = 0.0
+    }
+
+    fun v(y: Double) {
+        path.rLineTo(0f, y.toFloat())
+        lastY +=y
+        secondLastX = 0.0
+        secondLastY = 0.0
+    }
+
+
+}
 
 object SvgGeometry {
     /*
@@ -144,9 +202,49 @@ s-65,47,-65,47z M834 ${hLinePad}H400000v40H845z`,
                             s-65,47,-65,47z M834 80H400000v40H845z'/>
 
      */
+    fun build(body: PathBuilder.()->Unit ) : Path {
+        val builder = PathBuilder()
+        builder.body()
+        return builder.path
+    }
+
+
     val sqrtMain by lazy {
-        val path = Path()
+        build {
+            M(95.0,702.0)
+            c(-2.7,0.0,-7.17,-2.7,-13.5,-8.0)
+            c(-5.8,-5.3,-9.5,
+            -10.0,-9.5,-14.0)
+            c(0.0,-2.0,0.3,-3.3,1.0,-4.0)
+            c(1.3,-2.7,23.83,-20.7,67.5,-54.0)
+            c(44.2,-33.3,65.8, -50.3,66.5,-51.0)
+            c(1.3,-1.3,3.0,-2.0,5.0,-2.0)
+            c(4.7,0.0,8.7,3.3,12.0,10.0)
+            s(173.0,378.0,173.0,378.0)
+            c(0.7,0.0, 35.3,-71.0,104.0,-213.0)
+            c(68.7,-142.0,137.5,-285.0,206.5,-429.0)
+            c(69.0,-144.0,104.5,-217.7,106.5, -221.0)
+            c(5.3,-9.3,12.0,-14.0,20.0,-14.0)
+            H(400000.0)
+            v(40.0)
+            H(845.2724)
+            s(-225.272,467.0,-225.272,467.0)
+            s(-235.0,486.0,-235.0,486.0)
+            c(-2.7,4.7,-9.0,7.0,-19.0,7.0)
+            c(-6.0,0.0,-10.0,-1.0,-12.0,-3.0)
+            s(-194.0,-422.0,-194.0,-422.0)
+            s(-65.0,47.0,-65.0,47.0)
+            z()
+            M(834.0, 80.0)
+            H(400000.0)
+            v(40.0)
+            H(845.0)
+            z()
+        }
+
         // https://www.w3.org/TR/SVG/paths.html
+        /*
+        val path = Path()
         path.moveTo(95f, 702f)
         path.rCubicTo(-2.7f, 0f, -7.17f, -2.7f, -13.5f, -8f)
         path.rCubicTo(-5.8f,-5.3f,-9.5f, -10f,-9.5f,-14f)
@@ -189,6 +287,7 @@ s-65,47,-65,47z M834 ${hLinePad}H400000v40H845z`,
         path.lineTo(845f, 120f)
         path.close()
         path
+        */
     }
 }
 
