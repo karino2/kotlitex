@@ -605,9 +605,9 @@ object RenderBuilderDelimiter {
 
         // Create a span containing an SVG image of a sqrt symbol.
         var span : RNodePathSpan
-        var spanHeight = 0.0
-        var texHeight = 0.0
-        var viewBoxHeight = 0.0
+        var spanHeight: Double
+        var texHeight: Double
+        var viewBoxHeight:Double
         var advanceWidth : Double
 
         // We create viewBoxes with 80 units of "padding" above each surd.

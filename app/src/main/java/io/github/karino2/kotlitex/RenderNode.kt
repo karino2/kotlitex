@@ -94,7 +94,7 @@ class RNodeSpan(var children: MutableList<RenderNode> = mutableListOf(), var wid
 }
 
 // PathNode in js.
-class RNodePath(path: Path) : RenderNode() {
+class RNodePath(val path: Path) : RenderNode() {
     // TODO: support other pathName
     constructor(pathName: String) : this(SvgGeometry.sqrtMain) {
         if(pathName != "sqrtMain")
@@ -105,7 +105,7 @@ class RNodePath(path: Path) : RenderNode() {
 data class ViewBox(val minX: Double, val minY: Double, val width: Double, val height: Double)
 
 // SvgNode in js.
-class RNodePathHolder(children: MutableList<RNodePath>, val widthStr: String, val heightStr: String,
+class RNodePathHolder(val children: MutableList<RNodePath>, val widthStr: String, val heightStr: String,
                       val viewBox: ViewBox, val preserveAspectRatio: String,
                       val styleStr: String?=null) : RenderNode()
 
