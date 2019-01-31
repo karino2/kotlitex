@@ -76,11 +76,12 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
                 // "xMinYMin slice"
                 val mat = Matrix()
 
-                val (minx, miny, widthvb, heightvb) = parent.rnode.viewBox
+                val heightvb = parent.rnode.viewBox.height
                 val (_, _, wb, hb) = parent.bounds
 
                 // this is preserveAspectRatio = meet
                 /*
+                val (minx, miny, widthvb, heightvb) = parent.rnode.viewBox
                     val viewBoxF = RectF(minx.toFloat(), miny.toFloat(), (minx+widthvb).toFloat(), (miny+heightvb).toFloat())
                     val dstBox = RectF(x, y, (x+wb).toFloat(), (y+hb).toFloat())
                     mat.setRectToRect(viewBoxF, dstBox, Matrix.ScaleToFit.START)
