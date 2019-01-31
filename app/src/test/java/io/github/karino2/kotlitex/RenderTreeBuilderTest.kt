@@ -232,7 +232,8 @@ class RenderTreeBuilderTest {
 
                     // check something interesting
                     ac(0) {
-                        ac(0) {// target.children[1].children[0].children[0].children[0]
+                        ac(0) {
+                            // target.children[1].children[0].children[0].children[0]
                             ac(0) {
                                 ac(1) {
                                     ac(0) {
@@ -254,7 +255,7 @@ class RenderTreeBuilderTest {
                             ac(1) {
                                 cnum(2)
                                 h(0.04)
-                                style(CssStyle(top="-3.23em"))
+                                style(CssStyle(top = "-3.23em"))
 
                                 // res[0].children[1].children[0].children[0].children[0].children[1].children[1]
                                 // frac-line
@@ -271,6 +272,14 @@ class RenderTreeBuilderTest {
 
             }
         }
+    }
+
+    @Test
+    fun buildExpression_plus() {
+        val input = parse("x+y")
+        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+
+        assertTrue(actual.isNotEmpty())
     }
 
 }

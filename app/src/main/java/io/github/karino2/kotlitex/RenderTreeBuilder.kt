@@ -1,7 +1,7 @@
 package io.github.karino2.kotlitex
 
 import android.util.Log
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 data class Measurement(val number: Int, val unit: String) {
     val isValidUnit: Boolean
@@ -21,6 +21,7 @@ object RenderTreeBuilder {
     val groupBuilders : MutableMap<String, RenderNodeHandlerType>
         get()= LatexFunctions.renderGroupBuilders
 
+    // defineFunctionBuilder in js.
     fun registerBuilder(nodeType: String, builder: (ParseNode, Options)->RenderNode) {
         groupBuilders[nodeType] = builder
     }
@@ -192,6 +193,38 @@ object RenderTreeBuilder {
         }
         */
     }
+
+    /**
+     * Makes a symbol in Main-Regular or AMS-Regular.
+     * Used for rel, bin, open, close, inner, and punct.
+     *
+     * TODO(#953): Make `options` mandatory and always pass it in.
+     */
+    fun mathsym(
+        value: String,
+        mode: Mode,
+        options: Options?,
+        classes: MutableSet<CssClass>
+    ): RNodeSymbol {
+        // Decide what font to render the symbol in by its entry in the symbols
+        // table.
+        // Have a special case for when the value = \ because the \ is used as a
+        // textord in unsupported command errors but cannot be parsed as a regular
+        // text ordinal and is therefore not present as a symbol in the symbols
+        // table for text, as well as a special case for boldsymbol because it
+        // can be used for bold + and -
+        if ((options?.font == "boldsymbol") &&
+            Symbols.lookupSymbol(value, "Main-Bold", mode).second != null) {
+            return makeSymbol(value, "Main-Bold", mode, options,
+                classes.concat(setOf(CssClass.mathbf)))
+        } else if (value == "\\" || Symbols.get(mode)[value]?.font == "main") {
+            return makeSymbol(value, "Main-Regular", mode, options, classes)
+        } else {
+            return makeSymbol(
+                value, "AMS-Regular", mode, options, classes.concat(setOf(CssClass.amsrm)))
+        }
+    }
+
 
     // Takes font options, and returns the appropriate fontLookup name
     fun retrieveTextFontName(fontFamily: String,
@@ -644,6 +677,12 @@ object RenderTreeBuilder {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }
         registerBuilder("textord") { node, opt -> makeOrd(node, opt, "textord") }
         registerBuilder("supsub") {node, opt-> RenderBuilderSupsub.makeSupsub(node, opt) }
+        registerBuilder("atom") { node, opt ->
+            if(node !is PNodeAtom) {
+                throw IllegalArgumentException("atom but not PNodeAtom")
+            }
+            RenderTreeBuilder.mathsym(node.text, node.mode, opt, mutableSetOf(CssClass.mFamily(node.family)))
+        }
     }
 
 }

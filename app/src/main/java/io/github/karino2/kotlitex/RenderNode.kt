@@ -6,16 +6,17 @@ import io.github.karino2.kotlitex.functions.SvgGeometry
 enum class CssClass {
     amsrm, base, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
     enclosing, frac_line, hide_tail,
-    mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
+    mathbf, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
-    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size6, root,
-    sizing,  size3, sqrt, struct, svg_align,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size3, reset_size6, root,
+    sizing,  size1, size3, size6, sqrt, struct, svg_align,
     textbf, textit, textrm,
     EMPTY;
 
     companion object {
         fun resetClass(size: Int) : CssClass{
             return when(size) {
+                3 -> CssClass.reset_size3
                 6 -> CssClass.reset_size6
                 else -> throw Exception("Unknown reset class size: $size")
             }
@@ -23,9 +24,23 @@ enum class CssClass {
 
         fun sizeClass(size: Int) : CssClass {
             return when(size) {
+                1 -> CssClass.size1
                 3 -> CssClass.size3
+                6 -> CssClass.size6
                 else -> throw Exception("Unknown size class size: $size")
             }
+        }
+
+        fun mFamily(family: Atoms): CssClass {
+            return when(family) {
+                Atoms.punct -> CssClass.mpunct
+                Atoms.bin -> CssClass.mbin
+                Atoms.close -> CssClass.mclose
+                Atoms.inner -> CssClass.minner
+                Atoms.open -> CssClass.mopen
+                Atoms.rel -> CssClass.mrel
+            }
+
         }
     }
 }
