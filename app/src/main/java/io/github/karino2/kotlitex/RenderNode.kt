@@ -8,16 +8,28 @@ enum class CssClass {
     enclosing, frac_line, hide_tail,
     mathbf, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
-    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, reset_size3, reset_size6, root,
-    sizing,  size1, size3, size6, sqrt, struct, svg_align,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct,
+    reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
+    reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
+    sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,
+    sqrt, struct, svg_align,
     textbf, textit, textrm,
     EMPTY;
 
     companion object {
         fun resetClass(size: Int) : CssClass{
             return when(size) {
+                1 -> CssClass.reset_size1
+                2 -> CssClass.reset_size2
                 3 -> CssClass.reset_size3
+                4 -> CssClass.reset_size4
+                5 -> CssClass.reset_size5
                 6 -> CssClass.reset_size6
+                7 -> CssClass.reset_size7
+                8 -> CssClass.reset_size8
+                9 -> CssClass.reset_size9
+                10 -> CssClass.reset_size10
+                11 -> CssClass.reset_size11
                 else -> throw Exception("Unknown reset class size: $size")
             }
         }
@@ -25,8 +37,16 @@ enum class CssClass {
         fun sizeClass(size: Int) : CssClass {
             return when(size) {
                 1 -> CssClass.size1
+                2 -> CssClass.size2
                 3 -> CssClass.size3
+                4 -> CssClass.size4
+                5 -> CssClass.size5
                 6 -> CssClass.size6
+                7 -> CssClass.size7
+                8 -> CssClass.size8
+                9 -> CssClass.size9
+                10 -> CssClass.size10
+                11 -> CssClass.size11
                 else -> throw Exception("Unknown size class size: $size")
             }
         }
