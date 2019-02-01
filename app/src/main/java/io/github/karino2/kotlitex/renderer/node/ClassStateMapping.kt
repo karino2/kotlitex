@@ -8,7 +8,18 @@ import io.github.karino2.kotlitex.renderer.RenderingState
 object ClassStateMapping {
     fun createState(klass: CssClass, state: RenderingState, node: RenderNode): RenderingState {
         return when (klass) {
+            CssClass.size1 -> state.copy(size = 1)
+            CssClass.size2 -> state.copy(size = 2)
             CssClass.size3 -> state.copy(size = 3)
+            CssClass.size4 -> state.copy(size = 4)
+            CssClass.size5 -> state.copy(size = 5)
+            CssClass.size6 -> state.copy(size = 6)
+            CssClass.size7 -> state.copy(size = 7)
+            CssClass.size8 -> state.copy(size = 8)
+            CssClass.size9 -> state.copy(size = 9)
+            CssClass.size10 -> state.copy(size = 10)
+            CssClass.size11 -> state.copy(size = 11)
+
             CssClass.vlist -> {
                 if (! isTrueVlist(node)) {
                     return state
