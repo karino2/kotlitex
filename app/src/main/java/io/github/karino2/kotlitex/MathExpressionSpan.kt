@@ -7,14 +7,14 @@ import android.text.style.DynamicDrawableSpan
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
 
-private class MathExpressionDrawable(expr: String) : Drawable() {
+private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBounds: Boolean = false) : Drawable() {
     var rootNode: VerticalList
     init {
         val options = Options(Style.TEXT)
         val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
-        val builder = VirtualNodeBuilder(nodes)
+        val builder = VirtualNodeBuilder(nodes, baseSize.toDouble())
         rootNode = builder.build()
     }
 
@@ -46,6 +46,21 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
         return y.toFloat() + 100
     }
 
+    private fun drawBounds(canvas: Canvas, bounds: Bounds) {
+        if (! drawBounds) {
+            return
+        }
+
+        val x = translateX(bounds.x)
+        val y = translateY(bounds.y)
+
+        paint.color = Color.RED
+        paint.strokeWidth = 1.0f
+        paint.style = Paint.Style.STROKE
+
+        canvas.drawRect(RectF(x, y, x+ bounds.width.toFloat(), y + bounds.height.toFloat()), paint)
+    }
+
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
         when (parent) {
             is VirtualContainerNode<*> -> {
@@ -59,6 +74,7 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
                 val x = translateX(parent.bounds.x)
                 val y = translateY(parent.bounds.y)
                 canvas.drawText(parent.text, x, y, textPaint)
+                drawBounds(canvas, parent.bounds)
             }
             is HorizontalLineNode -> {
                 paint.color = Color.BLACK
@@ -66,10 +82,13 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
                 val x = translateX(parent.bounds.x)
                 val y = translateY(parent.bounds.y)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat(), y, paint)
+                drawBounds(canvas, parent.bounds)
             }
             is PathNode -> {
                 val x = translateX(parent.bounds.x)
                 val y = translateY(parent.bounds.y)
+
+                drawBounds(canvas, parent.bounds)
 
 
                 // TODO: support other preserve aspect ratio.
@@ -119,9 +138,10 @@ private class MathExpressionDrawable(expr: String) : Drawable() {
 
 }
 
-class MathExpressionSpan(val expr: String) : DynamicDrawableSpan() {
+class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f) : DynamicDrawableSpan() {
     override fun getDrawable(): Drawable {
-        val drawable = MathExpressionDrawable(expr)
+        // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
+        val drawable = MathExpressionDrawable(expr, baseSize, drawBounds = false)
         drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         return drawable
     }
