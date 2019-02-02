@@ -13,7 +13,7 @@ class VirtualNodeBuilderTest {
     fun build() {
         val parser = Parser("x^2")
         val tree = RenderTreeBuilder.buildExpression(parser.parse(), Options(Style.TEXT), true)
-        val builder = VirtualNodeBuilder(tree, true)
+        val builder = VirtualNodeBuilder(tree, true, 10.0)
         println(builder.build())
     }
 }
