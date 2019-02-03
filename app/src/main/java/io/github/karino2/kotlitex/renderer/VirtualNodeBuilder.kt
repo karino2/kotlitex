@@ -3,8 +3,8 @@ package io.github.karino2.kotlitex.renderer
 import io.github.karino2.kotlitex.*
 import io.github.karino2.kotlitex.renderer.node.*
 
-class VirtualNodeBuilder(val children: List<RenderNode>, val headless: Boolean = false) {
-    var state: RenderingState = RenderingState()
+class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val headless: Boolean = false) {
+    var state: RenderingState = RenderingState().copy(baseSize = baseSize)
 
     fun build(): VerticalList {
         val row = VerticalListRow(emptySet())
