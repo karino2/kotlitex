@@ -2,6 +2,7 @@ package io.github.karino2.kotlitex
 
 import io.github.karino2.kotlitex.Lexer.Companion.combiningDiacriticalMarksEndRegex
 import io.github.karino2.kotlitex.functions.FunctionFrac
+import io.github.karino2.kotlitex.functions.FunctionOp
 import io.github.karino2.kotlitex.functions.FunctionSqrt
 
 enum class Mode { MATH, TEXT }
@@ -112,6 +113,7 @@ class Parser(val input: String) {
             // Is here right place?
             FunctionFrac.defineAll()
             FunctionSqrt.defineAll()
+            FunctionOp.defineAll()
         }
     }
 
