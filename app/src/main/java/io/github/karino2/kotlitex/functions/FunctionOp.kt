@@ -218,7 +218,7 @@ object FunctionOp {
             return RenderTreeBuilder.makeSpan(
                 mutableSetOf(CssClass.mop, CssClass.op_limits), mutableListOf(finalGroup), options)
         } else {
-            if (baseShift != null) {
+            if (baseShift != 0.0) {
                 base.style.position = "relative";
                 base.style.top = "${baseShift}em";
             }
@@ -257,7 +257,7 @@ object FunctionOp {
                 "\u2210", "\u2211", "\u22c0", "\u22c1", "\u22c2", "\u22c3", "\u2a00",
                 "\u2a01", "\u2a02", "\u2a04", "\u2a06"
             ),
-            { context: FunctionContext, args: List<ParseNode>, optArgs: List<ParseNode?> ->
+            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
                 val parser = context.parser
                 val fName = context.funcName
                 // TODO: support funcName.length == 1 case.
@@ -265,15 +265,6 @@ object FunctionOp {
                     if (fName.length === 1) {
                         fName = singleCharBigOps[fName];
                     }
-                 */
-                /*
-                override val mode: Mode, override val loc: SourceLocation?,
-                   var limits: Boolean,
-                   var alwaysHandleSupSub: Boolean?,
-                   val suppressBaseShift: Boolean?,
-                   val symbol: Boolean,
-                   var name: String,
-                   val body: Any?
                  */
                 PNodeOp(
                     parser.mode,
