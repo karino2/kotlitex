@@ -5,14 +5,14 @@ import io.github.karino2.kotlitex.functions.SvgGeometry
 
 enum class CssClass {
     amsrm, base, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
-    enclosing, frac_line, hide_tail,
+    enclosing, frac_line, hide_tail, large_op,
     mathbf, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
-    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, op_symbol,op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
     sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,
-    sqrt, struct, svg_align,
+    small_op, sqrt, struct, svg_align,
     textbf, textit, textrm,
     EMPTY;
 
@@ -83,7 +83,8 @@ data class CssStyle(
     var marginRight: String? = null,
     var borderBottomWidth: String? = null,
     var minWidth: String? = null,
-    var paddingLeft: String? = null
+    var paddingLeft: String? = null,
+    var position: String? = null
 /*
     backgroundColor: string,
     borderColor: string,
@@ -93,7 +94,6 @@ data class CssStyle(
     left: string,
     marginTop: string,
 
-    position: string,
     width: string,
     verticalAlign: string,
 
@@ -126,6 +126,10 @@ class RNodeSpan(var children: MutableList<RenderNode> = mutableListOf(), var wid
         val children = children.map { it.toString() }.joinToString(", ", "[", "]")
         return this.javaClass.simpleName + " { klasses = " + klasses + ", children = " + children + " }"
     }
+
+    // Basically RNodeSpan does not have italic, but in op.js, they put italic secretly
+    // I put this as field so that all other doesn't need to care there existence.
+    var italic = 0.0
 }
 
 // PathNode in js.
@@ -149,8 +153,8 @@ class RNodePathHolder(val children: MutableList<RNodePath>, val widthStr: String
 typealias RNodePathSpan = RNodeSpan
 
 
-class RNodeSymbol(val text: String,
-                  val italic: Double = 0.0,
+class RNodeSymbol(var text: String,
+                  var italic: Double = 0.0,
                   val skew: Double = 0.0,
                   val width: Double = 0.0,
                   klasses : MutableSet<CssClass> = mutableSetOf(), height: Double = 0.0,

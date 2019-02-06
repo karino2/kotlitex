@@ -20,7 +20,7 @@ data class PNodeOp(override val mode: Mode, override val loc: SourceLocation?,
                    var alwaysHandleSupSub: Boolean?,
                    val suppressBaseShift: Boolean?,
                    val symbol: Boolean,
-                   val name: String,
+                   var name: String,
                    val body: Any?
                   ) : ParseNode() {
     override val type = "op"

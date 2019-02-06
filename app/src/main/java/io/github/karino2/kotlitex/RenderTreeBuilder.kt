@@ -672,6 +672,59 @@ object RenderTreeBuilder {
         return group
     }
 
+    fun tryCombineChars(in_chars: List<RenderNode>): MutableList<RenderNode> {
+        val chars = in_chars.toMutableList()
+        var i = 0
+        while(i < chars.size-1) {
+            val prev = chars[i];
+            val next = chars[i + 1];
+            if (prev is RNodeSymbol
+                && next is RNodeSymbol
+                && canCombine(prev, next)) {
+
+                prev.text += next.text;
+                prev.height = Math.max(prev.height, next.height);
+                prev.depth = Math.max(prev.depth, next.depth);
+                // Use the last character's italic correction since we use
+                // it to add padding to the right of the span created from
+                // the combined characters.
+                prev.italic = next.italic;
+                chars.removeAt(i+1)
+                i--;
+            }
+            i++
+        }
+        return chars
+    }
+
+
+    private fun canCombine(prev: RNodeSymbol, next: RNodeSymbol): Boolean {
+        if (prev.klasses != next.klasses
+            || prev.skew != next.skew
+            || prev.maxFontSize != next.maxFontSize) {
+            return false
+        }
+
+        /*
+        for (style in prev.style) {
+            if (prev.style.hasOwnProperty(style)
+                && prev.style[style] !== next.style[style]) {
+                return false;
+            }
+        }
+        for (const style in next.style) {
+            if (next.style.hasOwnProperty(style)
+                && prev.style[style] !== next.style[style]) {
+                return false;
+            }
+        }
+        */
+        if(prev.style != next.style)
+            return false
+
+        return true
+    }
+
 
     init {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }

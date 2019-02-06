@@ -282,4 +282,19 @@ class RenderTreeBuilderTest {
         assertTrue(actual.isNotEmpty())
     }
 
+    @Test
+    fun buildExpression_sum() {
+        val input = parse("\\sum^N_{k=1} k")
+        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+
+        assertTrue(actual.isNotEmpty())
+    }
+
+    @Test
+    fun buildExpression_prod() {
+        val input = parse("\\prod^N_{k=1} k")
+        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+
+        assertTrue(actual.isNotEmpty())
+    }
 }
