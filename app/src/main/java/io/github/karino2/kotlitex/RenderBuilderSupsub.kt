@@ -1,11 +1,45 @@
 package io.github.karino2.kotlitex
 
+import io.github.karino2.kotlitex.functions.FunctionOp
 import java.lang.IllegalArgumentException
 
+
+typealias RenderHandler = (ParseNode, Options)->RenderNode
 object RenderBuilderSupsub {
+
+
+    fun htmlBuilderDelegate(group: PNodeSupSub, options: Options) :  RenderHandler?{
+        val base = group.base ?: return null
+        when (base) {
+            is PNodeOp -> {
+                // Operators handle supsubs differently when they have limits
+                // (e.g. `\displaystyle\sum_2^3`)
+                val delegate = base.limits &&
+                (options.style.size == Style.DISPLAY.size ||
+                        base.alwaysHandleSupSub == true)
+                if(delegate)
+                    return FunctionOp::renderNodeBuilder
+                return null
+            }
+            /*
+            TODO:
+            is PNodeAccent -> {
+                return utils.isCharacterBox(base.base) ? accent.htmlBuilder : null;
+            }
+            is PNodeHorizBrace -> {
+                const isSup = !group.sub;
+                return isSup === base.isOver ? horizBrace.htmlBuilder : null;
+
+            }
+            */
+            else -> return null
+
+        }
+    }
+
     // Super scripts and subscripts, whose precise placement can depend on other
     // functions that precede them.
-    fun makeSupsub(group: ParseNode, options: Options) : RNodeSpan {
+    fun makeSupsub(group: ParseNode, options: Options) : RenderNode {
         if(group !is PNodeSupSub) {
             throw IllegalArgumentException("unexpected type in makeSupsub.")
         }
@@ -14,12 +48,10 @@ object RenderBuilderSupsub {
 
         // Here is where we defer to the inner group if it should handle
         // superscripts and subscripts itself.
-        /*TODO:
-        const builderDelegate = htmlBuilderDelegate(group, options);
-        if (builderDelegate) {
+        val builderDelegate = htmlBuilderDelegate(group, options);
+        if (builderDelegate != null) {
             return builderDelegate(group, options);
         }
-         */
 
         val valueBase = group.base
         val valueSup = group.sup
