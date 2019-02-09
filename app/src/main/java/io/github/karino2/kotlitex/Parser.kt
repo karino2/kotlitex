@@ -62,7 +62,6 @@ data class Settings(val displayMode :Boolean = false, val throwOnError: Boolean 
                     val maxSize: Int = Int.MAX_VALUE,
                     val maxExpand: Int = 1000,
                     val allowedProtocols: List<String> = emptyList()) {
-
     /**
      * Report nonstrict (non-LaTeX-compatible) input.
      * Can safely not be called if `this.strict` is false in JavaScript.
@@ -104,7 +103,7 @@ data class AccentRelation(val text: String, val math: String) {
     fun get(mode: Mode) =if(mode==Mode.MATH) math else text
 }
 
-class Parser(val input: String) {
+class Parser(val input: String, val settings:Settings = Settings()) {
     companion object {
         val endOfExpression = listOf("}", "\\end", "\\right", "&");
         val SUPSUB_GREEDINESS = 1
@@ -118,7 +117,7 @@ class Parser(val input: String) {
     }
 
 
-    val settings = Settings()
+
 
 
     var mode = Mode.MATH

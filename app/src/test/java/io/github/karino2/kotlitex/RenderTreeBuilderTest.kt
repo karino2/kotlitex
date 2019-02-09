@@ -53,8 +53,8 @@ fun assertSpan(node: RenderNode?, body: SpanAsserter.()->Unit) {
 
 
 class RenderTreeBuilderTest {
-    fun parse(input: String) : List<ParseNode> {
-        val parser = Parser(input)
+    fun parse(input: String, settings: Settings = Settings()) : List<ParseNode> {
+        val parser = Parser(input, settings)
         return  parser.parse()
     }
 
@@ -284,8 +284,9 @@ class RenderTreeBuilderTest {
 
     @Test
     fun buildExpression_sum() {
+        val opt = Options(Style.DISPLAY)
         val input = parse("\\sum^N_{k=1} k")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        val actual = RenderTreeBuilder.buildExpression(input, opt, true)
 
         assertTrue(actual.isNotEmpty())
     }
