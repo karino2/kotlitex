@@ -10,7 +10,7 @@ import io.github.karino2.kotlitex.renderer.node.*
 private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBounds: Boolean = false) : Drawable() {
     var rootNode: VerticalList
     init {
-        val options = Options(Style.TEXT)
+        val options = Options(Style.DISPLAY)
         val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
@@ -37,13 +37,13 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
     }
 
     // TODO
-    override fun getIntrinsicWidth(): Int = 200
-    override fun getIntrinsicHeight(): Int = 200
+    override fun getIntrinsicWidth(): Int = 400
+    override fun getIntrinsicHeight(): Int = 400
     private fun translateX(x: Double): Float {
         return x.toFloat() + 100
     }
     private fun translateY(y: Double): Float {
-        return y.toFloat() + 100
+        return y.toFloat() + 200
     }
 
     private fun drawBounds(canvas: Canvas, bounds: Bounds) {
