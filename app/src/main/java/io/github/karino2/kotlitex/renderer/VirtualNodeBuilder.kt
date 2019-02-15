@@ -46,7 +46,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
 
     private fun createSvgNode(node: RenderNode) {
         if(node is RNodePathHolder) {
-            val height = (+node.heightStr.replace("em", "").toDouble()) * state.em
+            val height = state.parseEm(node.heightStr)
             node.height = height
             // TODO: support fill.
             // node.attributes.fill = this._state.color
