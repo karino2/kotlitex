@@ -42,7 +42,15 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
         state = StyleStateMapping.createState(state, node)
     }
 
-    private fun createMSpace() {}
+    private fun createMSpace() {
+        if (state.mspace > 0.0) {
+            val mspace = HPaddingNode(state.klasses)
+            mspace.setPosition(state.nextX(), state.y)
+            mspace.bounds.width = state.mspace * state.fontSize()
+            state.vlist.addCell(mspace)
+            state = state.withResetMargin()
+        }
+    }
 
     private fun createSvgNode(node: RenderNode) {
         if(node is RNodePathHolder) {
