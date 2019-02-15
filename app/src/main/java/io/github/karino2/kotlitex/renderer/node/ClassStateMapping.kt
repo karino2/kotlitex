@@ -31,7 +31,7 @@ object ClassStateMapping {
                 state.copy(vlist = vlist).withResetMargin()
             }
             CssClass.pstruct -> {
-                val height = node.style.height!!.replace("em", "").toDouble() * state.em
+                val height = state.parseEm(node.style.height!!)
                 val tableRow = VerticalListRow(state.klasses)
                 state.vlist.addRow(tableRow)
                 tableRow.setPosition(state.nextX(), state.y + height)
