@@ -11,7 +11,7 @@ console.log(katex.renderToString("\\sqrt{3}", {displayMode:true}))
                         <span class="svg-align" style="top:-3em;">
                             <span class="pstrut" style="height:3em;"></span>
                             <span class="mord" style="padding-left:0.833em;">
-                            <span class="mord">3</span>
+                              <span class="mord">3</span>
                             </span>
                         </span>
                         <span style="top:-2.916095em;">

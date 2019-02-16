@@ -27,16 +27,6 @@ class RenderTreeBuilderInstrumentedTest {
         return  parser.parse()
     }
 
-    val options = Options(Style.TEXT)
-    // This is used to check intermediate result by debugger.
-    @Test
-    fun buildExpression_sqrt_call_success() {
-        val input = parse("\\sqrt{3}")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
-
-        assertTrue(actual.isNotEmpty())
-    }
-
     @Test
     fun buildExpression_sqrt() {
         val opt = Options(Style.DISPLAY)
@@ -46,11 +36,19 @@ class RenderTreeBuilderInstrumentedTest {
         assertEquals(1, actual.size)
         val target = actual[0]
 
-        assertSpan(target) { ac(0) { ac(0){ ac(0){ac(1)
-        {
-            styleTop("-2.916095em")
-        }
-        }}}}
+        assertSpan(target) { ac(0) { ac(0){
+            ac(0){
+                style(CssStyle("0.956095em"))
+                ac(0) {
+                    // svg-align
+                    ac(1) {
+                        style(CssStyle(paddingLeft="0.833em"))
+                    }
+                }
+                ac(1) {
+                    styleTop("-2.916095em")
+                }
+            }}}}
     }
 
 
