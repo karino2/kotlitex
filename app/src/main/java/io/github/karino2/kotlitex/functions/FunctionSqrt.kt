@@ -45,7 +45,7 @@ object FunctionSqrt {
         val minDelimiterHeight = inner.height + inner.depth + lineClearance + theta // Create a sqrt SVG of the required minimum size
 
         // Create a sqrt SVG of the required minimum size
-        val (img, ruleWidth, advanceWidth) =
+        val (img, advanceWidth, ruleWidth) =
                 makeSqrtImage(minDelimiterHeight, options);
 
         val delimDepth = img.height - ruleWidth;

@@ -37,4 +37,22 @@ class RenderTreeBuilderInstrumentedTest {
         assertTrue(actual.isNotEmpty())
     }
 
+    @Test
+    fun buildExpression_sqrt() {
+        val opt = Options(Style.DISPLAY)
+        val input = parse("\\sqrt{3}")
+        val actual = RenderTreeBuilder.buildExpression(input, opt, true)
+
+        assertEquals(1, actual.size)
+        val target = actual[0]
+
+        assertSpan(target) { ac(0) { ac(0){ ac(0){ac(1)
+        {
+            styleTop("-2.916095em")
+        }
+        }}}}
+    }
+
+
+
 }
