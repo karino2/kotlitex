@@ -14,6 +14,27 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class VirtualNodeBuilderInstrumentedTest {
     val TAG = "VirtualNodeBuilderInstrumentedTest"
+    private fun printTree(parent: RenderNode, level: Int) {
+        when (parent) {
+            is RNodeSpan -> {
+                println("  ".repeat(level) + "${parent.javaClass.simpleName} {")
+                parent.children.forEach {
+                    printTree(it, level + 1)
+                }
+                println("  ".repeat(level) + "}")
+            }
+            else -> {
+                println("  ".repeat(level) + parent.toString())
+            }
+        }
+    }
+
+    private fun printTree(parents: List<RenderNode>, level: Int = 0) {
+        parents.forEach {
+            printTree(it, level)
+        }
+    }
+
     private fun printTree(parent: VirtualCanvasNode, level: Int = 0) {
         when (parent) {
             is VirtualContainerNode<*> -> {
@@ -33,10 +54,13 @@ class VirtualNodeBuilderInstrumentedTest {
     fun build() {
         val parser = Parser("\\sqrt{3}")
         val renderTree = RenderTreeBuilder.buildExpression(parser.parse(), Options(Style.DISPLAY), true)
+        println("Render Tree")
+        printTree(renderTree)
+
         val builder = VirtualNodeBuilder(renderTree, 100.0)
         val virtualNodeTree = builder.build();
 
-        println("\\sqrt{3}")
+        println("Virtual Node Tree")
         printTree(virtualNodeTree)
 
         // TODO: Write actual assertions. Right now, this test is just for showing the tree.
