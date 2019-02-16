@@ -1,7 +1,19 @@
 package io.github.karino2.kotlitex.renderer
 
-import io.github.karino2.kotlitex.*
-import io.github.karino2.kotlitex.renderer.node.*
+import io.github.karino2.kotlitex.CssClass
+import io.github.karino2.kotlitex.RNodePathHolder
+import io.github.karino2.kotlitex.RNodeSpan
+import io.github.karino2.kotlitex.RNodeSymbol
+import io.github.karino2.kotlitex.RenderNode
+import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
+import io.github.karino2.kotlitex.renderer.node.CssFont
+import io.github.karino2.kotlitex.renderer.node.CssFontFamily
+import io.github.karino2.kotlitex.renderer.node.HPaddingNode
+import io.github.karino2.kotlitex.renderer.node.PathNode
+import io.github.karino2.kotlitex.renderer.node.StyleStateMapping
+import io.github.karino2.kotlitex.renderer.node.TextNode
+import io.github.karino2.kotlitex.renderer.node.VerticalList
+import io.github.karino2.kotlitex.renderer.node.VerticalListRow
 
 class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val headless: Boolean = false) {
     var state: RenderingState = RenderingState().copy(baseSize = baseSize)
@@ -53,7 +65,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
     }
 
     private fun createSvgNode(node: RenderNode) {
-        if(node is RNodePathHolder) {
+        if (node is RNodePathHolder) {
             val height = state.parseEm(node.heightStr)
             node.height = height
             // TODO: support fill.
