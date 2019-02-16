@@ -86,11 +86,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
             }
             is PathNode -> {
                 val x = translateX(parent.bounds.x)
-
-                // TODO: "y - height" should work according to VirtualNodesToCreateJS.js, but it doesn't
-                // val y = (translateY(parent.bounds.y) - parent.bounds.height).toFloat()
-                // instead...
-                val y = (translateY(0.0) - parent.bounds.height).toFloat()
+                val y = (translateY(parent.bounds.y) - parent.bounds.height).toFloat()
 
                 drawBounds(canvas, parent.bounds)
 

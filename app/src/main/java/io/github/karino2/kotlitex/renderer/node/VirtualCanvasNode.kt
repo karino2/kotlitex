@@ -23,6 +23,16 @@ sealed class VirtualCanvasNode(var klasses: Set<String>) {
 
     open fun updateSize() {
     }
+
+    override fun toString(): String {
+        val b = StringBuilder()
+        b.append("${this.javaClass.simpleName} { bounds=${bounds}, margin=${margin}")
+        if (klasses.isNotEmpty()) {
+            b.append(", klasses=${klasses}")
+        }
+        b.append(" }")
+        return b.toString()
+    }
 }
 
 /**
@@ -201,7 +211,11 @@ class TextNode(
     }
 
     override fun toString(): String {
-        return this.javaClass.simpleName + " { text = " + text + ", klasses = " + this.klasses + " }"
+        val b = StringBuilder()
+        b.append("${this.javaClass.simpleName} { text=${text}")
+        b.append(", bounds=${bounds}")
+        b.append(" }")
+        return b.toString()
     }
 }
 
