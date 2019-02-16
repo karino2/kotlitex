@@ -48,10 +48,7 @@ class RenderTreeBuilderInstrumentedTest {
 
         assertSpan(target) { ac(0) { ac(0){ ac(0){ac(1)
         {
-            // what canvas-latex obtain.
-            // styleTop("-2.916095em")
-
-            styleTop("-3.62519em")
+            styleTop("-2.916095em")
         }
         }}}}
     }

@@ -593,7 +593,7 @@ object RenderBuilderDelimiter {
     /**
      * Make a sqrt image of the given height,
      */
-    fun makeSqrtImage(height: Double, options: Options) : Triple<RNodePathSpan, /*ruleWidth*/ Double, /*advancedWidth*/ Double> {
+    fun makeSqrtImage(height: Double, options: Options) : Triple<RNodePathSpan, /*advancedWidth*/ Double, /*ruleWidth*/ Double> {
         // Define a newOptions that removes the effect of size changes such as \Huge.
         // We don't pick different a height surd for \Huge. For it, we scale up.
         val newOptions = options.havingBaseSizing()
