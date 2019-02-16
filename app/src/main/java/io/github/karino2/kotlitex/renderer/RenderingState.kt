@@ -43,7 +43,7 @@ data class RenderingState(
         variant = "normal",
         weight = "normal",
         vlist = VerticalList(Alignment.CENTER, 0.0, emptySet()),
-        textAlign = Alignment.CENTER,
+        textAlign = Alignment.NONE,
         minWidth = 0.0,
         marginRight = 0.0,
         marginLeft = 0.0,

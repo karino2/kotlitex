@@ -4,7 +4,7 @@ import android.graphics.Paint
 import io.github.karino2.kotlitex.RNodePathHolder
 
 enum class Alignment {
-    LEFT, RIGHT, CENTER
+    NONE /* same as null on canvas-latex */, LEFT, RIGHT, CENTER
 }
 
 /**

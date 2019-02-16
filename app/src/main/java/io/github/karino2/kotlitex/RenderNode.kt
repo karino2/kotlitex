@@ -161,6 +161,12 @@ class RNodeSymbol(var text: String,
                   depth: Double = 0.0, style: CssStyle = CssStyle())
     : RenderNode(klasses, height, depth, 0.0, style) {
     override fun toString(): String {
-        return this.javaClass.simpleName + " { klasses = " + klasses + ", text = " + text + " }"
+        val b = StringBuilder()
+        b.append("${this.javaClass.simpleName} { text='$text', style=$style")
+        if (klasses.isNotEmpty()) {
+            b.append(", klasses=$klasses")
+        }
+        b.append(" }")
+        return b.toString()
     }
 }
