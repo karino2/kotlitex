@@ -92,7 +92,7 @@ class RenderNodeTest {
         val target = spans[0]
 
         assertTrue(target is RNodeSpan)
-        val mord = (target as RNodeSpan)!!
+        val mord = (target as RNodeSpan)
 
         assertEquals(2, mord.children.size)
         assertTrue(mord.hasClass(CssClass.mord))

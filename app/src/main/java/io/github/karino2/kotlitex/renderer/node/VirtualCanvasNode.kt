@@ -26,9 +26,9 @@ sealed class VirtualCanvasNode(var klasses: Set<String>) {
 
     override fun toString(): String {
         val b = StringBuilder()
-        b.append("${this.javaClass.simpleName} { bounds=${bounds}, margin=${margin}")
+        b.append("${this.javaClass.simpleName} { bounds=$bounds, margin=$margin")
         if (klasses.isNotEmpty()) {
-            b.append(", klasses=${klasses}")
+            b.append(", klasses=$klasses")
         }
         b.append(" }")
         return b.toString()
@@ -212,8 +212,8 @@ class TextNode(
 
     override fun toString(): String {
         val b = StringBuilder()
-        b.append("${this.javaClass.simpleName} { text=${text}")
-        b.append(", bounds=${bounds}")
+        b.append("${this.javaClass.simpleName} { text=$text")
+        b.append(", bounds=$bounds")
         b.append(" }")
         return b.toString()
     }
@@ -227,4 +227,4 @@ class HPaddingNode(klasses: Set<String>) : VirtualCanvasNode(klasses)
 class HorizontalLineNode(val color: String, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
 
 // SvgNode in canvas-latex. Note that there is the same class-name in katex (but this class is counter-part of canvas-latex, not katex).
-class PathNode(val rnode : RNodePathHolder, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
+class PathNode(val rnode: RNodePathHolder, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
