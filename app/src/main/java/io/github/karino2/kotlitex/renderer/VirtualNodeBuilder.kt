@@ -82,7 +82,8 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
 
     private fun createTextNode(node: RenderNode) {
         if (node is RNodeSymbol) {
-            if (node.text.length > 0) {
+            val isZeroWidthSpace = (node.text.length == 1 && node.text[0] == '\u200B')
+            if (node.text.length > 0 && !isZeroWidthSpace) {
                 val s = this.state
                 val textNode = TextNode(node.text, CssFont(CssFontFamily.SERIF, state.fontSize()), state.color, state.klasses)
 
