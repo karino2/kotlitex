@@ -109,7 +109,7 @@ class VerticalListRow(klasses: Set<String>) : VirtualContainerNode<VirtualCanvas
 }
 
 abstract class StretchyNode(val minWidth: Double, klasses: Set<String>) : VirtualCanvasNode(klasses) {
-    fun setListWidth(width: Double) {
+    open fun setListWidth(width: Double) {
         bounds.width = width + this.minWidth
     }
 }
@@ -228,4 +228,11 @@ class HPaddingNode(klasses: Set<String>) : VirtualCanvasNode(klasses)
 class HorizontalLineNode(val color: String, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
 
 // SvgNode in canvas-latex. Note that there is the same class-name in katex (but this class is counter-part of canvas-latex, not katex).
-class PathNode(val rnode: RNodePathHolder, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses)
+class PathNode(val rnode: RNodePathHolder, minWidth: Double, klasses: Set<String>) : StretchyNode(minWidth, klasses) {
+    override fun setListWidth(width: Double) {
+        bounds.width = width
+        // in original implementation, they also update width of virtualHtmlNode.attributes here.
+        // But I think we do not use it.
+    }
+
+}
