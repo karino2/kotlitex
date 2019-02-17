@@ -152,6 +152,7 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
             Alignment.LEFT -> leftAlign()
             Alignment.CENTER -> centerAlign()
             Alignment.RIGHT -> rightAlign()
+            Alignment.NONE -> {}
         }
     }
 
