@@ -50,6 +50,9 @@ object ClassStateMapping {
                 state.vlist.addCell(lineNode)
                 return state.withResetMargin()
             }
+            CssClass.mfrac -> {
+                state.copy(textAlign = Alignment.CENTER)
+            }
             else -> state
         }
     }
