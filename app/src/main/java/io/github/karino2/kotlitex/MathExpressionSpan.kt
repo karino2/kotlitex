@@ -78,7 +78,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
             }
             is HorizontalLineNode -> {
                 paint.color = Color.BLACK
-                paint.strokeWidth = 1.0f
+                paint.strokeWidth = parent.bounds.height.toFloat()
                 val x = translateX(parent.bounds.x)
                 val y = translateY(parent.bounds.y)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat(), y, paint)
