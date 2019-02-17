@@ -64,7 +64,7 @@ class RenderNodeTest {
                                         italic = 0.05,
                                         maxFontSize = 0.7,
                                         children = list {
-                                            span("pstruct", sheight = "2.7em")
+                                            span("pstrut", sheight = "2.7em")
                                             span(
                                                 "sizing reset-size6 size3 mtight",
                                                 height = 0.45110799999999995,
