@@ -135,7 +135,7 @@ object RenderBuilderVList {
             }
         }
         pstrutSize += 2
-        val pstrut = makeSpan(mutableSetOf(CssClass.pstruct))
+        val pstrut = makeSpan(mutableSetOf(CssClass.pstrut))
         pstrut.style.height = pstrutSize.toString() + "em"
 
         // Create a new list of actual children at the correct offsets

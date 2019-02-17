@@ -8,7 +8,7 @@ enum class CssClass {
     enclosing, frac_line, hide_tail, large_op,
     mathbf, mathdefault, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
-    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstruct, op_symbol,op_limits,
+    vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstrut, op_symbol,op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
     sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,

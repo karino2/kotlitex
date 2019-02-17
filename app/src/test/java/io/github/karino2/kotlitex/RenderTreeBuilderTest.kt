@@ -107,7 +107,7 @@ class RenderTreeBuilderTest {
                                 cnum(2)
                                 assertSpan(child(0)) {
                                     knum(1)
-                                    kl(CssClass.pstruct)
+                                    kl(CssClass.pstrut)
                                     depth(0.0)
                                     maxFont(0.0)
                                     h(0.0)
