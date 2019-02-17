@@ -234,5 +234,4 @@ class PathNode(val rnode: RNodePathHolder, minWidth: Double, klasses: Set<String
         // in original implementation, they also update width of virtualHtmlNode.attributes here.
         // But I think we do not use it.
     }
-
 }
