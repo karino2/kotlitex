@@ -4,11 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-
 class RenderTreeBuilderTest {
-    fun parse(input: String, settings: Settings = Settings()) : List<ParseNode> {
+    fun parse(input: String, settings: Settings = Settings()): List<ParseNode> {
         val parser = Parser(input, settings)
-        return  parser.parse()
+        return parser.parse()
     }
 
     val options = Options(Style.TEXT)
@@ -21,7 +20,6 @@ class RenderTreeBuilderTest {
 
         assertTrue(actual is RNodeSpan)
     }
-
 
     /*
         Run the same code in node katex, then check value by debugger and write this test.
@@ -112,7 +110,7 @@ class RenderTreeBuilderTest {
                                     depth(0.0)
                                     maxFont(0.0)
                                     h(0.0)
-                                    style(CssStyle(height="2.7em"))
+                                    style(CssStyle(height = "2.7em"))
                                     cnum(0)
                                 }
                                 assertSpan(child(1)) {
@@ -137,7 +135,6 @@ class RenderTreeBuilderTest {
                                         w(0.5)
                                     }
                                 }
-
                             }
                         }
                     }
@@ -199,9 +196,7 @@ class RenderTreeBuilderTest {
                                             maxFont(0.7)
                                         }
                                     }
-
                                 }
-
                             }
 
                             // target.children[1].children[0].children[0].children[0].children[1]
@@ -220,9 +215,7 @@ class RenderTreeBuilderTest {
                             }
                         }
                     }
-
                 }
-
             }
         }
     }
@@ -251,6 +244,4 @@ class RenderTreeBuilderTest {
 
         assertTrue(actual.isNotEmpty())
     }
-
-
 }

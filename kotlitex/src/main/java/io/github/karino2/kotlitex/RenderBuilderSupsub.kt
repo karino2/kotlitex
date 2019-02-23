@@ -2,12 +2,10 @@ package io.github.karino2.kotlitex
 
 import io.github.karino2.kotlitex.functions.FunctionOp
 
-
-typealias RenderHandler = (ParseNode, Options)->RenderNode
+typealias RenderHandler = (ParseNode, Options) -> RenderNode
 object RenderBuilderSupsub {
 
-
-    fun htmlBuilderDelegate(group: PNodeSupSub, options: Options) :  RenderHandler?{
+    fun htmlBuilderDelegate(group: PNodeSupSub, options: Options): RenderHandler? {
         val base = group.base ?: return null
         when (base) {
             is PNodeOp -> {
@@ -16,7 +14,7 @@ object RenderBuilderSupsub {
                 val delegate = base.limits &&
                 (options.style.size == Style.DISPLAY.size ||
                         base.alwaysHandleSupSub == true)
-                if(delegate)
+                if (delegate)
                     return FunctionOp::renderNodeBuilder
                 return null
             }
@@ -32,14 +30,13 @@ object RenderBuilderSupsub {
             }
             */
             else -> return null
-
         }
     }
 
     // Super scripts and subscripts, whose precise placement can depend on other
     // functions that precede them.
-    fun makeSupsub(group: ParseNode, options: Options) : RenderNode {
-        if(group !is PNodeSupSub) {
+    fun makeSupsub(group: ParseNode, options: Options): RenderNode {
+        if (group !is PNodeSupSub) {
             throw IllegalArgumentException("unexpected type in makeSupsub.")
         }
         // Superscript and subscripts are handled in the TeXbook on page
@@ -47,9 +44,9 @@ object RenderBuilderSupsub {
 
         // Here is where we defer to the inner group if it should handle
         // superscripts and subscripts itself.
-        val builderDelegate = htmlBuilderDelegate(group, options);
+        val builderDelegate = htmlBuilderDelegate(group, options)
         if (builderDelegate != null) {
-            return builderDelegate(group, options);
+            return builderDelegate(group, options)
         }
 
         val valueBase = group.base
@@ -57,8 +54,8 @@ object RenderBuilderSupsub {
         val valueSub = group.sub
 
         val base = RenderTreeBuilder.buildGroup(valueBase, options)
-        var supm : RenderNode? = null
-        var subm :  RenderNode? = null
+        var supm: RenderNode? = null
+        var subm: RenderNode? = null
 
         val metrics = options.fontMetrics
 
@@ -71,8 +68,8 @@ object RenderBuilderSupsub {
         val isCharacterBox = true
 
         if (valueSup != null) {
-            val newOptions = options.havingStyle(options.style.sup());
-            supm = RenderTreeBuilder.buildGroup(valueSup, newOptions, options);
+            val newOptions = options.havingStyle(options.style.sup())
+            supm = RenderTreeBuilder.buildGroup(valueSup, newOptions, options)
             if (!isCharacterBox) {
                 supShift = base.height - newOptions.fontMetrics.supDrop *
                         newOptions.sizeMultiplier / options.sizeMultiplier
@@ -80,31 +77,31 @@ object RenderBuilderSupsub {
         }
 
         if (valueSub != null) {
-            val newOptions = options.havingStyle(options.style.sub());
-            subm = RenderTreeBuilder.buildGroup(valueSub, newOptions, options);
+            val newOptions = options.havingStyle(options.style.sub())
+            subm = RenderTreeBuilder.buildGroup(valueSub, newOptions, options)
             if (!isCharacterBox) {
                 subShift = base.depth + newOptions.fontMetrics.subDrop *
-                        newOptions.sizeMultiplier / options.sizeMultiplier;
+                        newOptions.sizeMultiplier / options.sizeMultiplier
             }
         }
 
         // Rule 18c
         var minSupShift = if (options.style === Style.DISPLAY) {
-            metrics.sup1;
+            metrics.sup1
         } else if (options.style.cramped) {
-            metrics.sup3;
+            metrics.sup3
         } else {
-            metrics.sup2;
+            metrics.sup2
         }
 
         // scriptspace is a font-size-independent size, so scale it
         // appropriately for use as the marginRight.
-        val multiplier = options.sizeMultiplier;
-        val marginRight = ((0.5 / metrics.ptPerEm) / multiplier).toString() + "em";
+        val multiplier = options.sizeMultiplier
+        val marginRight = ((0.5 / metrics.ptPerEm) / multiplier).toString() + "em"
 
-        var marginLeft : String? = null
+        var marginLeft: String? = null
         if (subm != null) {
-            if(base is RNodeSymbol) {
+            if (base is RNodeSymbol) {
                 marginLeft = (-base.italic).toString() + "em"
             }
 
@@ -124,19 +121,19 @@ object RenderBuilderSupsub {
 
         val supsub = if (supm != null && subm != null) {
             supShift = maxOf(
-                supShift, minSupShift, supm.depth + 0.25 * metrics.xHeight);
-            subShift = Math.max(subShift, metrics.sub2);
+                supShift, minSupShift, supm.depth + 0.25 * metrics.xHeight)
+            subShift = Math.max(subShift, metrics.sub2)
 
-            val ruleWidth = metrics.defaultRuleThickness;
+            val ruleWidth = metrics.defaultRuleThickness
 
             // Rule 18e
-            val maxWidth = 4 * ruleWidth;
+            val maxWidth = 4 * ruleWidth
             if ((supShift - supm.depth) - (subm.height - subShift) < maxWidth) {
-                subShift = maxWidth - (supShift - supm.depth) + subm.height;
-                val psi = 0.8 * metrics.xHeight - (supShift - supm.depth);
+                subShift = maxWidth - (supShift - supm.depth) + subm.height
+                val psi = 0.8 * metrics.xHeight - (supShift - supm.depth)
                 if (psi > 0) {
-                    supShift += psi;
-                    subShift -= psi;
+                    supShift += psi
+                    subShift -= psi
                 }
             }
 
@@ -152,7 +149,7 @@ object RenderBuilderSupsub {
                 VListElemAndShift(supm, marginLeft, marginRight, mutableSetOf<CssClass>(), CssStyle(), -supShift)
             )
 
-            RenderBuilderVList.makeVList(VListParamIndividual(vlistElem), options);
+            RenderBuilderVList.makeVList(VListParamIndividual(vlistElem), options)
         } else if (subm != null) {
             // Rule 18b
             subShift = maxOf(
@@ -169,24 +166,22 @@ object RenderBuilderSupsub {
         } else if (supm != null) {
             // Rule 18c, d
             supShift = maxOf(supShift, minSupShift,
-                supm.depth + 0.25 * metrics.xHeight);
+                supm.depth + 0.25 * metrics.xHeight)
 
             RenderBuilderVList.makeVList(
-                VListParamPositioned(PositionType.Shift,-supShift,
+                VListParamPositioned(PositionType.Shift, -supShift,
                     mutableListOf(VListElem(supm, marginRight = marginRight))), options)
         } else {
-            throw Error("supsub must have either sup or sub.");
+            throw Error("supsub must have either sup or sub.")
         }
 
         // Wrap the supsub vlist in a span.msupsub to reset text-align.
         val mclassCand = RenderTreeBuilder.getTypeOfDomTree(base, "right")
-        val mclass = if(mclassCand != CssClass.EMPTY) mclassCand else CssClass.mord
+        val mclass = if (mclassCand != CssClass.EMPTY) mclassCand else CssClass.mord
         return RenderTreeBuilder.makeSpan(
             mutableSetOf(mclass),
             mutableListOf(base, RenderTreeBuilder.makeSpan(mutableSetOf(CssClass.msupsub), mutableListOf(supsub))),
             options
         )
-
     }
-
 }

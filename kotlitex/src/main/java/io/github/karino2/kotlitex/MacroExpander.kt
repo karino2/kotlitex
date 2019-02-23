@@ -1,6 +1,6 @@
 package io.github.karino2.kotlitex
 
-class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
+class MacroExpander(val input: String, var mode: Mode = Mode.MATH) {
     val lexer = Lexer(input)
 
     val stack = ArrayList<Token>()
@@ -10,11 +10,11 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
 
     companion object {
         val implicitCommands = setOf(
-            "\\relax",     // MacroExpander.js
+            "\\relax", // MacroExpander.js
         "^",           // Parser.js
         "_",           // Parser.js
         "\\limits",    // Parser.js
-        "\\nolimits"  // Parser.js
+        "\\nolimits" // Parser.js
         )
     }
 
@@ -22,8 +22,8 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
      * Returns the topmost token on the stack, without expanding it.
      * Similar in behavior to TeX's `\futurelet`.
      */
-    fun future() : Token {
-        if(stack.size == 0) {
+    fun future(): Token {
+        if (stack.size == 0) {
             pushToken(lexer.lex())
         }
         return stack.last()
@@ -33,10 +33,8 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
 
     fun popToken(): Token {
         future()
-        return stack.removeAt(stack.size-1)
+        return stack.removeAt(stack.size - 1)
     }
-
-
 
     /*
        In original katex, return type is Token|Token[] and semantics is a little different.(Fully expanded or not).
@@ -53,21 +51,20 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
     /**
      * Recursively expand first token, then return first non-expandable token.
      */
-    fun expandNextToken() : Token {
-        while(true) {
+    fun expandNextToken(): Token {
+        while (true) {
             val (expanded, tokens) = expandOnce()
 
-            if(expanded) {
+            if (expanded) {
                 val token = tokens.last()
 
                 // \relax stops the expansion, but shouldn't get returned (a
                 // null return value couldn't get implemented as a function).
                 if (token.text === "\\relax") {
-                    stack.removeAt(stack.size-1)
+                    stack.removeAt(stack.size - 1)
                 } else {
-                    return stack.removeAt(stack.size -1)  // === expanded
+                    return stack.removeAt(stack.size - 1) // === expanded
                 }
-
             }
         }
     }
@@ -75,5 +72,4 @@ class MacroExpander(val input: String, var mode : Mode = Mode.MATH) {
     fun switchMode(newMode: Mode) {
         mode = newMode
     }
-
 }

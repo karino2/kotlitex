@@ -71,7 +71,7 @@ class VirtualNodeBuilderInstrumentedTest {
         val renderTree = RenderTreeBuilder.buildExpression(parser.parse(), Options(Style.DISPLAY), true)
 
         val builder = VirtualNodeBuilder(renderTree, 100.0)
-        val virtualNodeTree = builder.build();
+        val virtualNodeTree = builder.build()
 
         val n = findFirst(virtualNodeTree) {
             (it is TextNode) && it.text == "3"
@@ -90,7 +90,7 @@ class VirtualNodeBuilderInstrumentedTest {
         printTree(renderTree)
 
         val builder = VirtualNodeBuilder(renderTree, 100.0)
-        val virtualNodeTree = builder.build();
+        val virtualNodeTree = builder.build()
 
         println("Virtual Node Tree")
         printTree(virtualNodeTree)

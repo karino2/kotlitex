@@ -5,7 +5,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class NodeMathOrdAsserter(val actual : PNodeMathOrd) {
+class NodeMathOrdAsserter(val actual: PNodeMathOrd) {
     fun text(expect: String) = assertEquals(expect, actual.text)
     fun start(expect: Int) = assertEquals(expect, actual.loc?.start)
     fun end(expect: Int) = assertEquals(expect, actual.loc?.end)
@@ -15,11 +15,11 @@ class NodeMathOrdAsserter(val actual : PNodeMathOrd) {
 fun assertMathOrd(node: ParseNode?, body: NodeMathOrdAsserter.() -> Unit) {
     assertTrue(node is PNodeMathOrd)
     // always succeed
-    if(node is PNodeMathOrd) {
+    if (node is PNodeMathOrd) {
         NodeMathOrdAsserter(node).body()
     }
 }
-class NodeTextOrdAsserter(val actual : PNodeTextOrd) {
+class NodeTextOrdAsserter(val actual: PNodeTextOrd) {
     fun text(expect: String) = assertEquals(expect, actual.text)
     fun start(expect: Int) = assertEquals(expect, actual.loc?.start)
     fun end(expect: Int) = assertEquals(expect, actual.loc?.end)
@@ -28,11 +28,10 @@ class NodeTextOrdAsserter(val actual : PNodeTextOrd) {
 fun assertTextOrd(node: ParseNode?, body: NodeTextOrdAsserter.() -> Unit) {
     assertTrue(node is PNodeTextOrd)
     // always succeed
-    if(node is PNodeTextOrd) {
+    if (node is PNodeTextOrd) {
         NodeTextOrdAsserter(node).body()
     }
 }
-
 
 class ParserTest {
     @Test

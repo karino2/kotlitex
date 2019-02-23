@@ -19,7 +19,6 @@ See https://github.com/Khan/KaTeX/wiki/Examining-TeX#group-types
  * accepted in (e.g. "math" or "text").
  */
 
-
 object SymbolDefinitions {
     // Some abbreviations for commonly used strings.
     // This helps minify the code, and also spotting typos using jshint.
@@ -46,7 +45,7 @@ object SymbolDefinitions {
     val textord = NonAtoms.textord
 
     // Now comes the symbol table
-    
+
     fun defineSymbol(mode: Mode, font: Font, group: Group, replace: String?, name: String, acceptUnicodeChar: Boolean = false) = Symbols.defineSymbol(mode, font, group, replace, name, acceptUnicodeChar)
 
     // Relation Symbols
@@ -139,7 +138,7 @@ object SymbolDefinitions {
         defineSymbol(math, main, bin, "\u2021", "\\ddagger")
         defineSymbol(math, main, bin, "\u2240", "\\wr", true)
         defineSymbol(math, main, bin, "\u2a3f", "\\amalg")
-        defineSymbol(math, main, bin, "\u0026", "\\And")  // from amsmath
+        defineSymbol(math, main, bin, "\u0026", "\\And") // from amsmath
     }
 
     fun defineArrow() {
@@ -226,7 +225,6 @@ object SymbolDefinitions {
         defineSymbol(math, ams, rel, "\ue016", "\\nsubseteqq")
         defineSymbol(math, ams, bin, "\u22b4", "\\unlhd")
         defineSymbol(math, ams, bin, "\u22b5", "\\unrhd")
-
 
 // AMS Negated Arrows
         defineSymbol(math, ams, rel, "\u219a", "\\nleftarrow", true)
@@ -758,35 +756,35 @@ object SymbolDefinitions {
             // The hex numbers in the next line are a surrogate pair.
             // 0xD835 is the high surrogate for all letters in the range we support.
             // 0xDC00 is the low surrogate for bold A.
-            wideChar = pair2String(0xD835, 0xDC00 + i)  // A-Z a-z bold
+            wideChar = pair2String(0xD835, 0xDC00 + i) // A-Z a-z bold
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDC34 + i)  // A-Z a-z italic
+            wideChar = pair2String(0xD835, 0xDC34 + i) // A-Z a-z italic
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDC68 + i)  // A-Z a-z bold italic
+            wideChar = pair2String(0xD835, 0xDC68 + i) // A-Z a-z bold italic
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDD04 + i)  // A-Z a-z Fractur
+            wideChar = pair2String(0xD835, 0xDD04 + i) // A-Z a-z Fractur
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDDA0 + i)  // A-Z a-z sans-serif
+            wideChar = pair2String(0xD835, 0xDDA0 + i) // A-Z a-z sans-serif
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDDD4 + i)  // A-Z a-z sans bold
+            wideChar = pair2String(0xD835, 0xDDD4 + i) // A-Z a-z sans bold
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDE08 + i)  // A-Z a-z sans italic
+            wideChar = pair2String(0xD835, 0xDE08 + i) // A-Z a-z sans italic
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDE70 + i)  // A-Z a-z monospace
+            wideChar = pair2String(0xD835, 0xDE70 + i) // A-Z a-z monospace
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
@@ -805,7 +803,7 @@ object SymbolDefinitions {
             // TODO: Add bold script when it is supported by a KaTeX font.
         }
         // "k" is the only double struck lower case letter in the KaTeX fonts.
-        wideChar = pair2String(0xD835, 0xDD5C)   // k double struck
+        wideChar = pair2String(0xD835, 0xDD5C) // k double struck
         defineSymbol(math, main, mathord, "k", wideChar)
         defineSymbol(text, main, textord, "k", wideChar)
 
@@ -813,23 +811,22 @@ object SymbolDefinitions {
         for (i in 0 until 10) {
             val ch = i.toString()
 
-            wideChar = pair2String(0xD835, 0xDFCE + i)  // 0-9 bold
+            wideChar = pair2String(0xD835, 0xDFCE + i) // 0-9 bold
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDFE2 + i)  // 0-9 sans serif
+            wideChar = pair2String(0xD835, 0xDFE2 + i) // 0-9 sans serif
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDFEC + i)  // 0-9 bold sans
+            wideChar = pair2String(0xD835, 0xDFEC + i) // 0-9 bold sans
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
 
-            wideChar = pair2String(0xD835, 0xDFF6 + i)  // 0-9 monospace
+            wideChar = pair2String(0xD835, 0xDFF6 + i) // 0-9 monospace
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
         }
-
     }
 
     fun defineUnicodeOther() {
@@ -852,8 +849,6 @@ object SymbolDefinitions {
         defineSymbol(text, main, textord, "\u2019", "’")
         defineSymbol(text, main, textord, "\u201c", "“")
         defineSymbol(text, main, textord, "\u201d", "”")
-
-
     }
 
     fun defineAllSymbols() {

@@ -6,7 +6,7 @@ import io.github.karino2.kotlitex.functions.FunctionOp
 import io.github.karino2.kotlitex.functions.FunctionSqrt
 
 enum class Mode { MATH, TEXT }
-data class SourceLocation(val lexer: Lexer?, val start:Int, val end: Int) {
+data class SourceLocation(val lexer: Lexer?, val start: Int, val end: Int) {
     companion object {
 
         /**
@@ -17,26 +17,23 @@ data class SourceLocation(val lexer: Lexer?, val start:Int, val end: Int) {
          *   and their lexers match.
          * - Otherwise, returns null.
          */
-        fun range(first: Token?, second: Token? = null) : SourceLocation? {
+        fun range(first: Token?, second: Token? = null): SourceLocation? {
             return if (second == null) {
                 first?.loc
-            } else if (first?.loc == null || second.loc == null
-                || first.loc.lexer != second.loc.lexer) {
+            } else if (first?.loc == null || second.loc == null ||
+                first.loc.lexer != second.loc.lexer) {
                 null
             } else {
                 SourceLocation(
-                    first.loc.lexer, first.loc.start, second.loc.end);
+                    first.loc.lexer, first.loc.start, second.loc.end)
             }
-
         }
     }
 
     fun getSource(): String {
-        return this.lexer!!.input.slice(start until end);
+        return this.lexer!!.input.slice(start until end)
     }
-
 }
-
 
 typealias Font = String
 
@@ -48,26 +45,32 @@ enum class Atoms : Group {
     bin, close, inner, open, punct, rel
 }
 
-enum class NonAtoms: Group {
+enum class NonAtoms : Group {
     accent_token, mathord, op_token, spacing, textord
 }
 
-data class CharInfo(val font: Font, val group : Group, val replace : String?)
+data class CharInfo(val font: Font, val group: Group, val replace: String?)
 
-data class Settings(val displayMode :Boolean = false, val throwOnError: Boolean = true,
-                    val errorColor: String = "#cc0000",
-                    val macros: Map<String, Any?> /*MacroMap*/ =  mapOf(),
-                    val colorIsTextColor: Boolean = false,
-                    val strict : Any? /* strict: boolean | "ignore" | "warn" | "error" | StrictFunction */ = "warn",
-                    val maxSize: Int = Int.MAX_VALUE,
-                    val maxExpand: Int = 1000,
-                    val allowedProtocols: List<String> = emptyList()) {
+data class Settings(
+    val displayMode: Boolean = false,
+    val throwOnError: Boolean = true,
+    val errorColor: String = "#cc0000",
+    val macros: Map<String, Any?> /*MacroMap*/ = mapOf(),
+    val colorIsTextColor: Boolean = false,
+    val strict: Any? /* strict: boolean | "ignore" | "warn" | "error" | StrictFunction */ = "warn",
+    val maxSize: Int = Int.MAX_VALUE,
+    val maxExpand: Int = 1000,
+    val allowedProtocols: List<String> = emptyList()
+) {
     /**
      * Report nonstrict (non-LaTeX-compatible) input.
      * Can safely not be called if `this.strict` is false in JavaScript.
      */
-    fun reportNonstrict(errorCode: String, errorMsg: String,
-    token: Any? /* Token | AnyParseNode*/) {
+    fun reportNonstrict(
+        errorCode: String,
+        errorMsg: String,
+        token: Any? /* Token | AnyParseNode*/
+    ) {
         /* TODO:
         val strict = this.strict;
         if (typeof strict === "function") {
@@ -77,18 +80,18 @@ data class Settings(val displayMode :Boolean = false, val throwOnError: Boolean 
         }
         */
         if (strict == null || strict == "ignore") {
-            return;
+            return
         } else if (strict == true || strict == "error") {
             throw ParseError(
                     "LaTeX-incompatible input and strict mode is set to 'error': " +
-                            "${errorMsg} [${errorCode}]", token as Token);
+                            "$errorMsg [$errorCode]", token as Token)
         } else if (strict == "warn") {
             /* TODO:
             typeof console !== "undefined" && console.warn(
                 "LaTeX-incompatible input and strict mode is set to 'warn': " +
                         `${errorMsg} [${errorCode}]`);
                         */
-        } else {  // won't happen in type-safe code
+        } else { // won't happen in type-safe code
             /* TODO:
             typeof console !== "undefined" && console.warn(
                 "LaTeX-incompatible input and strict mode is set to " +
@@ -96,16 +99,15 @@ data class Settings(val displayMode :Boolean = false, val throwOnError: Boolean 
                         */
         }
     }
-
 }
 
 data class AccentRelation(val text: String, val math: String) {
-    fun get(mode: Mode) =if(mode==Mode.MATH) math else text
+    fun get(mode: Mode) = if (mode == Mode.MATH) math else text
 }
 
-class Parser(val input: String, val settings:Settings = Settings()) {
+class Parser(val input: String, val settings: Settings = Settings()) {
     companion object {
-        val endOfExpression = listOf("}", "\\end", "\\right", "&");
+        val endOfExpression = listOf("}", "\\end", "\\right", "&")
         val SUPSUB_GREEDINESS = 1
 
         init {
@@ -116,15 +118,9 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         }
     }
 
-
-
-
-
     var mode = Mode.MATH
 
-
-
-    var _nextToken : Token? = null
+    var _nextToken: Token? = null
 
     val gullet = MacroExpander(input, mode)
 
@@ -137,7 +133,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
 
     fun consumeSpaces() {
         while (nextToken.text == " ") {
-            this.consume();
+            this.consume()
         }
     }
 
@@ -145,27 +141,25 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         // the newline character is normalized in Lexer, check original source
         while (nextToken.text != "EOF" && nextToken.loc != null &&
             nextToken.loc?.getSource()?.indexOf("\n") == -1) {
-            this.consume();
+            this.consume()
         }
 
         if (nextToken.text == "EOF") {
             this.settings.reportNonstrict("commentAtEnd",
                 "% comment has no terminating newline; LaTeX would " +
-                        "fail because of commenting the end of math mode (e.g. $)", null);
+                        "fail because of commenting the end of math mode (e.g. $)", null)
         }
         if (mode == Mode.MATH) {
             this.consumeSpaces(); // ignore spaces in math mode
-        } else {// text mode
+        } else { // text mode
             nextToken.loc?.let {
-                val source = it.getSource();
+                val source = it.getSource()
                 if (source.indexOf("\n") == source.length - 1) {
                     this.consumeSpaces(); // if no space after the first newline
                 }
             }
         }
     }
-
-
 
     fun switchMode(newMode: Mode) {
         mode = newMode
@@ -177,13 +171,13 @@ class Parser(val input: String, val settings:Settings = Settings()) {
      * appropriate error otherwise.
      */
     fun expect(text: String, consume: Boolean = true) {
-        if(nextToken.text != text) {
+        if (nextToken.text != text) {
             throw ParseError(
-                "Expected '${text}', got '${nextToken.text}'",
+                "Expected '$text', got '${nextToken.text}'",
                 nextToken
             )
         }
-        if(consume) {
+        if (consume) {
             consume()
         }
     }
@@ -192,21 +186,21 @@ class Parser(val input: String, val settings:Settings = Settings()) {
      * Parses a group when the mode is changing.
      */
     fun parseGroupOfType(
-            name: String,
-            type: LatexArgType?,
-            optional: Boolean,
-            greediness: Int?
-            ): ParseNode? {
+        name: String,
+        type: LatexArgType?,
+        optional: Boolean,
+        greediness: Int?
+    ): ParseNode? {
         return when (type) {
-            is ArgColor -> this.parseColorGroup(optional);
-            is ArgSize -> this.parseSizeGroup(optional);
-            is ArgUrl -> this.parseUrlGroup(optional);
-            is ArgMode -> this.parseGroup(name, optional, greediness, null, type.mode);
+            is ArgColor -> this.parseColorGroup(optional)
+            is ArgSize -> this.parseSizeGroup(optional)
+            is ArgUrl -> this.parseUrlGroup(optional)
+            is ArgMode -> this.parseGroup(name, optional, greediness, null, type.mode)
             is ArgOriginal -> this.parseGroup(name, optional, greediness)
             null -> this.parseGroup(name, optional, greediness)
             else ->
                 throw ParseError(
-                    "Unknown group type as $name", this.nextToken);
+                    "Unknown group type as $name", this.nextToken)
         }
     }
 
@@ -219,43 +213,42 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         optArgs: List<ParseNode?>,
         token: Token?,
         breakOnTokenText: String? /* BreakToken?, */
-        ): ParseNode {
+    ): ParseNode {
         val context = FunctionContext(name, this, token, breakOnTokenText)
         val func = LatexFunctions.functions[name]
         if (func?.handler != null) {
-            return func.handler(context, args, optArgs);
+            return func.handler(context, args, optArgs)
         } else {
-            throw ParseError("No function handler for ${name}", null)
+            throw ParseError("No function handler for $name", null)
         }
     }
-
 
     /**
      * Parses the arguments of a function or environment
      */
     fun parseArguments(
-            func: String,   // Should look like "\name" or "\begin{name}".
-            funcData: FunctionSpec /* FunctionSpec<*> | EnvSpec<*>,*/
-        ): Pair<List<ParseNode>, List<ParseNode?>> {
-        val totalArgs = funcData.numArgs + funcData.numOptionalArgs;
+        func: String, // Should look like "\name" or "\begin{name}".
+        funcData: FunctionSpec /* FunctionSpec<*> | EnvSpec<*>,*/
+    ): Pair<List<ParseNode>, List<ParseNode?>> {
+        val totalArgs = funcData.numArgs + funcData.numOptionalArgs
 
         if (totalArgs == 0) {
             return Pair(listOf(), listOf())
         }
 
-        val baseGreediness = funcData.greediness;
+        val baseGreediness = funcData.greediness
         val args = mutableListOf<ParseNode>()
         val optArgs = mutableListOf<ParseNode?>()
 
-        repeat(totalArgs) { i->
-            val argType = funcData.argTypes?.get(i);
+        repeat(totalArgs) { i ->
+            val argType = funcData.argTypes?.get(i)
             val isOptional = i < funcData.numOptionalArgs
             // Ignore spaces between arguments.  As the TeXbook says:
             // "After you have said ‘\def\row#1#2{...}’, you are allowed to
             //  put spaces between the arguments (e.g., ‘\row x n’), because
             //  TeX doesn’t use single spaces as undelimited arguments."
             if (i > 0 && !isOptional) {
-                this.consumeSpaces();
+                this.consumeSpaces()
             }
             // Also consume leading spaces in math mode, as parseSymbol
             // won't know what to do with them.  This can only happen with
@@ -264,21 +257,21 @@ class Parser(val input: String, val settings:Settings = Settings()) {
             // In KaTeX, for now, both spaces will get consumed.
             // TODO(edemaine)
             if (i == 0 && !isOptional && this.mode == Mode.MATH) {
-                this.consumeSpaces();
+                this.consumeSpaces()
             }
-            val nextToken = this.nextToken;
+            val nextToken = this.nextToken
             val arg = this.parseGroupOfType(
                 "argument to '$func'",
-            argType, isOptional, baseGreediness);
+            argType, isOptional, baseGreediness)
             if (arg == null) {
                 if (isOptional) {
                     optArgs.add(null)
                     return@repeat // continue
                 }
                 throw ParseError(
-                    "Expected group after '$func'", nextToken);
+                    "Expected group after '$func'", nextToken)
             }
-            if(isOptional) {
+            if (isOptional) {
                 optArgs.add(arg)
             } else {
                 args.add(arg)
@@ -288,8 +281,6 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         return Pair(args, optArgs)
     }
 
-
-
     /**
      * Parses an entire function, including its base and all of its arguments.
      */
@@ -297,18 +288,18 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         breakOnTokenText: String? /* BreakToken?, "]" | "}" | "$" | "\\)" | "\\cr" */,
         name: String?, // For error reporting.
         greediness: Int?
-       ): ParseNode? {
-        val token = this.nextToken;
+    ): ParseNode? {
+        val token = this.nextToken
         val func = token.text
         val funcData = LatexFunctions.functions[func] ?: return null
 
         if (greediness != null && funcData.spec.greediness <= greediness) {
             throw ParseError(
                     "Got function '" + func + "' with no arguments" +
-                            if(name != null) " as $name" else "", token)
+                            if (name != null) " as $name" else "", token)
         } else if (this.mode == Mode.TEXT && !funcData.spec.allowedInText) {
             throw ParseError(
-                "Can't use function '$func' in text mode", token);
+                "Can't use function '$func' in text mode", token)
         } else if (this.mode == Mode.MATH && !funcData.spec.allowedInMath) throw ParseError(
             "Can't use function '$func' in math mode", token)
 
@@ -316,36 +307,35 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         // mode specified by the function (for instant mode switching),
         // and then immediately switch back.
         if (funcData.spec.consumeMode != null) {
-            val oldMode = this.mode;
-            this.switchMode(funcData.spec.consumeMode);
-            this.consume();
-            this.switchMode(oldMode);
+            val oldMode = this.mode
+            this.switchMode(funcData.spec.consumeMode)
+            this.consume()
+            this.switchMode(oldMode)
         } else {
-            this.consume();
+            this.consume()
         }
-        val (args, optArgs) = this.parseArguments(func, funcData.spec);
-        return this.callFunction(func, args, optArgs, token, breakOnTokenText);
+        val (args, optArgs) = this.parseArguments(func, funcData.spec)
+        return this.callFunction(func, args, optArgs, token, breakOnTokenText)
     }
-
 
     /**
      * Parses a group, essentially returning the string formed by the
      * brace-enclosed tokens plus some position information.
      */
     fun parseStringGroup(
-        modeName: LatexArgType,  // Used to describe the mode in error messages.
+        modeName: LatexArgType, // Used to describe the mode in error messages.
         optional: Boolean,
         raw: Boolean? = null
     ): Token? {
-        val groupBegin = if(optional)  "[" else "{"
-        val groupEnd = if(optional) "]" else "}"
+        val groupBegin = if (optional) "[" else "{"
+        val groupEnd = if (optional) "]" else "}"
         if (nextToken.text != groupBegin) {
             if (optional) {
-                return null;
+                return null
             } else if (raw == true && nextToken.text != "EOF" &&
-                "[^{}\\[\\]]".toRegex().matches(nextToken.text)){ //  /[^{}[\]]/.test(nextToken.text)) {
+                "[^{}\\[\\]]".toRegex().matches(nextToken.text)) { //  /[^{}[\]]/.test(nextToken.text)) {
                 // allow a single character in raw string group
-                this.consume();
+                this.consume()
                 return nextToken
             }
         }
@@ -361,22 +351,22 @@ class Parser(val input: String, val settings:Settings = Settings()) {
                 "EOF" ->
                 throw ParseError(
                         "Unexpected end of input in " + modeName,
-                firstToken.range(lastToken, str));
+                firstToken.range(lastToken, str))
                 "%" ->
                 if (raw != true) { // allow % in raw string group
-                    this.consumeComment();
+                    this.consumeComment()
                     continue@loop
                 }
                 groupBegin -> nested++
                 groupEnd -> nested--
             }
             lastToken = this.nextToken
-            str += lastToken.text;
-            this.consume();
+            str += lastToken.text
+            this.consume()
         }
-        this.mode = outerMode;
-        this.expect(groupEnd);
-        return firstToken.range(lastToken, str);
+        this.mode = outerMode
+        this.expect(groupEnd)
+        return firstToken.range(lastToken, str)
     }
 
     /**
@@ -385,16 +375,15 @@ class Parser(val input: String, val settings:Settings = Settings()) {
     fun parseColorGroup(optional: Boolean): PNodeColorToken? {
         val res = this.parseStringGroup(ArgColor, optional) ?: return null
 
-        val match = "^(#[a-f0-9]{3}|#?[a-f0-9]{6}|[a-z]+)\$".toRegex(RegexOption.IGNORE_CASE).matchEntire(res.text) ?:
-            throw ParseError("Invalid color: '" + res.text + "'", res);
+        val match = "^(#[a-f0-9]{3}|#?[a-f0-9]{6}|[a-z]+)\$".toRegex(RegexOption.IGNORE_CASE).matchEntire(res.text)
+            ?: throw ParseError("Invalid color: '" + res.text + "'", res)
 
-
-        var color = match.groupValues[0];
+        var color = match.groupValues[0]
         if ("^[0-9a-f]{6}$".toRegex(RegexOption.IGNORE_CASE).matches(color)) {
             // We allow a 6-digit HTML color spec without a leading "#".
             // This follows the xcolor package's HTML color model.
             // Predefined color names are all missed by this RegEx pattern.
-            color = "#$color";
+            color = "#$color"
         }
         return PNodeColorToken(mode, null, color)
     }
@@ -406,19 +395,19 @@ class Parser(val input: String, val settings:Settings = Settings()) {
      */
     fun parseRegexGroup(
         regex: Regex,
-        modeName: String   // Used to describe the mode in error messages.
+        modeName: String // Used to describe the mode in error messages.
     ): Token {
         val outerMode = this.mode
         this.mode = Mode.TEXT
         val firstToken = this.nextToken
         var lastToken = firstToken
         var str = ""
-        while (this.nextToken.text != "EOF"
-            && (regex.matches(str + this.nextToken.text)
-                    || this.nextToken.text == "%")) {
+        while (this.nextToken.text != "EOF" &&
+            (regex.matches(str + this.nextToken.text) ||
+                    this.nextToken.text == "%")) {
             if (this.nextToken.text == "%") {
-                this.consumeComment();
-                continue;
+                this.consumeComment()
+                continue
             }
             lastToken = this.nextToken
             str += lastToken.text
@@ -433,17 +422,16 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         return firstToken.range(lastToken, str)
     }
 
-
     /**
      * Parses a size specification, consisting of magnitude and unit.
      */
     fun parseSizeGroup(optional: Boolean): PNodeSize? {
-        var isBlank = false;
+        var isBlank = false
         var res = (if (!optional && this.nextToken.text != "{") {
             this.parseRegexGroup(
-                "^[-+]? *(?:$|\\d+|\\d+\\.\\d*|\\.\\d*) *[a-z]{0,2} *$".toRegex(), "size");
+                "^[-+]? *(?:$|\\d+|\\d+\\.\\d*|\\.\\d*) *[a-z]{0,2} *$".toRegex(), "size")
         } else {
-            this.parseStringGroup(ArgSize, optional);
+            this.parseStringGroup(ArgSize, optional)
         }) ?: return null
 
         if (!optional && res.text.isEmpty()) {
@@ -451,10 +439,10 @@ class Parser(val input: String, val settings:Settings = Settings()) {
             // affect \kern, \hspace, etc. It will capture the mandatory arguments
             // to \genfrac and \above.
             res = res.copy(text = "0pt") // Enable \above{}
-            isBlank = true;      // This is here specifically for \genfrac
+            isBlank = true; // This is here specifically for \genfrac
         }
-        val match = ("([-+]?) *(\\d+(?:\\.\\d*)?|\\.\\d+) *([a-z]{2})".toRegex()).matchEntire(res.text) ?:
-            throw ParseError("Invalid size: '" + res.text + "'", res);
+        val match = ("([-+]?) *(\\d+(?:\\.\\d*)?|\\.\\d+) *([a-z]{2})".toRegex()).matchEntire(res.text)
+            ?: throw ParseError("Invalid size: '" + res.text + "'", res)
 
         val data = Measurement(
             (match.groupValues[1] + match.groupValues[2]).toInt(), // sign + magnitude, cast to number
@@ -462,7 +450,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         )
 
         if (!data.isValidUnit) {
-            throw ParseError("Invalid unit: '" + data.unit + "'", res);
+            throw ParseError("Invalid unit: '" + data.unit + "'", res)
         }
         return PNodeSize(mode, null, data, isBlank)
     }
@@ -480,11 +468,11 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         // replace backslashes with forward slashes.
         val url = res.text.replace("\\([#$%&~_^{}]".toRegex(), "$1")
         val protocolMatch = """^\s*([^\\/#]*?)(?::|&#0*58|&#x0*3a)""".toRegex(RegexOption.IGNORE_CASE).matchEntire(url)
-        val protocol = if(protocolMatch != null)  protocolMatch.groupValues[1] else "_relative"
+        val protocol = if (protocolMatch != null) protocolMatch.groupValues[1] else "_relative"
 
         val allowed = this.settings.allowedProtocols
         if ("*" !in allowed && protocol !in allowed)
-            throw ParseError("Forbidden protocol '${protocol}'", res)
+            throw ParseError("Forbidden protocol '$protocol'", res)
 
         return PNodeUrl(mode, null, url)
     }
@@ -503,7 +491,6 @@ class Parser(val input: String, val settings:Settings = Settings()) {
 
         val textNode = PNodeText(mode, null, textordArray)
 
-
         val colorNode = PNodeColor(
             mode, null, this.settings.errorColor, listOf(textNode)
         )
@@ -511,7 +498,6 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         this.consume()
         return colorNode
     }
-
 
     /**
      * If `optional` is false or absent, this parses an ordinary group,
@@ -531,7 +517,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         greediness: Int?,
         breakOnTokenText: String? = null,
         in_mode: Mode? = null
-        ): ParseNode?
+    ): ParseNode?
     {
         val outerMode = mode
         val firstToken = nextToken
@@ -556,37 +542,36 @@ class Parser(val input: String, val settings:Settings = Settings()) {
                 switchMode(outerMode)
             }
             // End group namespace before consuming symbol after close brace
-            this.gullet.endGroup();
+            this.gullet.endGroup()
             expect(closeBrace)
             return PNodeOrdGroup(mode, SourceLocation.range(firstToken, lastToken), expression)
-        }else if(optional) {
+        } else if (optional) {
             // Return nothing for an optional group
-            result = null;
+            result = null
         } else {
             // If there exists a function with this name, parse the function.
             // Otherwise, just return a nucleus
 
             // TODO:
-            result = this.parseFunction(breakOnTokenText, name, greediness) ?:
-                    this.parseSymbol();
+            result = this.parseFunction(breakOnTokenText, name, greediness)
+                    ?: this.parseSymbol()
             if (result == null && text[0] == '\\' &&
                 text !in MacroExpander.implicitCommands) {
                 if (this.settings.throwOnError) {
                     throw ParseError(
-                        "Undefined control sequence: $text", firstToken);
+                        "Undefined control sequence: $text", firstToken)
                 }
-                result = this.handleUnsupportedCmd();
+                result = this.handleUnsupportedCmd()
             }
         }
         // Switch mode back
         if (in_mode != null) {
-            switchMode(outerMode);
+            switchMode(outerMode)
         }
-        return result;
+        return result
     }
 
-    fun supportedCodepoint(ch : Int) = Symbols.supportedCodepoint(ch)
-
+    fun supportedCodepoint(ch: Int) = Symbols.supportedCodepoint(ch)
 
     /**
      * Parse a single symbol out of the string. Here, we handle single character
@@ -597,7 +582,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         var text = nucleus.text
 
         if ("^\\\\verb[^a-zA-Z]".toRegex().find(text) != null) {
-            this.consume();
+            this.consume()
 
             var arg = text.substring(5)
             val star = (arg[0] == '*')
@@ -609,33 +594,33 @@ class Parser(val input: String, val settings:Settings = Settings()) {
             if (arg.length < 2 || arg[0] != arg.last()) {
                 throw ParseError("\\verb assertion failed -- \nplease report what input caused this bug", null)
             }
-            arg = arg.slice(1 until (arg.length-1)) // remove first and last char
+            arg = arg.slice(1 until (arg.length - 1)) // remove first and last char
             return PNodeVerb(Mode.TEXT, null, arg, star)
         } else if (text === "%") {
-            this.consumeComment();
-            return this.parseSymbol();
+            this.consumeComment()
+            return this.parseSymbol()
         }
         // At this point, we should have a symbol, possibly with accents.
         // First expand any accented base symbol according to unicodeSymbols.
-        if (Symbols.unicodeSymbols.containsKey(text[0])
-            && !Symbols.get(mode).containsKey(text.substring(0 until 1))) {
+        if (Symbols.unicodeSymbols.containsKey(text[0]) &&
+            !Symbols.get(mode).containsKey(text.substring(0 until 1))) {
             // This behavior is not strict (XeTeX-compatible) in math mode.
             if (this.settings.strict != null && mode == Mode.MATH) {
                 this.settings.reportNonstrict("unicodeTextInMathMode",
                     "Accented Unicode text character \"${text[0]}\" used in " +
-                            "math mode", nucleus);
+                            "math mode", nucleus)
             }
-            text = Symbols.unicodeSymbols[text[0]] + text.substring(1);
+            text = Symbols.unicodeSymbols[text[0]] + text.substring(1)
         }
         // Strip off any combining characters
-        val match = combiningDiacriticalMarksEndRegex.find(text);
+        val match = combiningDiacriticalMarksEndRegex.find(text)
         if (match != null) {
 
-            text = text.substring(0, match.range.start);
+            text = text.substring(0, match.range.start)
             if (text == "i") {
-                text = "\u0131"  // dotless i, in math and text mode
+                text = "\u0131" // dotless i, in math and text mode
             } else if (text == "j") {
-                text = "\u0237"  // dotless j, in math and text mode
+                text = "\u0237" // dotless j, in math and text mode
             }
         }
         // Recognize base symbol
@@ -653,11 +638,10 @@ class Parser(val input: String, val settings:Settings = Settings()) {
                 PNodeAtom(group, mode, loc, text)
             } else {
                 // TODO: handle all Non Atom
-                when(group) {
+                when (group) {
                     NonAtoms.textord -> PNodeTextOrd(mode, loc, text)
                     NonAtoms.mathord -> PNodeMathOrd(mode, loc, text)
                     else -> throw NotImplementedError("NYI for non ATOM symbols.")
-
                 }
                 /*
                         // $FlowFixMe
@@ -669,7 +653,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
                         };
                         */
             }
-            symbol = s;
+            symbol = s
         } else if (text[0].toInt() >= 0x80) { // no symbol for e.g. ^
             if (settings.strict != null) {
                 if (!supportedCodepoint(text[0].toInt())) {
@@ -684,26 +668,24 @@ class Parser(val input: String, val settings:Settings = Settings()) {
             }
             symbol = PNodeTextOrd(mode, SourceLocation.range(nucleus), text)
         } else {
-            return null;  // EOF, ^, _, {, }, etc.
+            return null; // EOF, ^, _, {, }, etc.
         }
-        this.consume();
+        this.consume()
         // Transform combining characters into accents
         if (match != null) {
-            for (accent in match.value){
+            for (accent in match.value) {
                 if (!Symbols.unicodeAccents.containsKey(accent)) {
-                    throw ParseError("Unknown accent ' ${accent}'", nucleus)
+                    throw ParseError("Unknown accent ' $accent'", nucleus)
                 }
 
-
                 val command = Symbols.unicodeAccents[accent]?.get(mode) ?: throw ParseError(
-                            "Accent ${accent} unsupported in ${this.mode} mode", nucleus)
+                            "Accent $accent unsupported in ${this.mode} mode", nucleus)
 
                 symbol = PNodeAccent(mode, SourceLocation.range(nucleus), command, false, true, symbol)
             }
         }
         return symbol
     }
-
 
     /**
      * Parses a group with optional super/subscripts.
@@ -715,14 +697,14 @@ class Parser(val input: String, val settings:Settings = Settings()) {
 
         // In text mode, we don't have superscripts or subscripts
         if (mode === Mode.TEXT) {
-            return base;
+            return base
         }
 
         // Note that base may be empty (i.e. null) at this point.
 
-        var superscript : ParseNode? = null
-        var subscript : ParseNode? = null
-        while(true) {
+        var superscript: ParseNode? = null
+        var subscript: ParseNode? = null
+        while (true) {
             // Guaranteed in math mode, so eat any spaces first.
             consumeSpaces()
 
@@ -731,59 +713,58 @@ class Parser(val input: String, val settings:Settings = Settings()) {
 
             if (lex.text === "\\limits" || lex.text === "\\nolimits") {
                 // We got a limit control
-                val opNode = base as? PNodeOp ?:
-                               throw ParseError("Limit controls must follow a math operator", lex)
+                val opNode = base as? PNodeOp ?: throw ParseError("Limit controls must follow a math operator", lex)
 
-                val limits = lex.text == "\\limits";
-                opNode.limits = limits;
-                opNode.alwaysHandleSupSub = true;
-                this.consume();
+                val limits = lex.text == "\\limits"
+                opNode.limits = limits
+                opNode.alwaysHandleSupSub = true
+                this.consume()
             } else if (lex.text == "^") {
                 // We got a superscript start
                 if (superscript != null) {
-                    throw ParseError("Double superscript", lex);
+                    throw ParseError("Double superscript", lex)
                 }
-                superscript = handleSupSubscript("superscript");
+                superscript = handleSupSubscript("superscript")
             } else if (lex.text == "_") {
                 // We got a subscript start
                 if (subscript != null) {
-                    throw ParseError("Double subscript", lex);
+                    throw ParseError("Double subscript", lex)
                 }
-                subscript = this.handleSupSubscript("subscript");
+                subscript = this.handleSupSubscript("subscript")
             } else if (lex.text === "'") {
                 // We got a prime
                 if (superscript != null) {
-                    throw ParseError("Double superscript", lex);
+                    throw ParseError("Double superscript", lex)
                 }
                 val prime = PNodeTextOrd(mode, null, "\\prime")
 
                 // Many primes can be grouped together, so we handle this here
-                val primes : MutableList<ParseNode> = mutableListOf(prime);
-                this.consume();
+                val primes: MutableList<ParseNode> = mutableListOf(prime)
+                this.consume()
                 // Keep lexing tokens until we get something that's not a prime
                 while (nextToken.text == "'") {
                     // For each one, add another prime to the list
-                    primes.add(prime);
-                    this.consume();
+                    primes.add(prime)
+                    this.consume()
                 }
                 // If there's a superscript following the primes, combine that
                 // superscript in with the primes.
                 if (nextToken.text == "^") {
-                    primes.add(handleSupSubscript("superscript"));
+                    primes.add(handleSupSubscript("superscript"))
                 }
                 // Put everything into an ordgroup as the superscript
                 superscript = PNodeOrdGroup(mode, null, primes)
             } else if (lex.text === "%") {
-                this.consumeComment();
+                this.consumeComment()
             } else {
                 // If it wasn't ^, _, or ', stop parsing super/subscripts
-                break;
+                break
             }
         }
 
         // Base must be set if superscript or subscript are set per logic above,
         // but need to check here for type check to pass.
-        if (superscript !=null || subscript != null) {
+        if (superscript != null || subscript != null) {
             // If we got either a superscript or subscript, create a supsub
 
             return PNodeSupSub(mode, null, base, superscript, subscript)
@@ -802,10 +783,9 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         consume()
         consumeSpaces() // ignore spaces before sup/subscript argument
 
-        return parseGroup(name, false, SUPSUB_GREEDINESS) ?:
-                        throw ParseError("Expected group after '${symbol}'", symbolToken)
+        return parseGroup(name, false, SUPSUB_GREEDINESS)
+                        ?: throw ParseError("Expected group after '$symbol'", symbolToken)
     }
-
 
     /**
      * Parses an "expression", which is a list of atoms.
@@ -818,37 +798,36 @@ class Parser(val input: String, val settings:Settings = Settings()) {
      *                     with, or `null` if something else should end the
      *                     expression.
      */
-    fun parseExpression(breakOnInfix: Boolean, breakOnTokenText: String? = null) : List<ParseNode> {
+    fun parseExpression(breakOnInfix: Boolean, breakOnTokenText: String? = null): List<ParseNode> {
         val body = ArrayList<ParseNode>()
         // Keep adding atoms to the body until we can't parse any more atoms (either
         // we reached the end, a }, or a \right)
-        while(true) {
+        while (true) {
             // Ignore spaces in math mode
             if (this.mode == Mode.MATH) {
-                this.consumeSpaces();
+                this.consumeSpaces()
             }
             val lex = nextToken
-            if(endOfExpression.contains(lex.text)) {
+            if (endOfExpression.contains(lex.text)) {
                 break
             }
-            if(breakOnTokenText != null && breakOnTokenText == lex.text) {
+            if (breakOnTokenText != null && breakOnTokenText == lex.text) {
                 break
             }
 
             if (breakOnInfix && LatexFunctions.functions[lex.text]?.spec?.infix == true) {
-                break;
+                break
             }
             val atom = parseAtom(breakOnTokenText) ?: break
             body.add(atom)
         }
 
-        if(mode == Mode.TEXT){
+        if (mode == Mode.TEXT) {
             // TODO:
             // this.formLigatures(body);
         }
         return handleInfixNodes(body)
     }
-
 
     /**
      * Rewrites infix operators such as \over with corresponding commands such
@@ -911,11 +890,10 @@ class Parser(val input: String, val settings:Settings = Settings()) {
          */
     }
 
-
     /**
      * Main parsing function, which parses an entire input.
      */
-    fun parse() : List<ParseNode> {
+    fun parse(): List<ParseNode> {
         // Create a group namespace for the math expression.
         // (LaTeX creates a new group for every $...$, $$...$$, \[...\].)
         gullet.beginGroup()
@@ -936,12 +914,10 @@ class Parser(val input: String, val settings:Settings = Settings()) {
         val parse = parseExpression(false)
 
         // If we succeeded, make sure there's an EOF at the end
-        this.expect("EOF", false);
+        this.expect("EOF", false)
 
         // End the group namespace for the expression
         gullet.endGroup()
-        return parse;
+        return parse
     }
-
 }
-

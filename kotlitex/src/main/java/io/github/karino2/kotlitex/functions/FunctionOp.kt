@@ -28,19 +28,19 @@ object FunctionOp {
 
     // NOTE: Unlike most `renderNodeBuilder`s, this one handles not only "op", but also
     // "supsub" since some of them (like \int) can affect super/subscripting.
-    fun renderNodeBuilder(grp: ParseNode /* ParseNode<"supsub"> | ParseNode<NODETYPE> */, options: Options) : RenderNode {
+    fun renderNodeBuilder(grp: ParseNode /* ParseNode<"supsub"> | ParseNode<NODETYPE> */, options: Options): RenderNode {
         // Operators are handled in the TeXbook pg. 443-444, rule 13(a).
         var supGroup: ParseNode? = null
         var subGroup: ParseNode? = null
         var hasLimits = false
-        val group = if(grp is PNodeSupSub) {
+        val group = if (grp is PNodeSupSub) {
             // If we have limits, supsub will pass us its group to handle. Pull
             // out the superscript and subscript and set the group to the op in
             // its base.
-            supGroup = grp.sup;
-            subGroup = grp.sub;
+            supGroup = grp.sup
+            subGroup = grp.sub
 
-            hasLimits = true;
+            hasLimits = true
             grp.base as PNodeOp
         } else {
             grp as PNodeOp
@@ -57,20 +57,20 @@ object FunctionOp {
 
         var base = if (group.symbol) {
             // If this is a symbol, create the symbol.
-            val fontName = if(large)  "Size2-Regular" else "Size1-Regular"
+            val fontName = if (large) "Size2-Regular" else "Size1-Regular"
 
             var stash = ""
             if (group.name == "\\oiint" || group.name == "\\oiiint") {
                 // No font glyphs yet, so use a glyph w/o the oval.
                 // TODO: When font glyphs are available, delete this code.
-                stash = group.name.substring(1);
+                stash = group.name.substring(1)
                 // $FlowFixMe
-                group.name = if(stash == "oiint")  "\\iint" else  "\\iiint"
+                group.name = if (stash == "oiint") "\\iint" else "\\iiint"
             }
 
             val base1 = RenderTreeBuilder.makeSymbol(
                 group.name, fontName, Mode.MATH, options,
-                mutableSetOf(CssClass.mop, CssClass.op_symbol, if(large)  CssClass.large_op else CssClass.small_op));
+                mutableSetOf(CssClass.mop, CssClass.op_symbol, if (large) CssClass.large_op else CssClass.small_op))
 
             // TODO: support oiint and oiint
             /*
@@ -101,7 +101,7 @@ object FunctionOp {
         } else if (group.body != null) {
             // karino: Is this cast always success?
             // If this is a list, compose that list.
-            val inner = RenderTreeBuilder.buildExpression(group.body as List<ParseNode>, options, true);
+            val inner = RenderTreeBuilder.buildExpression(group.body as List<ParseNode>, options, true)
             if (inner.size == 1 && inner[0] is RNodeSymbol) {
                 val sym = inner[0]
                 // replace old mclass
@@ -121,24 +121,24 @@ object FunctionOp {
                 RenderTreeBuilder.mathsym(it.toString(), group.mode, null, mutableSetOf())
             }.toMutableList()
 
-            RenderTreeBuilder.makeSpan(mutableSetOf(CssClass.mop), output, options);
+            RenderTreeBuilder.makeSpan(mutableSetOf(CssClass.mop), output, options)
         }
 
         // If content of op is a single symbol, shift it vertically.
         val (baseShift, slant) =
-            if ((base is RNodeSymbol
-                        || group.name == "\\oiint" || group.name == "\\oiiint")
-                && group.suppressBaseShift != true) {
+            if ((base is RNodeSymbol ||
+                        group.name == "\\oiint" || group.name == "\\oiiint") &&
+                group.suppressBaseShift != true) {
                 // We suppress the shift of the base of \overset and \underset. Otherwise,
                 // shift the symbol so its center lies on the axis (rule 13). It
                 // appears that our fonts have the centers of the symbols already
                 // almost on the axis, so these numbers are very small. Note we
                 // don't actually apply this here, but instead it is used either in
                 // the vlist creation or separately when there are no limits.
-                Pair( (base.height - base.depth) / 2 -
+                Pair((base.height - base.depth) / 2 -
                         options.fontMetrics.axisHeight,
                     // The slant of the symbol is just its italic correction.
-                    if(base is RNodeSymbol) base.italic else 0.0)
+                    if (base is RNodeSymbol) base.italic else 0.0)
             } else Pair(0.0, 0.0)
 
         if (hasLimits) {
@@ -150,19 +150,18 @@ object FunctionOp {
             // aside from the kern calculations, is copied from supsub.
             val sup = supGroup?.let {
                 val elem = RenderTreeBuilder.buildGroup(
-                    supGroup, options.havingStyle(style.sup()), options);
+                    supGroup, options.havingStyle(style.sup()), options)
                 ElemKern(
                         elem,
                         Math.max(
                             options.fontMetrics.bigOpSpacing1,
                             options.fontMetrics.bigOpSpacing3 - elem.depth)
                     )
-
             }
 
             val sub = subGroup?.let {
                 val elem = RenderTreeBuilder.buildGroup(
-                        subGroup, options.havingStyle(style.sub()), options);
+                        subGroup, options.havingStyle(style.sub()), options)
                 ElemKern(elem,
                                 Math.max(
                                         options.fontMetrics.bigOpSpacing2,
@@ -185,7 +184,7 @@ object FunctionOp {
                         bottom,
                         listOf(
                             VListKern(options.fontMetrics.bigOpSpacing5),
-                            VListElem(sub.elem,  "${-slant}em"),
+                            VListElem(sub.elem, "${-slant}em"),
                             VListKern(sub.kern),
                             VListElem(base),
                             VListKern(sup.kern),
@@ -194,7 +193,7 @@ object FunctionOp {
                             )
                     ), options)
             } else if (sub != null) {
-                val top = base.height - baseShift;
+                val top = base.height - baseShift
 
                 // Shift the limits by the slant of the symbol. Note
                 // that we are supposed to shift the limits by 1/2 of the slant,
@@ -212,7 +211,7 @@ object FunctionOp {
                             )
                     ), options)
             } else if (sup != null) {
-                val bottom = base.depth + baseShift;
+                val bottom = base.depth + baseShift
 
                 RenderBuilderVList.makeVList(
                     VListParamPositioned(
@@ -224,25 +223,24 @@ object FunctionOp {
                             VListElem(sup.elem, "${slant}em"),
                             VListKern(options.fontMetrics.bigOpSpacing5)
                             )
-                    ), options);
+                    ), options)
             } else {
                 // This case probably shouldn't occur (this would mean the
                 // supsub was sending us a group with no superscript or
                 // subscript) but be safe.
-                return base;
+                return base
             }
 
             return RenderTreeBuilder.makeSpan(
                 mutableSetOf(CssClass.mop, CssClass.op_limits), mutableListOf(finalGroup), options)
         } else {
             if (baseShift != 0.0) {
-                base.style.position = "relative";
-                base.style.top = "${baseShift}em";
+                base.style.position = "relative"
+                base.style.top = "${baseShift}em"
             }
 
-            return base;
+            return base
         }
-
     }
 
     /*
@@ -274,7 +272,7 @@ object FunctionOp {
                 "\u2210", "\u2211", "\u22c0", "\u22c1", "\u22c2", "\u22c3", "\u2a00",
                 "\u2a01", "\u2a02", "\u2a04", "\u2a06"
             ),
-            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
+            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */: List<ParseNode?> ->
                 val parser = context.parser
                 val fName = context.funcName
                 // TODO: support funcName.length == 1 case.
@@ -289,7 +287,7 @@ object FunctionOp {
                     true,
                     null,
                     null,
-                     true,
+                    true,
                     fName,
                     null
                 )
@@ -297,5 +295,4 @@ object FunctionOp {
             FunctionOp::renderNodeBuilder
         )
     }
-
 }

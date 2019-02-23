@@ -1,37 +1,38 @@
 package io.github.karino2.kotlitex
 
-data class FontMetrics(val cssEmPerMu: Double,
-                       val slant: Double,
-                       val space: Double,
-                       val stretch: Double,
-                       val shrink: Double,
-                       val xHeight: Double,
-                       val quad: Int,
-                       val extraSpace: Double,
-                       val num1: Double,
-                       val num2: Double,
-                       val num3: Double,
-                       val denom1: Double,
-                       val denom2: Double,
-                       val sup1: Double,
-                       val sup2: Double,
-                       val sup3: Double,
-                       val sub1: Double,
-                       val sub2: Double,
-                       val supDrop: Double,
-                       val subDrop: Double,
-                       val delim1: Double,
-                       val delim2: Double,
-                       val axisHeight: Double,
-                       val defaultRuleThickness: Double,
-                       val bigOpSpacing1: Double,
-                       val bigOpSpacing2: Double,
-                       val bigOpSpacing3: Double,
-                       val bigOpSpacing4: Double,
-                       val bigOpSpacing5: Double,
-                       val sqrtRuleThickness: Double,
-                       val ptPerEm: Int,
-                       val doubleRuleSep: Double
+data class FontMetrics(
+    val cssEmPerMu: Double,
+    val slant: Double,
+    val space: Double,
+    val stretch: Double,
+    val shrink: Double,
+    val xHeight: Double,
+    val quad: Int,
+    val extraSpace: Double,
+    val num1: Double,
+    val num2: Double,
+    val num3: Double,
+    val denom1: Double,
+    val denom2: Double,
+    val sup1: Double,
+    val sup2: Double,
+    val sup3: Double,
+    val sub1: Double,
+    val sub2: Double,
+    val supDrop: Double,
+    val subDrop: Double,
+    val delim1: Double,
+    val delim2: Double,
+    val axisHeight: Double,
+    val defaultRuleThickness: Double,
+    val bigOpSpacing1: Double,
+    val bigOpSpacing2: Double,
+    val bigOpSpacing3: Double,
+    val bigOpSpacing4: Double,
+    val bigOpSpacing5: Double,
+    val sqrtRuleThickness: Double,
+    val ptPerEm: Int,
+    val doubleRuleSep: Double
 ) {
     companion object {
         /**
@@ -149,7 +150,7 @@ data class FontMetrics(val cssEmPerMu: Double,
             "defaultRuleThickness", // xi8; cmex7: 0.049
             "bigOpSpacing1",       // xi9
             "bigOpSpacing2",       // xi10
-            "bigOpSpacing3",             // xi11
+            "bigOpSpacing3", // xi11
             "bigOpSpacing4",         // xi12; cmex7: 0.611
             "bigOpSpacing5",         // xi13; cmex7: 0.143
 
@@ -167,7 +168,7 @@ data class FontMetrics(val cssEmPerMu: Double,
             // `\showthe\doublerulesep` in LaTeX. Equals 2.0 / ptPerEm.
             "doubleRuleSep"
         )
-        fun createFontMetrics(cssEmPerMu : Double, argVals: List<Double>) : FontMetrics {
+        fun createFontMetrics(cssEmPerMu: Double, argVals: List<Double>): FontMetrics {
             val slant = argVals[0]
             val space = argVals[1]
             val stretch = argVals[2]
@@ -239,15 +240,15 @@ data class FontMetrics(val cssEmPerMu: Double,
         /**
          * Get the font metrics for a given size.
          */
-        fun getGlobalMetrics(size: Int) : FontMetrics {
+        fun getGlobalMetrics(size: Int): FontMetrics {
             val sizeIndex = when {
                 size >= 5 -> 0
                 size >= 3 -> 1
                 else -> 2
             }
-            if(!fontMetricsBySizeIndex.containsKey(sizeIndex)) {
+            if (!fontMetricsBySizeIndex.containsKey(sizeIndex)) {
                 val cssEmPerMu = sigmasAndXis["quad"]!![sizeIndex] / 18.0
-                val restVals =   sigmasAndXisKeyList.map { sigmasAndXis.get(it)!![sizeIndex]}
+                val restVals = sigmasAndXisKeyList.map { sigmasAndXis.get(it)!![sizeIndex] }
 
                 fontMetricsBySizeIndex[sizeIndex] = createFontMetrics(cssEmPerMu, restVals)
             }

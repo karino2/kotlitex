@@ -20,9 +20,9 @@ class RenderTreeBuilderInstrumentedTest {
         assertEquals("io.github.karino2.kotlitex.test", appContext.packageName)
     }
 
-    fun parse(input: String) : List<ParseNode> {
+    fun parse(input: String): List<ParseNode> {
         val parser = Parser(input)
-        return  parser.parse()
+        return parser.parse()
     }
 
     @Test
@@ -34,21 +34,18 @@ class RenderTreeBuilderInstrumentedTest {
         assertEquals(1, actual.size)
         val target = actual[0]
 
-        assertSpan(target) { ac(0) { ac(0){
-            ac(0){
+        assertSpan(target) { ac(0) { ac(0) {
+            ac(0) {
                 style(CssStyle("0.956095em"))
                 ac(0) {
                     // svg-align
                     ac(1) {
-                        style(CssStyle(paddingLeft="0.833em"))
+                        style(CssStyle(paddingLeft = "0.833em"))
                     }
                 }
                 ac(1) {
                     styleTop("-2.916095em")
                 }
-            }}}}
+            } } } }
     }
-
-
-
 }

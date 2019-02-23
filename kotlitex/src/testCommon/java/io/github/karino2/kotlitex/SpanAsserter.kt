@@ -14,7 +14,7 @@ class SymbolAsserter(val node: RNodeSymbol) {
     fun kl(klass: CssClass) = assertTrue(node.klasses.contains(klass))
 }
 
-fun assertSymbol(node: RenderNode?, body: SymbolAsserter.()->Unit) {
+fun assertSymbol(node: RenderNode?, body: SymbolAsserter.() -> Unit) {
     assertTrue(node is RNodeSymbol)
     val sym: RNodeSymbol = node as RNodeSymbol
     SymbolAsserter(sym).body()
@@ -36,7 +36,7 @@ class SpanAsserter(val node: RNodeSpan) {
      */
 
     // short cut of assertSpan(child(n)) {}
-    fun ac(childIndex: Int, body: SpanAsserter.()->Unit) {
+    fun ac(childIndex: Int, body: SpanAsserter.() -> Unit) {
         val next = child(childIndex)
         assertTrue(next is RNodeSpan)
         val sym: RNodeSpan = next as RNodeSpan
@@ -44,9 +44,8 @@ class SpanAsserter(val node: RNodeSpan) {
     }
 }
 
-fun assertSpan(node: RenderNode?, body: SpanAsserter.()->Unit) {
+fun assertSpan(node: RenderNode?, body: SpanAsserter.() -> Unit) {
     assertTrue(node is RNodeSpan)
     val sym: RNodeSpan = node as RNodeSpan
     SpanAsserter(sym).body()
 }
-

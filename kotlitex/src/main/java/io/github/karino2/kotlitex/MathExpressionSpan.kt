@@ -26,7 +26,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
     init {
         val options = Options(Style.DISPLAY)
         val parser = Parser(expr)
-        val parsed =  parser.parse()
+        val parsed = parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
         val builder = VirtualNodeBuilder(nodes, baseSize.toDouble())
         rootNode = builder.build()
@@ -72,7 +72,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
         paint.strokeWidth = 1.0f
         paint.style = Paint.Style.STROKE
 
-        canvas.drawRect(RectF(x, y, x+ bounds.width.toFloat(), y + bounds.height.toFloat()), paint)
+        canvas.drawRect(RectF(x, y, x + bounds.width.toFloat(), y + bounds.height.toFloat()), paint)
     }
 
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
@@ -104,7 +104,6 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
 
                 drawBounds(canvas, parent.bounds)
 
-
                 // TODO: support other preserve aspect ratio.
                 // "xMinYMin slice"
                 val mat = Matrix()
@@ -124,7 +123,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
                 Basically, width is far larger than height.
                 So we scale to fit to height, then clip.
                  */
-                val scale = (hb/heightvb).toFloat()
+                val scale = (hb / heightvb).toFloat()
                 mat.postScale(scale, scale)
                 mat.postTranslate(x, y)
 
@@ -136,9 +135,9 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
                 val path = Path()
 
                 canvas.save()
-                canvas.clipRect(RectF(x, y, x+wb.toFloat(), y+hb.toFloat()))
+                canvas.clipRect(RectF(x, y, x + wb.toFloat(), y + hb.toFloat()))
 
-                parent.rnode.children.forEach{
+                parent.rnode.children.forEach {
                     path.reset()
                     path.addPath(it.path, mat)
                     canvas.drawPath(path, paint)
@@ -149,14 +148,13 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
             }
         }
     }
-
 }
 
 class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f) : DynamicDrawableSpan() {
     override fun getDrawable(): Drawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
         val drawable = MathExpressionDrawable(expr, baseSize, drawBounds = false)
-        drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight())
         return drawable
     }
 }

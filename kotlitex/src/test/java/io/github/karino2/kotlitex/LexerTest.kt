@@ -3,7 +3,6 @@ package io.github.karino2.kotlitex
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 class LexerTest {
     @Test
     fun basicTest() {
@@ -27,6 +26,5 @@ class LexerTest {
 
         res1 = lexer.lex()
         assertEquals("EOF", res1.text)
-
     }
 }
