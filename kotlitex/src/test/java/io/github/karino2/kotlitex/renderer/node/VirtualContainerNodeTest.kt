@@ -1,8 +1,7 @@
 package io.github.karino2.kotlitex.renderer.node
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class VirtualContainerNodeTest {
 

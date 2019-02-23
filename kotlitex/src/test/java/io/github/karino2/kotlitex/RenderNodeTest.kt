@@ -1,8 +1,8 @@
 package io.github.karino2.kotlitex
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 
 fun toEnum(name: String) = CssClass.valueOf(name.replace("-", "_"))
 fun classesToEnums(klassnames: String) = klassnames.split(" ").filter { !it.isEmpty() }.map { toEnum(it) }.toMutableSet()

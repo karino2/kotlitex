@@ -1,7 +1,6 @@
 package io.github.karino2.kotlitex
 
 import io.github.karino2.kotlitex.functions.FunctionOp
-import java.lang.IllegalArgumentException
 
 
 typealias RenderHandler = (ParseNode, Options)->RenderNode

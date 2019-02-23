@@ -1,11 +1,25 @@
 package io.github.karino2.kotlitex
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PixelFormat
+import android.graphics.RectF
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.DynamicDrawableSpan
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
-import io.github.karino2.kotlitex.renderer.node.*
+import io.github.karino2.kotlitex.renderer.node.Bounds
+import io.github.karino2.kotlitex.renderer.node.HorizontalLineNode
+import io.github.karino2.kotlitex.renderer.node.PathNode
+import io.github.karino2.kotlitex.renderer.node.TextNode
+import io.github.karino2.kotlitex.renderer.node.VerticalList
+import io.github.karino2.kotlitex.renderer.node.VirtualCanvasNode
+import io.github.karino2.kotlitex.renderer.node.VirtualContainerNode
 
 private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBounds: Boolean = false) : Drawable() {
     var rootNode: VerticalList

@@ -6,8 +6,6 @@ import io.github.karino2.kotlitex.RenderTreeBuilder
 import io.github.karino2.kotlitex.Style
 import org.junit.Test
 
-import org.junit.Assert.*
-
 class VirtualNodeBuilderTest {
     @Test
     fun build() {

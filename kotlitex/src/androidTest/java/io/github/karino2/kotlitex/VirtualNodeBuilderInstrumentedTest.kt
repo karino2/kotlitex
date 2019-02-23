@@ -2,10 +2,11 @@ package io.github.karino2.kotlitex
 
 import android.support.test.runner.AndroidJUnit4
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
-import io.github.karino2.kotlitex.renderer.node.*
+import io.github.karino2.kotlitex.renderer.node.TextNode
+import io.github.karino2.kotlitex.renderer.node.VirtualCanvasNode
+import io.github.karino2.kotlitex.renderer.node.VirtualContainerNode
 import org.junit.Assert.assertEquals
 import org.junit.Test
-
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)

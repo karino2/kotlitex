@@ -1,9 +1,23 @@
 package io.github.karino2.kotlitex.functions
 
 import android.graphics.Path
-import io.github.karino2.kotlitex.*
+import io.github.karino2.kotlitex.CssClass
+import io.github.karino2.kotlitex.FunctionContext
+import io.github.karino2.kotlitex.FunctionSpec
+import io.github.karino2.kotlitex.LatexFunctions
+import io.github.karino2.kotlitex.Options
+import io.github.karino2.kotlitex.PNodeSqrt
+import io.github.karino2.kotlitex.ParseNode
+import io.github.karino2.kotlitex.PositionType
+import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RenderBuilderDelimiter.makeSqrtImage
-import java.lang.IllegalArgumentException
+import io.github.karino2.kotlitex.RenderBuilderVList
+import io.github.karino2.kotlitex.RenderTreeBuilder
+import io.github.karino2.kotlitex.Style
+import io.github.karino2.kotlitex.VListElem
+import io.github.karino2.kotlitex.VListKern
+import io.github.karino2.kotlitex.VListParamFirstBaseLine
+import io.github.karino2.kotlitex.VListParamPositioned
 
 /*
   This file is the port of functions/sqrt.js

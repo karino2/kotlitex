@@ -1,6 +1,7 @@
 package io.github.karino2.kotlitex
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 
 class SymbolAsserter(val node: RNodeSymbol) {
     fun text(v: String) = assertEquals(v, node.text)

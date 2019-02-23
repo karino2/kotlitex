@@ -1,7 +1,6 @@
 package io.github.karino2.kotlitex
 
 import android.util.Log
-import kotlin.IllegalArgumentException
 
 data class Measurement(val number: Int, val unit: String) {
     val isValidUnit: Boolean

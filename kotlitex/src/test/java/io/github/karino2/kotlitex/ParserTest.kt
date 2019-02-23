@@ -1,8 +1,9 @@
 package io.github.karino2.kotlitex
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class NodeMathOrdAsserter(val actual : PNodeMathOrd) {
     fun text(expect: String) = assertEquals(expect, actual.text)
