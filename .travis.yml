@@ -3,6 +3,10 @@
 # https://docs.travis-ci.com/user/languages/android/
 language: android
 
+env:
+  global:
+    - ADB_INSTALL_TIMEOUT=10 # minutes
+
 before_install:
   # Install SDK license so Android Gradle plugin can install deps.
   - mkdir "$ANDROID_HOME/licenses" || true
