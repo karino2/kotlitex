@@ -7,7 +7,6 @@ import io.github.karino2.kotlitex.RNodeSymbol
 import io.github.karino2.kotlitex.RenderNode
 import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
 import io.github.karino2.kotlitex.renderer.node.CssFont
-import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.HPaddingNode
 import io.github.karino2.kotlitex.renderer.node.PathNode
 import io.github.karino2.kotlitex.renderer.node.StyleStateMapping
@@ -85,7 +84,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
             val isZeroWidthSpace = (node.text.length == 1 && node.text[0] == '\u200B')
             if (node.text.length > 0 && !isZeroWidthSpace) {
                 val s = this.state
-                val textNode = TextNode(node.text, CssFont(CssFontFamily.SERIF, state.fontSize()), state.color, state.klasses)
+                val textNode = TextNode(node.text, CssFont.create(state.family, state.variant, state.fontSize()), state.color, state.klasses)
 
                 // Maybe subclass or type-parameter?
                 if (! headless) {

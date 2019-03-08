@@ -4,10 +4,12 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.DynamicDrawableSpan
+import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
 
-private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBounds: Boolean = false) : Drawable() {
+
+private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val drawBounds: Boolean = false) : Drawable() {
     var rootNode: VerticalList
     init {
         val options = Options(Style.DISPLAY)
@@ -69,7 +71,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
                 }
             }
             is TextNode -> {
-                textPaint.typeface = parent.font.getTypeface()
+                // TODO: temp font test.
+                textPaint.typeface = fontLoader.toTypeface(parent.font)
                 textPaint.textSize = parent.font.size.toFloat()
                 val x = translateX(parent.bounds.x)
                 val y = translateY(parent.bounds.y)
@@ -138,10 +141,10 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val drawBoun
 
 }
 
-class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f) : DynamicDrawableSpan() {
+class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f, val fontLoader: FontLoader) : DynamicDrawableSpan() {
     override fun getDrawable(): Drawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
-        val drawable = MathExpressionDrawable(expr, baseSize, drawBounds = false)
+        val drawable = MathExpressionDrawable(expr, baseSize, fontLoader, drawBounds = false)
         drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         return drawable
     }
