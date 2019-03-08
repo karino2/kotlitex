@@ -7,7 +7,6 @@ import io.github.karino2.kotlitex.RNodeSymbol
 import io.github.karino2.kotlitex.RenderNode
 import io.github.karino2.kotlitex.renderer.node.ClassStateMapping
 import io.github.karino2.kotlitex.renderer.node.CssFont
-import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 import io.github.karino2.kotlitex.renderer.node.HPaddingNode
 import io.github.karino2.kotlitex.renderer.node.PathNode
 import io.github.karino2.kotlitex.renderer.node.StyleStateMapping

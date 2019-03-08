@@ -19,8 +19,8 @@ class FontLoader(val assetManager: AssetManager) {
         Typeface.createFromAsset(assetManager, "fonts/KaTeX_Main-Regular.ttf")
     }
 
-    fun toTypeface(font: CssFont) : Typeface {
-        return when(font.family) {
+    fun toTypeface(font: CssFont): Typeface {
+        return when (font.family) {
             CssFontFamily.KaTeX_Size2 -> katexSize2
             CssFontFamily.Math_Italic -> mathDefault
             else -> default

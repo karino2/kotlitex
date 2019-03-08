@@ -30,6 +30,5 @@ class MainActivity : AppCompatActivity() {
         FontLoader(assets)
     }
 
-
     fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, fontLoader)
 }
