@@ -85,7 +85,7 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val h
             val isZeroWidthSpace = (node.text.length == 1 && node.text[0] == '\u200B')
             if (node.text.length > 0 && !isZeroWidthSpace) {
                 val s = this.state
-                val textNode = TextNode(node.text, CssFont(CssFontFamily.SERIF, state.fontSize()), state.color, state.klasses)
+                val textNode = TextNode(node.text, CssFont.create(state.family, state.variant, state.fontSize()), state.color, state.klasses)
 
                 // Maybe subclass or type-parameter?
                 if (! headless) {
