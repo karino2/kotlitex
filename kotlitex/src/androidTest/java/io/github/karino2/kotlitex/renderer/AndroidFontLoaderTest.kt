@@ -10,10 +10,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AndroidFontLoaderTest {
+    private fun createLoader(): FontLoader {
+        val ctx = InstrumentationRegistry.getTargetContext()
+        return AndroidFontLoader(ctx.assets)
+    }
+
     @Test
     fun measureTextWidth() {
-        val ctx = InstrumentationRegistry.getTargetContext()
-        val loader = AndroidFontLoader(ctx.assets)
+        val loader = createLoader()
         val font = CssFont("KaTeX_Math", 10.0)
         assertEquals(6.0, loader.measureTextWidth(font, "x"), 0.01)
         assertEquals(22.0, loader.measureTextWidth(font, "hello"), 0.01)
@@ -21,9 +25,14 @@ class AndroidFontLoaderTest {
 
     @Test
     fun toTypefaceIsFlyweight() {
-        val ctx = InstrumentationRegistry.getTargetContext()
-        val loader = AndroidFontLoader(ctx.assets)
+        val loader = createLoader()
         val font = CssFont("KaTeX_Math", 10.0)
         assertEquals(loader.toTypeface(font), loader.toTypeface(font))
+    }
+
+    @Test
+    fun fontToTypefaceMapKeyHandleNormal() {
+        val font = CssFont("KaTeX_Main", "Normal", 10.0)
+        assertEquals("KaTeX_Main-Regular", AndroidFontLoader.fontToTypefaceMapKey(font))
     }
 }

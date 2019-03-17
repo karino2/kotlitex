@@ -46,12 +46,14 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
         return paint.measureText(text).toDouble()
     }
 
-    private fun fontToTypefaceMapKey(font: CssFont): String {
-        var variant = font.variant.capitalize()
-        if (variant.isEmpty()) {
-            variant = "Regular"
+    companion object {
+        fun fontToTypefaceMapKey(font: CssFont): String {
+            var variant = font.variant.capitalize()
+            if (variant.isEmpty() || variant == "Normal") {
+                variant = "Regular"
+            }
+            return "${font.family}-$variant"
         }
-        return "${font.family}-$variant"
     }
 
     override fun toTypeface(font: CssFont): Typeface {
