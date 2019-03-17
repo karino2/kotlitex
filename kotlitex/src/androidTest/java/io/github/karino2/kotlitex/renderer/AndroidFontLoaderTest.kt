@@ -14,7 +14,7 @@ class AndroidFontLoaderTest {
     fun measureTextWidth() {
         val ctx = InstrumentationRegistry.getTargetContext()
         val loader = AndroidFontLoader(ctx.assets)
-        val font = CssFont.create("KaTeX_Math", "", 10.0)
+        val font = CssFont("KaTeX_Math", 10.0)
         assertEquals(6.0, loader.measureTextWidth(font, "x"), 0.01)
         assertEquals(22.0, loader.measureTextWidth(font, "hello"), 0.01)
     }
@@ -23,7 +23,7 @@ class AndroidFontLoaderTest {
     fun toTypefaceIsFlyweight() {
         val ctx = InstrumentationRegistry.getTargetContext()
         val loader = AndroidFontLoader(ctx.assets)
-        val font = CssFont.create("KaTeX_Math", "", 10.0)
+        val font = CssFont("KaTeX_Math", 10.0)
         assertEquals(loader.toTypeface(font), loader.toTypeface(font))
     }
 }

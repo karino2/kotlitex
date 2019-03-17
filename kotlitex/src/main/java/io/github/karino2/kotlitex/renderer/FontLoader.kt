@@ -4,7 +4,6 @@ import android.content.res.AssetManager
 import android.graphics.Paint
 import android.graphics.Typeface
 import io.github.karino2.kotlitex.renderer.node.CssFont
-import io.github.karino2.kotlitex.renderer.node.CssFontFamily
 
 interface FontLoader {
     fun measureTextWidth(font: CssFont, text: String): Double
@@ -15,29 +14,29 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
     FontLoader {
     private val typefaceMap =
         listOf(
-            "AMS-Regular",
-            "Caligraphic-Bold",
-            "Caligraphic-Regular",
-            "Fraktur-Bold",
-            "Fraktur-Regular",
-            "Main-Bold",
-            "Main-BoldItalic",
-            "Main-Italic",
-            "Main-Regular",
-            "Math-BoldItalic",
-            "Math-Italic",
-            "Math-Regular",
-            "SansSerif-Bold",
-            "SansSerif-Italic",
-            "SansSerif-Regular",
-            "Script-Regular",
-            "Size1-Regular",
-            "Size2-Regular",
-            "Size3-Regular",
-            "Size4-Regular",
-            "Typewriter-Regular"
+            "KaTeX_AMS-Regular",
+            "KaTeX_Caligraphic-Bold",
+            "KaTeX_Caligraphic-Regular",
+            "KaTeX_Fraktur-Bold",
+            "KaTeX_Fraktur-Regular",
+            "KaTeX_Main-Bold",
+            "KaTeX_Main-BoldItalic",
+            "KaTeX_Main-Italic",
+            "KaTeX_Main-Regular",
+            "KaTeX_Math-BoldItalic",
+            "KaTeX_Math-Italic",
+            "KaTeX_Math-Regular",
+            "KaTeX_SansSerif-Bold",
+            "KaTeX_SansSerif-Italic",
+            "KaTeX_SansSerif-Regular",
+            "KaTeX_Script-Regular",
+            "KaTeX_Size1-Regular",
+            "KaTeX_Size2-Regular",
+            "KaTeX_Size3-Regular",
+            "KaTeX_Size4-Regular",
+            "KaTeX_Typewriter-Regular"
             ).map {
-            it to Typeface.createFromAsset(assetManager, "fonts/KaTeX_$it.ttf")
+            it to Typeface.createFromAsset(assetManager, "fonts/$it.ttf")
         }.toMap()
 
     override fun measureTextWidth(font: CssFont, text: String): Double {
@@ -47,11 +46,15 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
         return paint.measureText(text).toDouble()
     }
 
-    override fun toTypeface(font: CssFont): Typeface {
-        return when (font.family) {
-            CssFontFamily.KaTeX_Size2 -> typefaceMap["Size2-Regular"]!!
-            CssFontFamily.Math_Italic -> typefaceMap["Math-Italic"]!!
-            else -> typefaceMap["Main-Regular"]!!
+    private fun fontToTypefaceMapKey(font: CssFont): String {
+        var variant = font.variant.capitalize()
+        if (variant.isEmpty()) {
+            variant = "Regular"
         }
+        return "${font.family}-$variant"
+    }
+
+    override fun toTypeface(font: CssFont): Typeface {
+        return typefaceMap.getValue(fontToTypefaceMapKey(font))
     }
 }
