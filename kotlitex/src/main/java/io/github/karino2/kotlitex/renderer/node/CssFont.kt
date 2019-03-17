@@ -1,7 +1,5 @@
 package io.github.karino2.kotlitex.renderer.node
 
-import android.graphics.Typeface
-
 enum class CssFontFamily {
     SERIF,
     KaTeX_Size2,
@@ -24,9 +22,5 @@ data class CssFont(val family: CssFontFamily, val size: Double) {
             }
             return CssFont(family, size)
         }
-    }
-
-    fun getTypeface(): Typeface {
-        return Typeface.SERIF
     }
 }

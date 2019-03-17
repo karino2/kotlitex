@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.widget.TextView
-import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.MathExpressionSpan
 
 class MainActivity : AppCompatActivity() {
@@ -26,9 +25,5 @@ class MainActivity : AppCompatActivity() {
         textView.text = spannable
     }
 
-    val fontLoader by lazy {
-        FontLoader(assets)
-    }
-
-    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, fontLoader)
+    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, assets)
 }
