@@ -1,9 +1,11 @@
 package io.github.karino2.kotlitex
 
+import android.content.res.AssetManager
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.DynamicDrawableSpan
+import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
@@ -16,7 +18,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
-        val builder = VirtualNodeBuilder(nodes, baseSize.toDouble())
+        val builder = VirtualNodeBuilder(nodes, baseSize.toDouble(), fontLoader)
         rootNode = builder.build()
     }
 
@@ -141,10 +143,11 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
 }
 
-class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f, val fontLoader: FontLoader) : DynamicDrawableSpan() {
+class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f, val assetManager: AssetManager) : DynamicDrawableSpan() {
     override fun getDrawable(): Drawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
-        val drawable = MathExpressionDrawable(expr, baseSize, fontLoader, drawBounds = false)
+        val drawable = MathExpressionDrawable(expr, baseSize,
+            AndroidFontLoader(assetManager), drawBounds = false)
         drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         return drawable
     }

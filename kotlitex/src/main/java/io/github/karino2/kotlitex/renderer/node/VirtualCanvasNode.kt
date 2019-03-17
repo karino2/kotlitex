@@ -1,7 +1,7 @@
 package io.github.karino2.kotlitex.renderer.node
 
-import android.graphics.Paint
 import io.github.karino2.kotlitex.RNodePathHolder
+import io.github.karino2.kotlitex.renderer.FontLoader
 
 enum class Alignment {
     NONE /* same as null on canvas-latex */, LEFT, RIGHT, CENTER
@@ -199,16 +199,14 @@ class VerticalList(var alignment: Alignment, var rowStart: Double, klasses: Set<
 }
 
 class TextNode(
+    val fontLoader: FontLoader,
     val text: String,
     val font: CssFont,
     val color: String,
     klasses: Set<String>
 ) : VirtualCanvasNode(klasses) {
     override fun updateSize() {
-        val paint = Paint()
-        paint.typeface = font.getTypeface()
-        paint.textSize = font.size.toFloat()
-        bounds.width = paint.measureText(text).toDouble()
+        bounds.width = fontLoader.measureTextWidth(font, text)
     }
 
     override fun toString(): String {
