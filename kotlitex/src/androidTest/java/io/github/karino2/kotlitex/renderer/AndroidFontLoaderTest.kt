@@ -16,11 +16,11 @@ class AndroidFontLoaderTest {
     }
 
     @Test
-    fun measureTextWidth() {
+    fun measureSize() {
         val loader = createLoader()
         val font = CssFont("KaTeX_Math", 10.0)
-        assertEquals(6.0, loader.measureTextWidth(font, "x"), 0.01)
-        assertEquals(22.0, loader.measureTextWidth(font, "hello"), 0.01)
+        assertEquals(6.0, loader.measureSize(font, "x").width, 0.01)
+        assertEquals(22.0, loader.measureSize(font, "hello").width, 0.01)
     }
 
     @Test
