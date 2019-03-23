@@ -5,13 +5,14 @@ import io.github.karino2.kotlitex.Options
 import io.github.karino2.kotlitex.Parser
 import io.github.karino2.kotlitex.RenderTreeBuilder
 import io.github.karino2.kotlitex.Style
+import io.github.karino2.kotlitex.renderer.node.Bounds
 import io.github.karino2.kotlitex.renderer.node.CssFont
 import org.junit.Test
 
 class VirtualNodeBuilderTest {
     class TestFontLoader : FontLoader {
-        override fun measureTextWidth(font: CssFont, text: String): Double {
-            return 10.0
+        override fun measureSize(font: CssFont, text: String): Bounds {
+            return Bounds(0.0, 0.0)
         }
 
         override fun toTypeface(font: CssFont): Typeface {

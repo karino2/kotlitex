@@ -4,10 +4,11 @@ import android.content.res.AssetManager
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
+import io.github.karino2.kotlitex.renderer.node.Bounds
 import io.github.karino2.kotlitex.renderer.node.CssFont
 
 interface FontLoader {
-    fun measureSize(font: CssFont, text: String): Rect
+    fun measureSize(font: CssFont, text: String): Bounds
     fun toTypeface(font: CssFont): Typeface
 }
 
@@ -15,12 +16,12 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
     FontLoader {
     private val paint = Paint()
 
-    override fun measureSize(font: CssFont, text: String): Rect {
+    override fun measureSize(font: CssFont, text: String): Bounds {
         val rect = Rect()
         paint.typeface = toTypeface(font)
         paint.textSize = font.size.toFloat()
         paint.getTextBounds(text, 0, text.length, rect)
-        return rect
+        return Bounds(0.0, 0.0, rect.width().toDouble(), rect.height().toDouble())
     }
 
     private val typefaceMap =

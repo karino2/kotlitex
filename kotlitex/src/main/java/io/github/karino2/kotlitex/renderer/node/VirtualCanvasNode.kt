@@ -206,9 +206,9 @@ class TextNode(
     klasses: Set<String>
 ) : VirtualCanvasNode(klasses) {
     override fun updateSize() {
-        val rect = fontLoader.measureSize(font, text)
-        bounds.width = rect.width().toDouble()
-        bounds.height = rect.height().toDouble()
+        val size = fontLoader.measureSize(font, text)
+        bounds.width = size.width
+        bounds.height = size.height
     }
 
     override fun toString(): String {
