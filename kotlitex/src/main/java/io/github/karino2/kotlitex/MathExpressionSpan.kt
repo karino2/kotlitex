@@ -62,7 +62,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         paint.strokeWidth = 1.0f
         paint.style = Paint.Style.STROKE
 
-        canvas.drawRect(RectF(x, y, x+ bounds.width.toFloat(), y + bounds.height.toFloat()), paint)
+        // TODO: This doesn't look right though...
+        canvas.drawRect(RectF(x, y - bounds.height.toFloat(), x + bounds.width.toFloat(), y), paint)
     }
 
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
@@ -147,7 +148,7 @@ class MathExpressionSpan(val expr: String, val baseSize: Float = 44.0f, val asse
     override fun getDrawable(): Drawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
         val drawable = MathExpressionDrawable(expr, baseSize,
-            AndroidFontLoader(assetManager), drawBounds = false)
+            AndroidFontLoader(assetManager), drawBounds = true)
         drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         return drawable
     }
