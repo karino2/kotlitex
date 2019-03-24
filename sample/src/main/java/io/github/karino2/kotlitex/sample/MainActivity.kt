@@ -11,8 +11,8 @@ import io.github.karino2.kotlitex.MathExpressionSpan
 class MainActivity : AppCompatActivity() {
 
     // private val PHYSICAL_BASE_SIZE = 100.0f // big size for debug
-    private val PHYSICAL_BASE_SIZE = 42f // textView.textSize, 14sp in my device.
-    // private val PHYSICAL_BASE_SIZE = 72f // 24sp
+    // private val PHYSICAL_BASE_SIZE = 42f // textView.textSize, 14sp in my device.
+    private val PHYSICAL_BASE_SIZE = 72f // 24sp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
