@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 
 
-private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val drawBounds: Boolean = false) : Drawable() {
+private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val drawBounds: Boolean = false)  {
     var rootNode: VerticalList
     init {
         val options = Options(Style.DISPLAY)
@@ -31,26 +31,11 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         typeface = Typeface.SERIF
     }
 
-    override fun setAlpha(alpha: Int) {
-    }
-
-    override fun getOpacity(): Int = PixelFormat.OPAQUE
-
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-    }
-
-    override fun draw(canvas: Canvas) {
-        drawRenderNodes(canvas, rootNode, 1.0f)
-    }
-
-    // TODO
-    override fun getIntrinsicWidth(): Int = 400
-    override fun getIntrinsicHeight(): Int = 400
     private fun translateX(x: Double): Float {
-        return x.toFloat() + 100
+        return x.toFloat()
     }
     private fun translateY(y: Double): Float {
-        return y.toFloat() + 200
+        return y.toFloat()
     }
 
     private fun drawBounds(canvas: Canvas, bounds: Bounds, ratio: Float) {
@@ -58,8 +43,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
             return
         }
 
-        val x = translateX(bounds.x)*ratio
-        val y = translateY(bounds.y)*ratio
+        val x = translateX(bounds.x*ratio)
+        val y = translateY(bounds.y*ratio)
 
         paint.color = Color.RED
         paint.strokeWidth = 1.0f
@@ -78,25 +63,24 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
                 }
             }
             is TextNode -> {
-                // TODO: temp font test.
                 textPaint.typeface = fontLoader.toTypeface(parent.font)
                 textPaint.textSize = parent.font.size.toFloat()*ratio
-                val x = translateX(parent.bounds.x)*ratio
-                val y = translateY(parent.bounds.y)*ratio
+                val x = translateX(parent.bounds.x*ratio)
+                val y = translateY(parent.bounds.y*ratio)
                 canvas.drawText(parent.text, x, y, textPaint)
                 drawBounds(canvas, parent.bounds, ratio)
             }
             is HorizontalLineNode -> {
                 paint.color = Color.BLACK
                 paint.strokeWidth = parent.bounds.height.toFloat()*ratio
-                val x = translateX(parent.bounds.x)*ratio
-                val y = translateY(parent.bounds.y)*ratio
+                val x = translateX(parent.bounds.x*ratio)
+                val y = translateY(parent.bounds.y*ratio)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat()*ratio, y, paint)
                 drawBounds(canvas, parent.bounds, ratio)
             }
             is PathNode -> {
-                val x = translateX(parent.bounds.x)*ratio
-                val y = (translateY(parent.bounds.y) - parent.bounds.height).toFloat()*ratio
+                val x = translateX(parent.bounds.x*ratio)
+                val y = (translateY(parent.bounds.y*ratio) - parent.bounds.height*ratio).toFloat()
 
                 drawBounds(canvas, parent.bounds, ratio)
 
@@ -149,7 +133,42 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
     }
 
     fun drawWithRatio(canvas: Canvas, ratio: Float) {
+        if(drawBounds)
+            drawBounds(canvas, calculateWholeBounds(), ratio)
         drawRenderNodes(canvas, rootNode, ratio)
+    }
+
+    fun calculateBounds(wholeBounds : Bounds, parent: VirtualCanvasNode) {
+        if(parent.bounds.width != 0.0) {
+            wholeBounds.extend(parent.bounds)
+            return
+        }
+        when (parent) {
+            is VirtualContainerNode<*> -> {
+                parent.nodes.forEach {
+                    calculateBounds(wholeBounds, it)
+                }
+            }
+        }
+    }
+
+    val bounds by lazy {
+        val b = calculateWholeBounds()
+
+        with(b) {
+            Rect(0, 0, (width).toInt(), (height).toInt())
+        }
+    }
+
+    private fun calculateWholeBounds(): Bounds {
+        val b = Bounds(rootNode.bounds.x, rootNode.bounds.y)
+        calculateBounds(b, rootNode)
+
+        // place rect to 0, 0
+        b.x = 0.0
+        b.y = 0.0
+
+        return b
     }
 
 }
@@ -224,13 +243,17 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
         val b = getCachedDrawable()
 
         // We always use full height. So we do not need any alignment, right?
-        val ratio = (bottom-top).toDouble() / b.bounds.bottom.toDouble()
-        Log.d("kotlitex", "ratio=$ratio")
+        // val ratio = (bottom-top).toDouble() / b.bounds.bottom.toDouble()
+        val ratio = baseHeightSpecified?.let { targetHeight ->
+            targetHeight / virtualBaseHeight
+        } ?: 1.0f
+
+        // Log.d("kotlitex", "x=$x, y=$y, top=$top, ratio=$ratio, expr=$expr")
 
 
 
         canvas.save()
-        canvas.translate(x, top.toFloat())
+        canvas.translate(x, y.toFloat())
         b.drawWithRatio(canvas, ratio.toFloat())
 
         canvas.restore()
@@ -240,8 +263,7 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
     private fun getDrawable(): MathExpressionDrawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
         val drawable = MathExpressionDrawable(expr, virtualBaseHeight,
-            AndroidFontLoader(assetManager), drawBounds = true)
-        drawable.setBounds(drawable.bounds.left, drawable.bounds.top, drawable.intrinsicWidth, drawable.intrinsicHeight);
+            AndroidFontLoader(assetManager), drawBounds = false)
         return drawable
     }
 
