@@ -192,17 +192,34 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
                 return (rect.right*ratio).roundToInt()
             }
 
+            val scaledBottom = (rect.bottom*ratio+0.5).roundToInt()
+            val ascent = scaledBottom/2
+            val descent = scaledBottom-ascent
 
-            val lineNum = rect.bottom/virtualBaseHeight
+
+
+            // val lineNum = rect.bottom/virtualBaseHeight
             // We follow DynamicDrawableSpan logic. But it's a little different from no-size specified case.
-            fm.ascent = -(lineNum*targetHeight).roundToInt()
+            // fm.ascent = -(lineNum*targetHeight).roundToInt()
+            /*
+            fm.ascent = -(rect.bottom*ratio).roundToInt()
             fm.descent = 0
             fm.top = fm.ascent
             fm.bottom = 0
+            */
+
+            fm.ascent = -ascent
+            fm.descent = descent
+
+            fm.bottom = fm.descent
+            fm.top = fm.ascent
+
+
             // should we roundUp?
             return (rect.right*ratio).roundToInt()
         }
         // below here is baseHeightSpecified == null case.
+        // We do not test this case much. May be we must change baseHeightSpecified to non-null.
 
         if(fm != null) {
             // TODO: consider handling of baseline.
