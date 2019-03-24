@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val textView = findViewById<TextView>(R.id.textView)
         Log.d("kotlitex", "textSize = ${textView.textSize}")
-        val spannable = SpannableStringBuilder("01234567 91 345 789 234 678 and the remaining text.")
+        val spannable = SpannableStringBuilder("01234567 91 345 789\n234 678 and the remaining text.")
 
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\frac{1}{2}", PHYSICAL_BASE_SIZE), 2, 4, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
