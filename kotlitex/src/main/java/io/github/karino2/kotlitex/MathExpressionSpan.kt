@@ -193,27 +193,15 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
             }
 
             val scaledBottom = (rect.bottom*ratio+0.5).roundToInt()
+
             val ascent = scaledBottom/2
             val descent = scaledBottom-ascent
-
-
-
-            // val lineNum = rect.bottom/virtualBaseHeight
-            // We follow DynamicDrawableSpan logic. But it's a little different from no-size specified case.
-            // fm.ascent = -(lineNum*targetHeight).roundToInt()
-            /*
-            fm.ascent = -(rect.bottom*ratio).roundToInt()
-            fm.descent = 0
-            fm.top = fm.ascent
-            fm.bottom = 0
-            */
 
             fm.ascent = -ascent
             fm.descent = descent
 
             fm.bottom = fm.descent
-            fm.top = fm.ascent
-
+            fm.top = - scaledBottom
 
             // should we roundUp?
             return (rect.right*ratio).roundToInt()
