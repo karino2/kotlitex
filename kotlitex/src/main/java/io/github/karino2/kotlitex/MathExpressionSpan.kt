@@ -4,6 +4,7 @@ import android.content.res.AssetManager
 import android.graphics.*
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
+import android.util.Log
 import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
@@ -173,7 +174,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
 // Similar to DynamicDrawableSpan, but getSize is a little different.
 // I create super class of DynamicDrawableSpan because getCachedDrawable is private and we neet it.
-class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val assetManager: AssetManager, val isMathMode: Boolean) : ReplacementSpan() {
+class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManager: AssetManager, val isMathMode: Boolean) : ReplacementSpan() {
     enum class Align {
         Bottom, BaseLine
     }
@@ -181,55 +182,45 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
     var verticalAlignment = Align.Bottom
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
+        if(isError)
+            return (baseHeight*5).toInt()
+        try {
+            return getSizeWithException(fm)
+        }catch(err: ParseError) {
+            Log.d("kotlitex", err.msg)
+            isError = true
+            return (baseHeight*5).toInt()
+        }catch(err: NotImplementedError) {
+            Log.d("kotlitex", err.message)
+            isError = true
+            return (baseHeight*5).toInt()
+        }
+    }
+
+    var isError = false
+
+    private fun getSizeWithException(fm: Paint.FontMetricsInt?): Int {
         val d = getCachedDrawable()
         val rect = d.bounds
 
-        baseHeightSpecified?.let { targetHeight ->
-            val ratio = targetHeight/virtualBaseHeight
-            if(fm == null) {
-                return (rect.right*ratio).roundToInt()
-            }
-
-            val scaledBottom = (rect.bottom*ratio+0.5).roundToInt()
-
-            val ascent = scaledBottom/2
-            val descent = scaledBottom-ascent
-
-            fm.ascent = -ascent
-            fm.descent = descent
-
-            fm.bottom = fm.descent
-            fm.top = - scaledBottom
-
-            // should we roundUp?
-            return (rect.right*ratio).roundToInt()
-        }
-        // below here is baseHeightSpecified == null case.
-        // We do not test this case much. May be we must change baseHeightSpecified to non-null.
-
-        if(fm != null) {
-            // TODO: consider handling of baseline.
-            // I think we should align drawable's drawRenderNode baseline to fm.baseline.
-            // But our font is different, so it's not obvious whether my assumption is correct.
-            // Currently, I just use whole height as our box height.
-
-
-            // fm.bottom and top seems zero. There seems no way to know current line height.
-            /*
-            val lineHeight = fm.bottom - fm.top
-            // sometime, bottom and top is zero. in this case, we regard
-            val ratio = if(lineHeight == 0) 1.0 else lineHeight/ rect.bottom.toDouble()
-
-            // should we roundup?
-            return (rect.right*ratio).roundToInt()
-             */
-            fm.ascent = -rect.bottom
-            fm.descent = 0
-            fm.top = fm.ascent
-            fm.bottom
+        val ratio = baseHeight / virtualBaseHeight
+        if (fm == null) {
+            return (rect.right * ratio).roundToInt()
         }
 
-        return rect.right
+        val scaledBottom = (rect.bottom * ratio + 0.5).roundToInt()
+
+        val ascent = scaledBottom / 2
+        val descent = scaledBottom - ascent
+
+        fm.ascent = -ascent
+        fm.descent = descent
+
+        fm.bottom = fm.descent
+        fm.top = -scaledBottom
+
+        // should we roundUp?
+        return (rect.right * ratio).roundToInt()
     }
 
     override fun draw(
@@ -243,13 +234,16 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
         bottom: Int,
         paint: Paint
     ) {
+        if(isError) {
+            canvas.drawText("ERROR", x, y.toFloat(), paint)
+            return
+        }
+
         val b = getCachedDrawable()
 
         // We always use full height. So we do not need any alignment, right?
         // val ratio = (bottom-top).toDouble() / b.bounds.bottom.toDouble()
-        val ratio = baseHeightSpecified?.let { targetHeight ->
-            targetHeight / virtualBaseHeight
-        } ?: 1.0f
+        val ratio = baseHeight / virtualBaseHeight
 
         // Log.d("kotlitex", "x=$x, y=$y, top=$top, ratio=$ratio, expr=$expr")
 

@@ -65,6 +65,11 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
 
     var isMathExist = false
 
+    val mathExpressionSize : Float
+    get() {
+        return baseSize*1.2f
+    }
+
     override fun appendNormal(text: String) {
         spannable.append(text)
     }
@@ -75,7 +80,8 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
 
     private fun appendMathSpan(exp: String, isMathMode: Boolean) {
         isMathExist = true
-        val span = MathExpressionSpan(exp, baseSize, assetManager, isMathMode)
+        val size = if(isMathMode) mathExpressionSize else baseSize
+        val span = MathExpressionSpan(exp, size, assetManager, isMathMode)
         val begin = spannable.length
         spannable.append("\$\$${exp}\$\$")
         spannable.setSpan(span, begin, spannable.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
@@ -118,8 +124,11 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
                     builder.oneLine(line)
                 }
             }
-            if(handler.isMathExist)
-                setText(handler.spannable)
+            if(handler.isMathExist) {
+                withContext(Dispatchers.Main) {
+                    setText(handler.spannable)
+                }
+            }
         }
 
     }
