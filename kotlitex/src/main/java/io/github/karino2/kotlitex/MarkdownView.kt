@@ -118,8 +118,11 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
                     builder.oneLine(line)
                 }
             }
-            if(handler.isMathExist)
-                setText(handler.spannable)
+            if(handler.isMathExist) {
+                withContext(Dispatchers.Main) {
+                    setText(handler.spannable)
+                }
+            }
         }
 
     }
