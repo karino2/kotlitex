@@ -190,6 +190,10 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
             Log.d("kotlitex", err.msg)
             isError = true
             return (baseHeight*5).toInt()
+        }catch(err: NotImplementedError) {
+            Log.d("kotlitex", err.message)
+            isError = true
+            return (baseHeight*5).toInt()
         }
     }
 
