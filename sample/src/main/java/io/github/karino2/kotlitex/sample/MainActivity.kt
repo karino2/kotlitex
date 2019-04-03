@@ -6,6 +6,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.widget.TextView
+import io.github.karino2.kotlitex.MarkdownView
 import io.github.karino2.kotlitex.MathExpressionSpan
 
 class MainActivity : AppCompatActivity() {
@@ -28,8 +29,14 @@ class MainActivity : AppCompatActivity() {
         spannable.setSpan(createMathSpan("\\frac{1}{1+\\frac{1}{x^2}}", PHYSICAL_BASE_SIZE), 6, 8, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\sum^N_{k=1} k", PHYSICAL_BASE_SIZE), 22, 25, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
+
+        findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
+            |${"$$"} \sum^N_{k=1} k${"$$"}
+            |Above is math line. This is a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
+            |${"$$"} \sqrt{5} ${"$$"}
+        """.trimMargin())
     }
 
-    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, assets)
+    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, assets, true)
 //    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, null, assets)
 }
