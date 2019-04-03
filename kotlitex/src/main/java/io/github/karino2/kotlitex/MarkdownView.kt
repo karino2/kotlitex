@@ -60,7 +60,10 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
     fun reset() {
         // spannable.clear() seems slow.
         spannable = SpannableStringBuilder()
+        isMathExist = false
     }
+
+    var isMathExist = false
 
     override fun appendNormal(text: String) {
         spannable.append(text)
@@ -71,6 +74,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
     }
 
     private fun appendMathSpan(exp: String, isMathMode: Boolean) {
+        isMathExist = true
         val span = MathExpressionSpan(exp, baseSize, assetManager, isMathMode)
         val begin = spannable.length
         spannable.append("\$\$${exp}\$\$")
@@ -114,7 +118,8 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
                     builder.oneLine(line)
                 }
             }
-            setText(handler.spannable)
+            if(handler.isMathExist)
+                setText(handler.spannable)
         }
 
     }
