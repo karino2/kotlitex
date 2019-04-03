@@ -14,6 +14,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    // 10 minutes seems too short. Make timeout longer.
+    adbOptions {
+        timeOutInMs 20 * 60 * 1000
+        installOptions "-d","-t"
+    }
+
     // for workaround https://github.com/Kotlin/kotlinx.coroutines/issues/1059
     packagingOptions {
         exclude 'META-INF/atomicfu.kotlin_module'
