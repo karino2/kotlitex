@@ -182,24 +182,15 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
     var verticalAlignment = Align.Bottom
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
+        ensureDrawable()
         if(isError)
             return (baseHeight*5).toInt()
-        try {
-            return getSizeWithException(fm)
-        }catch(err: ParseError) {
-            Log.d("kotlitex", err.msg)
-            isError = true
-            return (baseHeight*5).toInt()
-        }catch(err: NotImplementedError) {
-            Log.d("kotlitex", err.message)
-            isError = true
-            return (baseHeight*5).toInt()
-        }
+        return getSizeInternal(fm)
     }
 
     var isError = false
 
-    private fun getSizeWithException(fm: Paint.FontMetricsInt?): Int {
+    private fun getSizeInternal(fm: Paint.FontMetricsInt?): Int {
         val d = getCachedDrawable()
         val rect = d.bounds
 
@@ -221,6 +212,19 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
         // should we roundUp?
         return (rect.right * ratio).roundToInt()
+    }
+
+    fun ensureDrawable() {
+        try {
+            getCachedDrawable()
+        }catch(err: ParseError) {
+            Log.d("kotlitex", err.msg)
+            isError = true
+        }catch(err: NotImplementedError) {
+            Log.d("kotlitex", err.message)
+            isError = true
+        }
+
     }
 
     override fun draw(
