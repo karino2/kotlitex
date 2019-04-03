@@ -2,10 +2,8 @@ package io.github.karino2.kotlitex
 
 import android.content.res.AssetManager
 import android.graphics.*
-import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
-import android.util.Log
 import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
@@ -14,10 +12,10 @@ import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 
 
-private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val drawBounds: Boolean = false)  {
+private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, isMathMode: Boolean, val drawBounds: Boolean = false)  {
     var rootNode: VerticalList
     init {
-        val options = Options(Style.DISPLAY)
+        val options = if(isMathMode) Options(Style.DISPLAY) else Options(Style.TEXT)
         val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
@@ -175,7 +173,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
 // Similar to DynamicDrawableSpan, but getSize is a little different.
 // I create super class of DynamicDrawableSpan because getCachedDrawable is private and we neet it.
-class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val assetManager: AssetManager) : ReplacementSpan() {
+class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val assetManager: AssetManager, val isMathMode: Boolean) : ReplacementSpan() {
     enum class Align {
         Bottom, BaseLine
     }
@@ -268,7 +266,7 @@ class MathExpressionSpan(val expr: String, val baseHeightSpecified: Float?, val 
     private fun getDrawable(): MathExpressionDrawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
         val drawable = MathExpressionDrawable(expr, virtualBaseHeight,
-            AndroidFontLoader(assetManager), drawBounds = false)
+            AndroidFontLoader(assetManager), isMathMode, drawBounds = false)
         return drawable
     }
 
