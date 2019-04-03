@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         spannable.setSpan(createMathSpan("\\sqrt{3}", PHYSICAL_BASE_SIZE), 4, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\frac{1}{1+\\frac{1}{x^2}}", PHYSICAL_BASE_SIZE), 6, 8, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\sum^N_{k=1} k", PHYSICAL_BASE_SIZE), 22, 25, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        // spannable.setSpan(createMathSpan("\\mathcal{K}", PHYSICAL_BASE_SIZE), 27, 28, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
