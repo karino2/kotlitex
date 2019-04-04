@@ -1,10 +1,11 @@
-package io.github.karino2.kotlitex
+package io.github.karino2.kotlitex.view
 
 import android.content.res.AssetManager
 import android.graphics.*
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
 import android.util.Log
+import io.github.karino2.kotlitex.*
 import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
@@ -16,7 +17,9 @@ import kotlin.math.roundToInt
 private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, isMathMode: Boolean, val drawBounds: Boolean = false)  {
     var rootNode: VerticalList
     init {
-        val options = if(isMathMode) Options(Style.DISPLAY) else Options(Style.TEXT)
+        val options = if(isMathMode) Options(Style.DISPLAY) else Options(
+            Style.TEXT
+        )
         val parser = Parser(expr)
         val parsed =  parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
@@ -263,8 +266,10 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
     private fun getDrawable(): MathExpressionDrawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
-        val drawable = MathExpressionDrawable(expr, virtualBaseHeight,
-            AndroidFontLoader(assetManager), isMathMode, drawBounds = false)
+        val drawable = MathExpressionDrawable(
+            expr, virtualBaseHeight,
+            AndroidFontLoader(assetManager), isMathMode, drawBounds = false
+        )
         return drawable
     }
 

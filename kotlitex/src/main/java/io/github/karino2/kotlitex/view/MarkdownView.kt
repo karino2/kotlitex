@@ -1,4 +1,4 @@
-package io.github.karino2.kotlitex
+package io.github.karino2.kotlitex.view
 
 import android.content.Context
 import android.content.res.AssetManager
@@ -56,7 +56,8 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
 
 }
 
-class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Float) : MathSpanHandler {
+class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Float) :
+    MathSpanHandler {
     fun reset() {
         // spannable.clear() seems slow.
         spannable = SpannableStringBuilder()
