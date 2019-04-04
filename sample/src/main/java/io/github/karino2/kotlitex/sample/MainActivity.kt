@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.widget.TextView
-import io.github.karino2.kotlitex.MarkdownView
-import io.github.karino2.kotlitex.MathExpressionSpan
+import io.github.karino2.kotlitex.view.MarkdownView
+import io.github.karino2.kotlitex.view.MathExpressionSpan
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,5 +36,6 @@ class MainActivity : AppCompatActivity() {
         """.trimMargin())
     }
 
-    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, assets, true)
+    fun createMathSpan(expr: String, baseSize: Float) =
+        MathExpressionSpan(expr, baseSize, assets, true)
 }

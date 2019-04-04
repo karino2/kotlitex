@@ -1,7 +1,7 @@
 package io.github.karino2.kotlitex.renderer
 
-import io.github.karino2.kotlitex.MathSpanBuilder
-import io.github.karino2.kotlitex.MathSpanHandler
+import io.github.karino2.kotlitex.view.MathSpanBuilder
+import io.github.karino2.kotlitex.view.MathSpanHandler
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
