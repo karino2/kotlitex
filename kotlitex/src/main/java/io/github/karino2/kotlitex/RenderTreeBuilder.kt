@@ -159,6 +159,12 @@ object RenderTreeBuilder {
         return symbolNode;
     }
 
+    // The following have to be loaded from Main-Italic font, using class mathit
+    val mathitLetters = setOf(
+        "\\imath", "ı",       // dotless i
+        "\\jmath", "ȷ",       // dotless j
+        "\\pounds", "\\mathsterling", "\\textsterling", "£"   // pounds symbol
+    )
 
 
     /**
@@ -171,28 +177,59 @@ object RenderTreeBuilder {
     options: Options,
     classes: MutableSet<CssClass>
     ): Pair<String, CssClass> { // {| fontName: string, fontClass: string |}
-        return Pair(
-            /* fontName:*/ "Math-Italic",
-            /* fontClass: */ CssClass.mathdefault)
-
-
-        /*
-        if (/[0-9]/.test(value.charAt(0)) ||
-                // glyphs for \imath and \jmath do not exist in Math-Italic so we
-                // need to use Main-Italic instead
-                utils.contains(mathitLetters, value)) {
-            return {
-                fontName: "Main-Italic",
-                fontClass: "mathit",
-            };
+        return if ("[0-9]".toRegex().matches(value[0].toString()) ||
+            // glyphs for \imath and \jmath do not exist in Math-Italic so we
+            // need to use Main-Italic instead
+            mathitLetters.contains(value)) {
+            Pair(
+                /* fontName:*/ "Math-Italic",
+                /* fontClass: */ CssClass.mathit)
         } else {
-            return {
-                fontName: "Math-Italic",
-                fontClass: "mathdefault",
-            };
+            Pair(
+                /* fontName:*/ "Math-Italic",
+                /* fontClass: */ CssClass.mathdefault)
         }
-        */
     }
+
+    /**
+     * Determines which of the font names (Main-Italic, Math-Italic, and Caligraphic)
+     * and corresponding style tags (mathit, mathdefault, or mathcal) to use for font
+     * "mathnormal", depending on the symbol.  Use this function instead of fontMap for
+     * font "mathnormal".
+     */
+    fun mathnormal(value: String,
+                   mode: Mode,
+                   options: Options,
+                   classes: MutableSet<CssClass>
+    ): Pair<String, CssClass> {
+        return when {
+            mathitLetters.contains(value) -> Pair("Main-Italic", CssClass.mathit)
+            "[0-9]".toRegex().matches(value[0].toString()) -> Pair("Caligraphic-Regular", CssClass.mathcal)
+            else -> Pair("Math-Italic", CssClass.mathdefault)
+        }
+    }
+
+    /**
+     * Determines which of the two font names (Main-Bold and Math-BoldItalic) and
+     * corresponding style tags (mathbf or boldsymbol) to use for font "boldsymbol",
+     * depending on the symbol.  Use this function instead of fontMap for font
+     * "boldsymbol".
+     */
+    fun boldsymbol(
+        value: String,
+        mode: Mode,
+        options: Options,
+        classes: MutableSet<CssClass>
+    ): Pair<String, CssClass> {
+        return if (Symbols.lookupSymbol(value, "Math-BoldItalic", mode).second != null) {
+            Pair("Math-BoldItalic", CssClass.boldsymbol)
+        } else {
+            // Some glyphs do not exist in Math-BoldItalic so we need to use
+            // Main-Bold instead.
+            Pair("Main-Bold", CssClass.mathbf)
+        }
+    }
+
 
     /**
      * Makes a symbol in Main-Regular or AMS-Regular.
@@ -225,6 +262,16 @@ object RenderTreeBuilder {
         }
     }
 
+    fun knownFontNameToCssClass(fontName: String) : CssClass {
+        return when (fontName) {
+            "amsrm" -> CssClass.amsrm
+            "textrm" -> CssClass.textrm
+            "textsf" -> CssClass.textsf
+            "texttt" -> CssClass.texttt
+            "mathcal" -> CssClass.mathcal
+            else -> throw NotImplementedError("Custom font NYI. (${fontName})")
+        }
+    }
 
     // Takes font options, and returns the appropriate fontLookup name
     fun retrieveTextFontName(fontFamily: String,
@@ -252,6 +299,63 @@ object RenderTreeBuilder {
         return "${baseFontName}-${fontStylesName}"
     }
 
+    /**
+     * Maps TeX font commands to objects containing:
+     * - variant: string used for "mathvariant" attribute in buildMathML.js
+     * - fontName: the "style" parameter to fontMetrics.getCharacterMetrics
+     */
+    // A map between tex font commands an MathML mathvariant attribute values
+    data class FontMapElem(val /* bold, normal, italic */ variant: String, val fontName: String)
+
+    val fontMap = mapOf(
+        // styles
+        "mathbf" to FontMapElem("bold", "Main-Bold"),
+        "mathrm" to FontMapElem(
+            "normal",
+            "Main-Regular"
+        ),
+        "textit" to FontMapElem(
+            "italic",
+            "Main-Italic"
+        ),
+        "mathit" to FontMapElem(
+            "italic",
+            "Main-Italic"
+        ),
+
+        // Default math font, "mathnormal" and "boldsymbol" are missing because they
+        // require the use of several fonts: Main-Italic and Math-Italic for default
+        // math font, Main-Italic, Math-Italic, Caligraphic for "mathnormal", and
+        // Math-BoldItalic and Main-Bold for "boldsymbol".  This is handled by a
+        // special case in makeOrd which ends up calling mathdefault, mathnormal,
+        // and boldsymbol.
+
+        // families
+        "mathbb" to FontMapElem(
+            "double-struck",
+            "AMS-Regular"
+        ),
+        "mathcal" to FontMapElem(
+            "script",
+            "Caligraphic-Regular"
+        ),
+        "mathfrak" to FontMapElem(
+            "fraktur",
+            "Fraktur-Regular"
+        ),
+        "mathscr" to FontMapElem(
+            "script",
+            "Script-Regular"
+        ),
+        "mathsf" to FontMapElem(
+            "sans-serif",
+            "SansSerif-Regular"
+        ),
+        "mathtt" to FontMapElem(
+            "monospace",
+            "Typewriter-Regular"
+        )
+    )
 
     /**
      * Makes either a mathord or textord in the correct font and color.
@@ -268,39 +372,34 @@ object RenderTreeBuilder {
 
         // Math mode or Old font (i.e. \rm)
         val isFont = mode == Mode.MATH || (mode == Mode.TEXT && options.font != "");
-        /*
         val fontOrFamily = if(isFont)  options.font else options.fontFamily
-        TODO:
-        if (text.charCodeAt(0) === 0xD835) {
+        /* TODO
+        if (text[0].toInt() == 0xD835) {
             // surrogate pairs get special treatment
             const [wideFontName, wideFontClass] = wideCharacterFont(text, mode);
             return makeSymbol(text, wideFontName, mode, options,
                 classes.concat(wideFontClass));
-        } else if (fontOrFamily) {
-            let fontName;
-            let fontClasses;
-            if (fontOrFamily === "boldsymbol" || fontOrFamily === "mathnormal") {
-                const fontData = fontOrFamily === "boldsymbol"
-                ? boldsymbol(text, mode, options, classes)
-                : mathnormal(text, mode, options, classes);
-                fontName = fontData.fontName;
-                fontClasses = [fontData.fontClass];
-            } else if (utils.contains(mathitLetters, text)) {
-                fontName = "Main-Italic";
-                fontClasses = ["mathit"];
-            } else if (isFont) {
-                fontName = fontMap[fontOrFamily].fontName;
-                fontClasses = [fontOrFamily];
-            } else {
-                fontName = retrieveTextFontName(fontOrFamily, options.fontWeight,
-                    options.fontShape);
-                fontClasses = [fontOrFamily, options.fontWeight, options.fontShape];
-            }
+        } else */ if (fontOrFamily.isNotEmpty()) {
+            val (fontName, fontClasses) =
+                if (fontOrFamily == "boldsymbol" || fontOrFamily == "mathnormal") {
+                    val (fontName, fontClass) =
+                        if(fontOrFamily == "boldsymbol") boldsymbol(text, mode, options, classes)
+                        else  mathnormal(text, mode, options, classes);
+                    Pair(fontName, mutableSetOf(fontClass))
+                } else if (mathitLetters.contains(text)) {
+                    Pair("Main-Italic", mutableSetOf(CssClass.mathit))
+                 } else if (isFont) {
+                    Pair(fontMap.getValue(fontOrFamily).fontName, mutableSetOf(knownFontNameToCssClass(fontOrFamily)))
+                } else {
+                    Pair(retrieveTextFontName(fontOrFamily, options.fontWeight, options.fontShape),
+                        mutableSetOf(knownFontNameToCssClass(fontOrFamily), options.fontWeight, options.fontShape))
+                }
 
-            if (lookupSymbol(text, fontName, mode).metrics) {
+            if (Symbols.lookupSymbol(text, fontName, mode).second != null) {
                 return makeSymbol(text, fontName, mode, options,
                     classes.concat(fontClasses));
-            } else if (ligatures.hasOwnProperty(text) &&
+            } /* TODO
+             else if (ligatures.hasOwnProperty(text) &&
                 fontName.substr(0, 10) === "Typewriter") {
                 // Deconstruct ligatures in monospace fonts (\texttt, \tt).
                 const parts = [];
@@ -309,9 +408,8 @@ object RenderTreeBuilder {
                         classes.concat(fontClasses)));
                 }
                 return makeFragment(parts);
-            }
+            } */
         }
-        */
 
         // Makes a symbol in the default font for mathords and textords.
         if (group is PNodeMathOrd) {
@@ -321,14 +419,14 @@ object RenderTreeBuilder {
         } else if (group is PNodeTextOrd) {
             val font = Symbols.get(mode)[text]?.font
             if (font == "ams") {
-                val fontName = retrieveTextFontName("amsrm", options.fontWeight,
-                options.fontShape);
+                val fontName =
+                    retrieveTextFontName("amsrm", options.fontWeight, options.fontShape);
                 return makeSymbol(
                     text, fontName, mode, options,
                     classes.concat(setOf(CssClass.amsrm, options.fontWeight, options.fontShape)));
             } else if (font == "main" || font == null) {
-                val fontName = retrieveTextFontName("textrm", options.fontWeight,
-                options.fontShape);
+                val fontName =
+                    retrieveTextFontName("textrm", options.fontWeight, options.fontShape);
                 return makeSymbol(
                     text, fontName, mode, options,
                     classes.concat(setOf(options.fontWeight, options.fontShape)));
@@ -346,7 +444,7 @@ object RenderTreeBuilder {
             }
         } else {
             // never reached here in kotlin.
-            throw Error("unexpected type: " + type + " in makeOrd");
+            throw Error("unexpected type: $type in makeOrd");
         }
     }
 
