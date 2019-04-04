@@ -473,6 +473,17 @@ object RenderTreeBuilder {
         return node;
     }
 
+    val domEnum = setOf(
+        CssClass.mord,
+        CssClass.mop,
+        CssClass.mbin,
+        CssClass.mrel,
+        CssClass.mopen,
+        CssClass.mclose,
+        CssClass.mpunct,
+        CssClass.minner
+    )
+
     fun getTypeOfDomTree(in_node: RenderNode?, side: String /* left or right */) : CssClass {
         if (in_node == null) {
             return CssClass.EMPTY
@@ -481,12 +492,10 @@ object RenderTreeBuilder {
         val node = getOutermostNode(in_node, side)
         // This makes a lot of assumptions as to where the type of atom
         // appears.  We should do a better job of enforcing this.
-        // TODO:
-        /*
-        return DomEnum[node.classes[0]] || null;
-        */
-        if(node.hasClass(CssClass.mord))
-            return CssClass.mord
+        domEnum.forEach {
+            if(node.hasClass(it))
+                return it
+        }
         return CssClass.EMPTY
     }
 

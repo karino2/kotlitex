@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.textView)
         // Log.d("kotlitex", "textSize = ${textView.textSize}")
         val spannable = SpannableStringBuilder("01234567 91 345 789\n234 678 and the remaining text.")
-
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\frac{1}{2}", PHYSICAL_BASE_SIZE), 2, 4, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\sqrt{3}", PHYSICAL_BASE_SIZE), 4, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
             |${"$$"} \sum^N_{k=1} k${"$$"}
-            |${"$$"} \mathcal{X} ${"$$"}
+            |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |Above is math line. This is a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"}
         """.trimMargin())

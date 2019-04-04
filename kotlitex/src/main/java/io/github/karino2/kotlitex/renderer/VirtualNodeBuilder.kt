@@ -57,7 +57,10 @@ class VirtualNodeBuilder(val children: List<RenderNode>, baseSize: Double, val f
         if (state.mspace > 0.0) {
             val mspace = HPaddingNode(state.klasses)
             mspace.setPosition(state.nextX(), state.y)
-            mspace.bounds.width = state.mspace * state.fontSize()
+            // Original canvas-latex code multiple em here, but we multiply em in ClassStateMapping::mspace.
+            // mspace.bounds.width = state.mspace * state.fontSize()
+
+            mspace.bounds.width = state.mspace
             state.vlist.addCell(mspace)
             state = state.withResetMargin()
         }

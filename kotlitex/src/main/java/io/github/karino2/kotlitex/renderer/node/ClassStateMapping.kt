@@ -53,6 +53,14 @@ object ClassStateMapping {
             CssClass.mfrac -> {
                 state.copy(textAlign = Alignment.CENTER)
             }
+            CssClass.mspace -> {
+                node.style.marginRight?.let {
+                    val mspace = state.parseEm(it)
+                    return state.copy(mspace = mspace)
+                }
+                return state
+            }
+
             CssClass.mathcal -> {
                 state.copy(weight = "normal", variant = "normal", family = "KaTeX_Caligraphic")
             }
