@@ -1,3 +1,17 @@
+console.log(katex.renderToString("\\mathcal{X}", {displayMode:true}))
+<span class="katex">
+  <span class="katex-mathml"><math><semantics><mrow><mi mathvariant="script">X</mi></mrow><annotation encoding="application/x-tex">\mathcal{X}</annotation></semantics></math></span>
+  <span class="katex-html" aria-hidden="true">
+    <span class="base">
+      <span class="strut" style="height:0.68333em;vertical-align:0em;"></span>
+      <span class="mord">
+        <span class="mord mathcal" style="margin-right:0.14643em;">X</span>
+      </span>
+    </span>
+  </span>
+</span>
+
+
 console.log(katex.renderToString("\\sqrt{3}", {displayMode:true}))
 <span class="katex">
   <span class="katex-mathml"><math><semantics><mrow><msqrt><mn>3</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{3}</annotation></semantics></math></span>

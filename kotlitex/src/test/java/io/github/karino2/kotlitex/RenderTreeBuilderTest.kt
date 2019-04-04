@@ -27,8 +27,7 @@ class RenderTreeBuilderTest {
      */
     @Test
     fun buildExpression_xSup2_sameAsNode() {
-        val input = parse("x^2")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        val actual = buildExpression("x^2")
 
         assertEquals(1, actual.size)
         val target = actual[0]
@@ -150,8 +149,7 @@ class RenderTreeBuilderTest {
      */
     @Test
     fun buildExpression_frac_sameAsNode() {
-        val input = parse("\\frac{1}{2}")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        val actual = buildExpression("\\frac{1}{2}")
 
         assertEquals(1, actual.size)
         val target = actual[0]
@@ -228,8 +226,7 @@ class RenderTreeBuilderTest {
 
     @Test
     fun buildExpression_plus() {
-        val input = parse("x+y")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        val actual = buildExpression("x+y")
 
         assertTrue(actual.isNotEmpty())
     }
@@ -245,10 +242,22 @@ class RenderTreeBuilderTest {
 
     @Test
     fun buildExpression_prod() {
-        val input = parse("\\prod^N_{k=1} k")
-        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        val actual = buildExpression("\\prod^N_{k=1} k")
 
         assertTrue(actual.isNotEmpty())
+    }
+
+    @Test
+    fun buildExpression_mathCal() {
+        val actual = buildExpression("\\mathcal{X}")
+        assertTrue(((actual[0] as RNodeSpan).children[0] as RNodeSymbol).klasses.contains(CssClass.mathcal))
+    }
+
+
+    private fun buildExpression(expression: String): List<RenderNode> {
+        val input = parse(expression)
+        val actual = RenderTreeBuilder.buildExpression(input, options, true)
+        return actual
     }
 
 

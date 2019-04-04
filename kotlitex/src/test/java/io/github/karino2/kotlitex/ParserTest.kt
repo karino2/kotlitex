@@ -82,12 +82,21 @@ class ParserTest {
             }
             else -> assertTrue(false)
         }
-        @Test
-        fun parsePlus() {
-            val parser = Parser("x+y")
-
-            val actual = parser.parse()
-            assertTrue(actual.isNotEmpty())
-        }
     }
+
+    @Test
+    fun parsePlus() {
+        val parser = Parser("x+y")
+
+        val actual = parser.parse()
+        assertTrue(actual.isNotEmpty())
+    }
+
+    @Test
+    fun parseMathcal() {
+        val parser = Parser("\\mathcal{X}")
+        val actual = parser.parse()
+        assertTrue(actual[0] is PNodeFont)
+    }
+
 }

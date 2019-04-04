@@ -53,6 +53,9 @@ object ClassStateMapping {
             CssClass.mfrac -> {
                 state.copy(textAlign = Alignment.CENTER)
             }
+            CssClass.mathcal -> {
+                state.copy(weight = "normal", variant = "normal", family = "KaTeX_Caligraphic")
+            }
             CssClass.mathdefault -> {
                 // TODO: temp implementation.
                 state.copy(family = "KaTeX_Math", variant = "italic")

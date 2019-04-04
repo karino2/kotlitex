@@ -4,7 +4,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.util.Log
 import android.widget.TextView
 import io.github.karino2.kotlitex.MarkdownView
 import io.github.karino2.kotlitex.MathExpressionSpan
@@ -20,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val textView = findViewById<TextView>(R.id.textView)
-        Log.d("kotlitex", "textSize = ${textView.textSize}")
+        // Log.d("kotlitex", "textSize = ${textView.textSize}")
         val spannable = SpannableStringBuilder("01234567 91 345 789\n234 678 and the remaining text.")
 
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
@@ -28,16 +27,15 @@ class MainActivity : AppCompatActivity() {
         spannable.setSpan(createMathSpan("\\sqrt{3}", PHYSICAL_BASE_SIZE), 4, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\frac{1}{1+\\frac{1}{x^2}}", PHYSICAL_BASE_SIZE), 6, 8, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         spannable.setSpan(createMathSpan("\\sum^N_{k=1} k", PHYSICAL_BASE_SIZE), 22, 25, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        // spannable.setSpan(createMathSpan("\\mathcal{K}", PHYSICAL_BASE_SIZE), 27, 28, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
             |${"$$"} \sum^N_{k=1} k${"$$"}
+            |${"$$"} \mathcal{X} ${"$$"}
             |Above is math line. This is a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"}
         """.trimMargin())
     }
 
     fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, baseSize, assets, true)
-//    fun createMathSpan(expr: String, baseSize: Float) = MathExpressionSpan(expr, null, assets)
 }

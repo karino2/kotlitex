@@ -1,6 +1,7 @@
 package io.github.karino2.kotlitex
 
 import io.github.karino2.kotlitex.Lexer.Companion.combiningDiacriticalMarksEndRegex
+import io.github.karino2.kotlitex.functions.FunctionFont
 import io.github.karino2.kotlitex.functions.FunctionFrac
 import io.github.karino2.kotlitex.functions.FunctionOp
 import io.github.karino2.kotlitex.functions.FunctionSqrt
@@ -113,6 +114,7 @@ class Parser(val input: String, val settings:Settings = Settings()) {
             FunctionFrac.defineAll()
             FunctionSqrt.defineAll()
             FunctionOp.defineAll()
+            FunctionFont.defineAll()
         }
     }
 

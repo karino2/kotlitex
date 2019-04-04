@@ -54,6 +54,15 @@ data class PNodeAccent(override val mode: Mode, override val loc: SourceLocation
     override val type = "accent"
 }
 
+data class PNodeFont(override val mode: Mode, override val loc: SourceLocation?, val font: String, val body: ParseNode) : ParseNode() {
+    override val type = "font"
+}
+
+data class PNodeMClass(override val mode: Mode, override val loc: SourceLocation?, val mclass: String, val body: List<ParseNode>) : ParseNode() {
+    override val type = "mclass"
+}
+
+
 // LaTeX display style.
 enum class SizeStyle {
     TEXT,
