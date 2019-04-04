@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
+            |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
             |Above is math line. This is a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"}
         """.trimMargin())
