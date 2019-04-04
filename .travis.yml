@@ -18,7 +18,7 @@ install:
   # Install the rest of tools (e.g., avdmanager)
   - sdkmanager tools
 
-script: ./build.sh
+script: travis_wait ./build.sh
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
