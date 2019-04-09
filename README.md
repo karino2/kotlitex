@@ -68,4 +68,4 @@ Also, our library contains other libraries.
 
 - This library contain [KaTeX font](https://github.com/KaTeX/katex-fonts), which is under MIT license.
 - Some data table and comment is from [KaTeX](https://github.com/KaTeX/KaTeX/), which is under MIT license.
-- Rendering part, code is from scratch, but logic is very similar to [Canvas-Latex](https://github.com/CurriculumAssociates/canvas-latex), which is under MIT license.
+- For rendering part, though code is from scratch, logic is very similar to [Canvas-Latex](https://github.com/CurriculumAssociates/canvas-latex), which is under MIT license.
