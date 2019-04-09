@@ -45,17 +45,17 @@ We provide MarkdownView class, which parse math expression of jekyll style async
 
 # Include kotlitex to other project
 
-1. create kotlitex-release.aar and place to your project as kotlitex.aar
+1. Make kotlitex-kotlitex of release flavor to create kotlitex-release.aar and place to your project as kotlitex.aar
 2. Import kotlitex.aar as official document says. [https://developer.android.com/studio/projects/android-library](https://developer.android.com/studio/projects/android-library)
-3. Add build.gralde as following
+3. Add build.gralde as following (We use kotlin version 1.3.20)
 
 ```
     // kotlitex
     implementation project(":kotlitex")
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.0-alpha-2'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.0-alpha-2"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
 ```
 
 Then use `io.github.karino2.kotlitex.view.MarkdownView` and call setMarkdown(text) to render math expression.
