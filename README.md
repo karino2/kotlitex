@@ -59,6 +59,7 @@ We provide MarkdownView class, which parse math expression of jekyll style async
 ```
 
 Then use `io.github.karino2.kotlitex.view.MarkdownView` and call setMarkdown(text) to render math expression.
+MainActivity.kt under sample directory show basic usage.
 
 # License
 

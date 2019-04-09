@@ -20,20 +20,18 @@ class MainActivity : AppCompatActivity() {
 
         val textView = findViewById<TextView>(R.id.textView)
         // Log.d("kotlitex", "textSize = ${textView.textSize}")
-        val spannable = SpannableStringBuilder("01234567 91 345 789\n234 678 and the remaining text.")
+        val spannable = SpannableStringBuilder("01234 This is direct math span test.")
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(createMathSpan("\\frac{1}{2}", PHYSICAL_BASE_SIZE), 2, 4, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(createMathSpan("\\sqrt{3}", PHYSICAL_BASE_SIZE), 4, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(createMathSpan("\\frac{1}{1+\\frac{1}{x^2}}", PHYSICAL_BASE_SIZE), 6, 8, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(createMathSpan("\\sum^N_{k=1} k", PHYSICAL_BASE_SIZE), 22, 25, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
-        findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, this is math test ${"$$"}x^2${"$$"} end.
+        findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, MarkdownView. Math ${"$$"}x^2${"$$"} inlined.
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
-            |Above is math line. This is a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
+            |Some text between math lines.
+            |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
             |${"$$"} \sqrt{5} ${"$$"}
+            |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
         """.trimMargin())
     }
 
