@@ -104,6 +104,17 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
 }
 
 class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context, attrSet) {
+    companion object {
+        var CACHE_ENABLED = true
+        var CACHE_SIZE = 1024
+        val cache = object: LinkedHashMap<String, Spannable>(128, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Spannable>?): Boolean {
+                return this.size > CACHE_SIZE
+            }
+        }
+
+    }
+
     var job : Job? = null
 
     val handler by lazy {
@@ -117,6 +128,14 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
     fun setMarkdown(text: String) {
         job?.let { it.cancel() }
         handler.reset()
+
+        if(CACHE_ENABLED) {
+            cache[text]?.let {
+                setText(it)
+                return
+            }
+        }
+
         setText(text)
         job = GlobalScope.launch {
             withContext(Dispatchers.IO) {
@@ -128,6 +147,9 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
             }
             if(handler.isMathExist) {
                 withContext(Dispatchers.Main) {
+                    if(CACHE_ENABLED) {
+                        cache[text] = handler.spannable
+                    }
                     setText(handler.spannable)
                 }
             }
