@@ -253,6 +253,11 @@ class RenderTreeBuilderTest {
         assertTrue(((actual[0] as RNodeSpan).children[0] as RNodeSymbol).klasses.contains(CssClass.mathcal))
     }
 
+    @Test
+    fun buildExpression_mathbb() {
+        val actual = buildExpression("\\mathbb{R}")
+        assertEquals(1, actual.size)
+    }
 
     private fun buildExpression(expression: String): List<RenderNode> {
         val input = parse(expression)
