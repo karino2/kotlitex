@@ -61,7 +61,7 @@ object ClassStateMapping {
                 return state
             }
             CssClass.mathbb -> {
-                state.copy(weight="normal", variant="normal", family="KaTeX_AMS")
+                state.copy(weight = "normal", variant = "normal", family = "KaTeX_AMS")
             }
             CssClass.mathcal -> {
                 state.copy(weight = "normal", variant = "normal", family = "KaTeX_Caligraphic")
