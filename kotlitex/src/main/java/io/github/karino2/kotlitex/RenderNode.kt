@@ -6,7 +6,7 @@ import io.github.karino2.kotlitex.functions.SvgGeometry
 enum class CssClass {
     amsrm, base, boldsymbol, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
     enclosing, frac_line, hide_tail, large_op,
-    mathbf, mathcal, mathdefault, mathit, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
+    mathbb, mathbf, mathcal, mathdefault, mathit, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
     msupsub, mspace, mult, nulldelimiter,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstrut, op_symbol,op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,

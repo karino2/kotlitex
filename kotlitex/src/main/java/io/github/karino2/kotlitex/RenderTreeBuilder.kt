@@ -269,6 +269,7 @@ object RenderTreeBuilder {
             "textsf" -> CssClass.textsf
             "texttt" -> CssClass.texttt
             "mathcal" -> CssClass.mathcal
+            "mathbb" -> CssClass.mathbb
             else -> throw NotImplementedError("Custom font NYI. (${fontName})")
         }
     }
