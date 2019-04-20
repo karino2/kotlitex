@@ -70,6 +70,9 @@ object ClassStateMapping {
                 // TODO: temp implementation.
                 state.copy(family = "KaTeX_Math", variant = "italic")
             }
+            CssClass.mathscr -> {
+                state.copy(weight = "normal", variant = "normal", family = "KaTeX_Script")
+            }
             CssClass.large_op -> {
                 state.copy(weight = "normal", variant = "normal", family = "KaTeX_Size2")
             }

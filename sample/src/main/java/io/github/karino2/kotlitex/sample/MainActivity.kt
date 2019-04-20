@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, MarkdownView. Math ${"$$"}x^2${"$$"} inlined.
             |${"$$"} \mathbb{R} ${"$$"}
+            |${"$$"} \mathscr{F} ${"$$"}
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
