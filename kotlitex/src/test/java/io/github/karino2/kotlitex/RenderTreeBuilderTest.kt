@@ -259,6 +259,12 @@ class RenderTreeBuilderTest {
         assertEquals(1, actual.size)
     }
 
+    @Test
+    fun buildExpression_mathscr() {
+        val actual = buildExpression("\\mathscr{F}")
+        assertEquals(1, actual.size)
+    }
+
     private fun buildExpression(expression: String): List<RenderNode> {
         val input = parse(expression)
         val actual = RenderTreeBuilder.buildExpression(input, options, true)
