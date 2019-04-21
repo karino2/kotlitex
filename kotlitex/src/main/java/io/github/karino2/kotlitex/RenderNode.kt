@@ -4,15 +4,16 @@ import android.graphics.Path
 import io.github.karino2.kotlitex.functions.SvgGeometry
 
 enum class CssClass {
-    amsrm, base, boldsymbol, delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
-    enclosing, frac_line, hide_tail, large_op,
+    accent, accent_body, accent_full, amsrm, base, boldsymbol, brace_left, brace_center, brace_right,
+    delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
+    enclosing, frac_line, hide_tail, halfarrow_left, halfarrow_right, large_op,
     mathbb, mathbf, mathcal, mathdefault, mathit, mathscr, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
-    msupsub, mspace, mult, nulldelimiter,
+    msupsub, mspace, mult, nulldelimiter, overlay,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstrut, op_symbol,op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
     sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,
-    small_op, sqrt, struct, svg_align,
+    small_op, sqrt, struct, stretchy, svg_align,
     textbf, textit, textrm, textsf, texttt,
     EMPTY;
 
@@ -84,17 +85,17 @@ data class CssStyle(
     var borderBottomWidth: String? = null,
     var minWidth: String? = null,
     var paddingLeft: String? = null,
-    var position: String? = null
+    var position: String? = null,
+    var left: String? = null,
+    var width: String? = null
 /*
     backgroundColor: string,
     borderColor: string,
     borderRightWidth: string,
     borderTopWidth: string,
     bottom: string,
-    left: string,
     marginTop: string,
 
-    width: string,
     verticalAlign: string,
 
  */

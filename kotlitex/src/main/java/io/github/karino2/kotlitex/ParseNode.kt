@@ -38,7 +38,7 @@ class PNodeTextOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mo
     override val type = "textord"
 }
 
-data class PNodeSupSub(override val mode: Mode, override val loc: SourceLocation?, val base: ParseNode?, val sup: ParseNode?, val sub: ParseNode?) : ParseNode() {
+data class PNodeSupSub(override val mode: Mode, override val loc: SourceLocation?, var base: ParseNode?, val sup: ParseNode?, val sub: ParseNode?) : ParseNode() {
     override val type = "supsub"
 }
 
@@ -52,6 +52,17 @@ data class PNodeAtom(val family: Atoms, override val mode: Mode, override val lo
 
 data class PNodeAccent(override val mode: Mode, override val loc: SourceLocation?, val label: String, val isStretchy: Boolean, val isShifty: Boolean, val base: ParseNode) : ParseNode() {
     override val type = "accent"
+}
+data class PNodeAccentUnder(override val mode: Mode, override val loc: SourceLocation?, val label: String, val isStretchy: Boolean, val isShifty: Boolean, val base: ParseNode) : ParseNode() {
+    override val type = "accentUnder"
+}
+
+data class PNodeXArrow(override val mode: Mode, override val loc: SourceLocation?, val label: String, val body: ParseNode, val below: ParseNode?) : ParseNode() {
+    override val type = "xArrow"
+}
+
+data class PNodeHorizBrace(override val mode: Mode, override val loc: SourceLocation?, val label: String, val isOver: Boolean, val base: ParseNode) : ParseNode() {
+    override val type = "horizBrace"
 }
 
 data class PNodeFont(override val mode: Mode, override val loc: SourceLocation?, val font: String, val body: ParseNode) : ParseNode() {

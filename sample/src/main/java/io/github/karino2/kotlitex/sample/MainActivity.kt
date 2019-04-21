@@ -24,9 +24,9 @@ class MainActivity : AppCompatActivity() {
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
+        MarkdownView.CACHE_ENABLED = false
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, MarkdownView. Math ${"$$"}x^2${"$$"} inlined.
-            |${"$$"} \mathbb{R} ${"$$"}
-            |${"$$"} \mathscr{F} ${"$$"}
+            |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}

@@ -359,6 +359,40 @@ object RenderTreeBuilder {
         )
     )
 
+    data class OneSvgData(val path: String, val width: Double, val height : Double)
+
+    // svgData in js
+    val pathData = mapOf(
+        //   path, width, height
+        "vec" to OneSvgData("vec", 0.471, 0.714),                // values from the font glyph
+        "oiintSize1" to OneSvgData("oiintSize1", 0.957, 0.499),  // oval to overlay the integrand
+        "oiintSize2" to OneSvgData("oiintSize2", 1.472, 0.659),
+        "oiiintSize1" to OneSvgData("oiiintSize1", 1.304, 0.499),
+        "oiiintSize2" to OneSvgData("oiiintSize2", 1.98, 0.659)
+    )
+
+    // staticSvg in js.
+    fun staticPath(value: String, options: Options): RNodePathSpan {
+        // Create a span with inline SVG for the element.
+        val (pathName, width, height) = pathData[value]!!
+        val path = RNodePath(pathName);
+        val svgNode : RenderNode = RNodePathHolder(mutableListOf(path),
+            "${width}em",
+             "${height}em",
+            // Override CSS rule `.katex svg { width: 100% }`
+            // TODO: "style": "width:" + width + "em",
+            ViewBox(0.0, 0.0, 1000 * width, 1000 * height),
+            "xMinYMin")
+
+        val span = RNodePathSpan(mutableSetOf(CssClass.overlay), mutableListOf(svgNode), options)
+        span.height = height;
+        span.style.height = "${height}em";
+        span.style.width =   "${width}em";
+        return span;
+    }
+
+
+
     /**
      * Makes either a mathord or textord in the correct font and color.
      */
