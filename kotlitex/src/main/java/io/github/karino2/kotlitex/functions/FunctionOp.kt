@@ -62,7 +62,7 @@ object FunctionOp {
                 // We're in \oiint or \oiiint. Overlay the oval.
                 // TODO: When font glyphs are available, delete this code.
                 val italic = base1.italic
-                val oval = RenderTreeBuilder.staticSvg(stash + "Size"
+                val oval = RenderTreeBuilder.staticPath(stash + "Size"
                         + (if(large)  "2" else "1"), options);
                 val base2 = RenderBuilderVList.makeVList(
                     VListParamIndividual(
