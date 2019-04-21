@@ -11,3 +11,4 @@
 .externalNativeBuild
 app/build/
 projectFilesBackup/
+.idea/misc.xml

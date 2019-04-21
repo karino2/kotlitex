@@ -60,7 +60,8 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
     MathSpanHandler {
     fun reset() {
         // spannable.clear() seems slow.
-        spannable = SpannableStringBuilder()
+        if(spannable.isNotEmpty())
+            spannable = SpannableStringBuilder()
         isMathExist = false
     }
 
@@ -126,8 +127,8 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
     }
 
     fun setMarkdown(text: String) {
-        job?.let { it.cancel() }
-        handler.reset()
+        val prevJob = job
+        prevJob?.let { it.cancel() }
 
         if(CACHE_ENABLED) {
             cache[text]?.let {
@@ -139,6 +140,9 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
         setText(text)
         job = GlobalScope.launch {
             withContext(Dispatchers.IO) {
+                prevJob?.let { it.join() }
+                handler.reset()
+
                 val lines = text.split("\n")
                 repeat(lines.size) {
                     val line = lines[it]
