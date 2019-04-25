@@ -11,6 +11,7 @@ import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
 import java.lang.ref.WeakReference
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -74,7 +75,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
             }
             is HorizontalLineNode -> {
                 paint.color = Color.BLACK
-                paint.strokeWidth = parent.bounds.height.toFloat()*ratio
+                paint.strokeWidth = max(1.0f, parent.bounds.height.toFloat()*ratio)
                 val x = translateX(parent.bounds.x*ratio)
                 val y = translateY(parent.bounds.y*ratio)
                 canvas.drawLine(x, y, x + parent.bounds.width.toFloat()*ratio, y, paint)

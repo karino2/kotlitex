@@ -13,7 +13,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    
+
     // for workaround https://github.com/Kotlin/kotlinx.coroutines/issues/1059
     packagingOptions {
         exclude 'META-INF/atomicfu.kotlin_module'

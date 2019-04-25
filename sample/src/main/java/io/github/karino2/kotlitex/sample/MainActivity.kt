@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
+            |${"$$"}\underline{p_i} ${"$$"}
             |Some text between math lines.
             |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
             |${"$$"} \sqrt{5} ${"$$"}

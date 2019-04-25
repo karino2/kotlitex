@@ -15,6 +15,7 @@ enum class CssClass {
     sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,
     small_op, sqrt, struct, stretchy, svg_align,
     textbf, textit, textrm, textsf, texttt,
+    underline, underline_line,
     EMPTY;
 
     companion object {
