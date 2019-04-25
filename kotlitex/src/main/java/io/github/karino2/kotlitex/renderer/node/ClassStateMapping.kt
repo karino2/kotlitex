@@ -40,15 +40,11 @@ object ClassStateMapping {
                 tableRow.margin.right = state.marginRight
                 state.copy(pstrut = height)
             }
+            CssClass.underline_line -> {
+                withHorizLine(state, node)
+            }
             CssClass.frac_line -> {
-                val lineHeight = state.parseEm(node.style.borderBottomWidth!!)
-                val lineNode = HorizontalLineNode(state.color, state.minWidth, state.klasses)
-                lineNode.setPosition(state.nextX(), state.y)
-                lineNode.bounds.height = lineHeight
-                lineNode.margin.left = state.marginLeft
-                lineNode.margin.right = state.marginRight
-                state.vlist.addCell(lineNode)
-                return state.withResetMargin()
+                withHorizLine(state, node)
             }
             CssClass.mfrac -> {
                 state.copy(textAlign = Alignment.CENTER)
@@ -78,6 +74,20 @@ object ClassStateMapping {
             }
             else -> state
         }
+    }
+
+    private fun withHorizLine(
+        state: RenderingState,
+        node: RenderNode
+    ): RenderingState {
+        val lineHeight = state.parseEm(node.style.borderBottomWidth!!)
+        val lineNode = HorizontalLineNode(state.color, state.minWidth, state.klasses)
+        lineNode.setPosition(state.nextX(), state.y)
+        lineNode.bounds.height = lineHeight
+        lineNode.margin.left = state.marginLeft
+        lineNode.margin.right = state.marginRight
+        state.vlist.addCell(lineNode)
+        return state.withResetMargin()
     }
 
     private fun isTrueVlist(node: RenderNode): Boolean {

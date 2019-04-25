@@ -56,6 +56,9 @@ data class PNodeAccent(override val mode: Mode, override val loc: SourceLocation
 data class PNodeAccentUnder(override val mode: Mode, override val loc: SourceLocation?, val label: String, val isStretchy: Boolean, val isShifty: Boolean, val base: ParseNode) : ParseNode() {
     override val type = "accentUnder"
 }
+data class PNodeUnderline(override val mode: Mode, override val loc: SourceLocation?, val body: ParseNode) : ParseNode() {
+    override val type = "underline"
+}
 
 data class PNodeXArrow(override val mode: Mode, override val loc: SourceLocation?, val label: String, val body: ParseNode, val below: ParseNode?) : ParseNode() {
     override val type = "xArrow"
