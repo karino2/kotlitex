@@ -1,15 +1,15 @@
 package io.github.karino2.kotlitex.view
 
 import android.content.res.AssetManager
-import android.graphics.*
+import android.graphics.* // ktlint-disable no-wildcard-imports
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
 import android.util.Log
-import io.github.karino2.kotlitex.*
+import io.github.karino2.kotlitex.* // ktlint-disable no-wildcard-imports
 import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.FontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
-import io.github.karino2.kotlitex.renderer.node.*
+import io.github.karino2.kotlitex.renderer.node.* // ktlint-disable no-wildcard-imports
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.roundToInt

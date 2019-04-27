@@ -6,7 +6,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.util.AttributeSet
 import android.widget.TextView
-import kotlinx.coroutines.*
+import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 
 interface MathSpanHandler {
     fun appendNormal(text: String)
