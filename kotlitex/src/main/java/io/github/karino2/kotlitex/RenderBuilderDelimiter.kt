@@ -22,7 +22,6 @@ package io.github.karino2.kotlitex
  * used in `\left` and `\right`.
  */
 
-
 /**
  * There are three different sequences of delimiter sizes that the delimiters
  * follow depending on the kind of delimiter. This is used when creating custom
@@ -35,7 +34,7 @@ package io.github.karino2.kotlitex
  * them explicitly here.
  */
 
-sealed class  Delimiter
+sealed class Delimiter
 
 data class SmallDelimiter(val style: Style) : Delimiter()
 
@@ -46,7 +45,7 @@ enum class DelimiterSize(val size: Int) {
     FOUR(4)
 }
 data class LargeDelimiter(val size: DelimiterSize) : Delimiter()
-object StackDelimiter: Delimiter()
+object StackDelimiter : Delimiter()
 
 object RenderBuilderDelimiter {
 
@@ -80,8 +79,6 @@ object RenderBuilderDelimiter {
     // Used to create stacked delimiters of appropriate sizes in makeSizedDelim.
     val sizeToMaxHeight = listOf(0.0, 1.2, 1.8, 2.4, 3.0)
 
-
-
     // Delimiters that never stack try small delimiters and large delimiters only
     val stackNeverDelimiterSequence = listOf(
         SmallDelimiter(Style.SCRIPTSCRIPT),
@@ -94,7 +91,7 @@ object RenderBuilderDelimiter {
     )
 
 // Delimiters that always stack try the small delimiters first, then stack
-    val stackAlwaysDelimiterSequence =  listOf(
+    val stackAlwaysDelimiterSequence = listOf(
     SmallDelimiter(Style.SCRIPTSCRIPT),
     SmallDelimiter(Style.SCRIPT),
     SmallDelimiter(Style.TEXT),
@@ -117,7 +114,6 @@ object RenderBuilderDelimiter {
     val vbPad = 80   // padding above the surd, measured inside the viewBox.
     val emPad = 0.08 // padding, in ems, measured in the document.
 
-
     /**
      * Get the metrics for a given symbol and font, after transformation (i.e.
      * after following replacement from symbols.js)
@@ -129,19 +125,18 @@ object RenderBuilderDelimiter {
     ): CharacterMetrics {
         val replace = Symbols.mathMap[symbol]?.replace ?: symbol
         return Symbols.getCharacterMetrics(replace, font, mode) ?:
-            throw Error("Unsupported symbol $symbol and font size $font.");
-    };
-
+            throw Error("Unsupported symbol $symbol and font size $font.")
+    }
 
     /**
      * Get the font used in a delimiter based on what kind of delimiter it is.
      * TODO(#963) Use more specific font family return type once that is introduced.
      */
     fun delimTypeToFont(type: Delimiter): String {
-        return when(type) {
-            is SmallDelimiter-> "Main-Regular"
+        return when (type) {
+            is SmallDelimiter -> "Main-Regular"
             is LargeDelimiter -> "Size${type.size.size}-Regular"
-            is StackDelimiter ->"Size4-Regular"
+            is StackDelimiter -> "Size4-Regular"
         }
     }
 
@@ -159,8 +154,8 @@ object RenderBuilderDelimiter {
         // sizes (which correspond to larger numbers in style.size) we start earlier
         // in the sequence. Thus, scriptscript starts at index 3-3=0, script starts
         // at index 3-2=1, text starts at 3-1=2, and display starts at min(2,3-0)=2
-        val start = Math.min(2, 3 - options.style.size);
-        for(seq in sequence.drop(start)) {
+        val start = Math.min(2, 3 - options.style.size)
+        for (seq in sequence.drop(start)) {
             if (seq is StackDelimiter) {
                 // This is always the last delimiter, so we just break the loop now.
                 break
@@ -173,8 +168,8 @@ object RenderBuilderDelimiter {
             // account for the style change size.
 
             if (seq is SmallDelimiter) {
-                val newOptions = options.havingBaseStyle(seq.style);
-                heightDepth *= newOptions.sizeMultiplier;
+                val newOptions = options.havingBaseStyle(seq.style)
+                heightDepth *= newOptions.sizeMultiplier
             }
 
             // Check if the delimiter at this size works for the given height.
@@ -187,7 +182,6 @@ object RenderBuilderDelimiter {
         return sequence.last()
     }
 
-
     /**
      * Puts a delimiter span in a given style, and adds appropriate height, depth,
      * and maxFontSizes.
@@ -198,19 +192,18 @@ object RenderBuilderDelimiter {
         options: Options,
         classes: MutableSet<CssClass>
         ): RNodeSpan {
-        val newOptions = options.havingBaseStyle(toStyle);
+        val newOptions = options.havingBaseStyle(toStyle)
 
         val span = RenderTreeBuilder.makeSpan(
-                classes.concat(newOptions.sizingClasses(options)),
-        mutableListOf(delim), options)
+                classes.concat(newOptions.sizingClasses(options)), mutableListOf(delim), options)
 
         val delimSizeMultiplier =
-        newOptions.sizeMultiplier / options.sizeMultiplier;
-        span.height *= delimSizeMultiplier;
-        span.depth *= delimSizeMultiplier;
-        span.maxFontSize = newOptions.sizeMultiplier;
+            newOptions.sizeMultiplier / options.sizeMultiplier
+        span.height *= delimSizeMultiplier
+        span.depth *= delimSizeMultiplier
+        span.maxFontSize = newOptions.sizeMultiplier
 
-        return span;
+        return span
     }
 
     fun centerSpan(
@@ -218,17 +211,16 @@ object RenderBuilderDelimiter {
         options: Options,
         style: Style
     ) {
-        val newOptions = options.havingBaseStyle(style);
+        val newOptions = options.havingBaseStyle(style)
         val shift =
         (1 - options.sizeMultiplier / newOptions.sizeMultiplier) *
                 options.fontMetrics.axisHeight
 
         span.klasses.add(CssClass.delimcenter)
-        span.style.top = "${shift}em";
+        span.style.top = "${shift}em"
         span.height -= shift
         span.depth += shift
     }
-
 
     /**
      * Makes a small delimiter. This is a delimiter that comes in the Main-Regular
@@ -260,8 +252,8 @@ object RenderBuilderDelimiter {
         mode: Mode,
         options: Options
     ): RNodeSymbol {
-        return RenderTreeBuilder.makeSymbol(value, "Size${size}-Regular", mode, options);
-    };
+        return RenderTreeBuilder.makeSymbol(value, "Size${size}-Regular", mode, options)
+    }
 
     /**
      * Makes a large delimiter. This is a delimiter that comes in the Size1, Size2,
@@ -311,8 +303,7 @@ object RenderBuilderDelimiter {
         return VListElem(inner)
     }
 
-    fun Double.ceilToInt() : Int = Math.ceil(this).toInt()
-
+    fun Double.ceilToInt(): Int = Math.ceil(this).toInt()
 
     /**
      * Make a stacked delimiter out of a given delimiter, with the total height at
@@ -329,18 +320,18 @@ object RenderBuilderDelimiter {
         // There are four parts, the top, an optional middle, a repeated part, and a
         // bottom.
         var top = delim
-        var middle : String?
+        var middle: String?
         var repeat = delim
         var bottom = delim
-        middle = null;
+        middle = null
         // Also keep track of what font the delimiters are in
-        var font = "Size1-Regular";
+        var font = "Size1-Regular"
 
         // We set the parts and font based on the symbol. Note that we use
         // '\u23d0' instead of '|' and '\u2016' instead of '\\|' for the
         // repeats of the arrows
         if (delim == "\\uparrow") {
-            repeat = "\u23d0";
+            repeat = "\u23d0"
             bottom = repeat
         } else if (delim == "\\Uparrow") {
             bottom = "\u2016"
@@ -361,39 +352,39 @@ object RenderBuilderDelimiter {
             bottom = "\\Downarrow"
         } else if (delim == "[" || delim == "\\lbrack") {
             top = "\u23a1"
-            repeat = "\u23a2";
-            bottom = "\u23a3";
-            font = "Size4-Regular";
+            repeat = "\u23a2"
+            bottom = "\u23a3"
+            font = "Size4-Regular"
         } else if (delim == "]" || delim == "\\rbrack") {
-            top = "\u23a4";
-            repeat = "\u23a5";
-            bottom = "\u23a6";
-            font = "Size4-Regular";
+            top = "\u23a4"
+            repeat = "\u23a5"
+            bottom = "\u23a6"
+            font = "Size4-Regular"
         } else if (delim == "\\lfloor" || delim == "\u230a") {
             top = "\u23a2"
             repeat = top
-            bottom = "\u23a3";
-            font = "Size4-Regular";
+            bottom = "\u23a3"
+            font = "Size4-Regular"
         } else if (delim == "\\lceil" || delim == "\u2308") {
-            top = "\u23a1";
+            top = "\u23a1"
             bottom = "\u23a2"
             repeat = bottom
-            font = "Size4-Regular";
+            font = "Size4-Regular"
         } else if (delim == "\\rfloor" || delim == "\u230b") {
             top = "\u23a5"
             repeat = top
-            bottom = "\u23a6";
-            font = "Size4-Regular";
+            bottom = "\u23a6"
+            font = "Size4-Regular"
         } else if (delim == "\\rceil" || delim == "\u2309") {
-            top = "\u23a4";
+            top = "\u23a4"
             bottom = "\u23a5"
             repeat = bottom
-            font = "Size4-Regular";
+            font = "Size4-Regular"
         } else if (delim == "(" || delim == "\\lparen") {
             top = "\u239b"
             repeat = "\u239c"
             bottom = "\u239d"
-            font = "Size4-Regular";
+            font = "Size4-Regular"
         } else if (delim == ")" || delim == "\\rparen") {
             top = "\u239e"
             repeat = "\u239f"
@@ -444,32 +435,32 @@ object RenderBuilderDelimiter {
         var middleHeightTotal = 0.0
         var middleFactor = 1
         if (middle !== null) {
-            val middleMetrics = getMetrics(middle, font, mode);
-            middleHeightTotal = middleMetrics.height + middleMetrics.depth;
-            middleFactor = 2; // repeat symmetrically above and below middle
+            val middleMetrics = getMetrics(middle, font, mode)
+            middleHeightTotal = middleMetrics.height + middleMetrics.depth
+            middleFactor = 2 // repeat symmetrically above and below middle
         }
 
         // Calcuate the minimal height that the delimiter can have.
         // It is at least the size of the top, bottom, and optional middle combined.
-        val minHeight = topHeightTotal + bottomHeightTotal + middleHeightTotal;
+        val minHeight = topHeightTotal + bottomHeightTotal + middleHeightTotal
 
         // Compute the number of copies of the repeat symbol we will need
         val repeatCount = ((heightTotal - minHeight) / (middleFactor * repeatHeightTotal)).ceilToInt()
 
         // Compute the total height of the delimiter including all the symbols
         val realHeightTotal =
-            minHeight + repeatCount * middleFactor * repeatHeightTotal;
+            minHeight + repeatCount * middleFactor * repeatHeightTotal
 
         // The center of the delimiter is placed at the center of the axis. Note
         // that in this context, "center" means that the delimiter should be
         // centered around the axis in the current style, while normally it is
         // centered around the axis in textstyle.
-        var axisHeight = options.fontMetrics.axisHeight;
+        var axisHeight = options.fontMetrics.axisHeight
         if (center) {
-            axisHeight *= options.sizeMultiplier;
+            axisHeight *= options.sizeMultiplier
         }
         // Calculate the depth
-        val depth = realHeightTotal / 2 - axisHeight;
+        val depth = realHeightTotal / 2 - axisHeight
 
         // Now, we start building the pieces that will go into the vlist
 
@@ -477,43 +468,42 @@ object RenderBuilderDelimiter {
         val inners = mutableListOf<VListElem>()
 
         // Add the bottom symbol
-        inners.add(makeInner(bottom, font, mode));
+        inners.add(makeInner(bottom, font, mode))
 
         if (middle == null) {
             // Add that many symbols
             repeat(repeatCount) {
-                inners.add(makeInner(repeat, font, mode));
+                inners.add(makeInner(repeat, font, mode))
             }
         } else {
             // When there is a middle bit, we need the middle part and two repeated
             // sections
-            repeat(repeatCount){
-                inners.add(makeInner(repeat, font, mode));
+            repeat (repeatCount){
+                inners.add(makeInner(repeat, font, mode))
             }
-            inners.add(makeInner(middle, font, mode));
+            inners.add(makeInner(middle, font, mode))
             repeat(repeatCount) {
-                inners.add(makeInner(repeat, font, mode));
+                inners.add(makeInner(repeat, font, mode))
             }
         }
 
         // Add the top symbol
-        inners.add(makeInner(top, font, mode));
+        inners.add(makeInner(top, font, mode))
 
         // Finally, build the vlist
-        val newOptions = options.havingBaseStyle(Style.TEXT);
+        val newOptions = options.havingBaseStyle(Style.TEXT)
         val inner = RenderBuilderVList.makeVList(
                         VListParamPositioned(
                             PositionType.Bottom,
                             depth,
                             inners),
-                        newOptions);
+                        newOptions)
 
         return styleWrap(
             RenderTreeBuilder.makeSpan(mutableSetOf(CssClass.delimsizing, CssClass.mult),
                 mutableListOf(inner), newOptions),
-            Style.TEXT, options, classes);
+            Style.TEXT, options, classes)
     }
-
 
     /**
      * Make a delimiter of a given height+depth, with optional centering. Here, we
@@ -541,12 +531,12 @@ object RenderBuilderDelimiter {
         }
 
         // Look through the sequence
-        val delimType = traverseSequence(delim, height, sequence, options);
+        val delimType = traverseSequence(delim, height, sequence, options)
 
         // Get the delimiter from font glyphs.
         // Depending on the sequence element we decided on, call the
         // appropriate function.
-        return when(delimType) {
+        return when (delimType) {
             is SmallDelimiter -> makeSmallDelim(delim, delimType.style, center, options,
                 mode, classes)
             is LargeDelimiter -> makeLargeDelim(delim, delimType.size.size, center, options, mode,
@@ -557,10 +547,9 @@ object RenderBuilderDelimiter {
     }
 
     fun sqrtSvg(sqrtName: String,
-                    height: Double,
-                    viewBoxHeight: Double,
-                    options: Options
-                    ): RNodePathSpan {
+                height: Double,
+                viewBoxHeight: Double,
+                options: Options): RNodePathSpan {
         // TODO: support sqrtTail
         /*
     let alternate;
@@ -580,7 +569,7 @@ object RenderBuilderDelimiter {
         val pathNode = RNodePath(sqrtName)
 
         // Note: 1000:1 ratio of viewBox to document em width.
-        val svg  : RenderNode =  RNodePathHolder(mutableListOf(pathNode),
+        val svg: RenderNode = RNodePathHolder(mutableListOf(pathNode),
             "400em",
             height.toString() + "em",
             ViewBox(0.0, 0.0, 400000.0, viewBoxHeight),
@@ -589,11 +578,10 @@ object RenderBuilderDelimiter {
         return RNodePathSpan(mutableSetOf(CssClass.hide_tail), mutableListOf(svg), options)
     }
 
-
     /**
      * Make a sqrt image of the given height,
      */
-    fun makeSqrtImage(height: Double, options: Options) : Triple<RNodePathSpan, /*advancedWidth*/ Double, /*ruleWidth*/ Double> {
+    fun makeSqrtImage(height: Double, options: Options): Triple<RNodePathSpan, /*advancedWidth*/ Double, /*ruleWidth*/ Double> {
         // Define a newOptions that removes the effect of size changes such as \Huge.
         // We don't pick different a height surd for \Huge. For it, we scale up.
         val newOptions = options.havingBaseSizing()
@@ -604,11 +592,11 @@ object RenderBuilderDelimiter {
         var sizeMultiplier = newOptions.sizeMultiplier  // default
 
         // Create a span containing an SVG image of a sqrt symbol.
-        var span : RNodePathSpan
+        var span: RNodePathSpan
         var spanHeight: Double
         var texHeight: Double
-        var viewBoxHeight:Double
-        var advanceWidth : Double
+        var viewBoxHeight: Double
+        var advanceWidth: Double
 
         // We create viewBoxes with 80 units of "padding" above each surd.
         // Then browser rounding error on the parent span height will not
@@ -616,46 +604,44 @@ object RenderBuilderDelimiter {
         // included in the TeX-like `height` used for calculation of
         // vertical alignment. So texHeight = span.height < span.style.height.
 
-        when(delim) {
+        when (delim) {
             is SmallDelimiter -> {
                 // Get an SVG that is derived from glyph U+221A in font KaTeX-Main.
                 viewBoxHeight = (1000 + vbPad).toDouble()  // 1000 unit glyph height.
                 if (height < 1.0) {
-                    sizeMultiplier = 1.0;   // mimic a \textfont radical
+                    sizeMultiplier = 1.0   // mimic a \textfont radical
                 } else if (height < 1.4) {
-                    sizeMultiplier = 0.7;   // mimic a \scriptfont radical
+                    sizeMultiplier = 0.7   // mimic a \scriptfont radical
                 }
-                spanHeight = (1.0 + emPad) / sizeMultiplier;
-                texHeight = 1.00 / sizeMultiplier;
-                span = sqrtSvg("sqrtMain", spanHeight, viewBoxHeight, options);
-                span.style.minWidth = "0.853em";
-                advanceWidth = 0.833 / sizeMultiplier;  // from the font.
+                spanHeight = (1.0 + emPad) / sizeMultiplier
+                texHeight = 1.00 / sizeMultiplier
+                span = sqrtSvg("sqrtMain", spanHeight, viewBoxHeight, options)
+                span.style.minWidth = "0.853em"
+                advanceWidth = 0.833 / sizeMultiplier  // from the font.
             }
             is LargeDelimiter -> {
                 // These SVGs come from fonts: KaTeX_Size1, _Size2, etc.
-                viewBoxHeight = (1000 + vbPad).toDouble() * sizeToMaxHeight[delim.size.size];
-                texHeight = sizeToMaxHeight[delim.size.size] / sizeMultiplier;
-                spanHeight = (sizeToMaxHeight[delim.size.size] + emPad) / sizeMultiplier;
-                span = sqrtSvg("sqrtSize" + delim.size, spanHeight, viewBoxHeight, options);
-                span.style.minWidth = "1.02em";
-                advanceWidth = 1.0 / sizeMultiplier; // 1.0 from the font.
-
+                viewBoxHeight = (1000 + vbPad).toDouble() * sizeToMaxHeight[delim.size.size]
+                texHeight = sizeToMaxHeight[delim.size.size] / sizeMultiplier
+                spanHeight = (sizeToMaxHeight[delim.size.size] + emPad) / sizeMultiplier
+                span = sqrtSvg("sqrtSize" + delim.size, spanHeight, viewBoxHeight, options)
+                span.style.minWidth = "1.02em"
+                advanceWidth = 1.0 / sizeMultiplier // 1.0 from the font.
             }
             else -> {
                 // Tall sqrt. In TeX, this would be stacked using multiple glyphs.
                 // We'll use a single SVG to accomplish the same thing.
-                spanHeight = height + emPad;
-                texHeight = height;
-                viewBoxHeight = Math.floor(1000 * height) + vbPad;
-                span = sqrtSvg("sqrtTall", spanHeight, viewBoxHeight, options);
-                span.style.minWidth = "0.742em";
-                advanceWidth = 1.056;
+                spanHeight = height + emPad
+                texHeight = height
+                viewBoxHeight = Math.floor(1000 * height) + vbPad
+                span = sqrtSvg("sqrtTall", spanHeight, viewBoxHeight, options)
+                span.style.minWidth = "0.742em"
+                advanceWidth = 1.056
             }
         }
 
-
-        span.height = texHeight;
-        span.style.height = spanHeight.toString() + "em";
+        span.height = texHeight
+        span.style.height = spanHeight.toString() + "em"
 
         return Triple(
             span,
@@ -666,8 +652,5 @@ object RenderBuilderDelimiter {
             // have thicker rules.
             options.fontMetrics.sqrtRuleThickness * sizeMultiplier
         )
-
     }
-
-
 }

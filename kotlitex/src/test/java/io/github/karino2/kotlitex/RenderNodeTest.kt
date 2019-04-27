@@ -14,8 +14,7 @@ class SpanBuilder {
              top : String? = null,
              height: Double = 0.0,
              depth: Double = 0.0,
-             italic: Double = 0.0,
-               maxFontSize: Double = 0.0,
+             maxFontSize: Double = 0.0,
              sheight: String? = null
              ) : RNodeSpan {
 
@@ -61,7 +60,6 @@ class RenderNodeTest {
                                         "",
                                         top = "-3.063em",
                                         height = 0.45110799999999995,
-                                        italic = 0.05,
                                         maxFontSize = 0.7,
                                         children = list {
                                             span("pstrut", sheight = "2.7em")

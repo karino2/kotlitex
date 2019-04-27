@@ -70,7 +70,7 @@ object FunctionFont {
         LatexFunctions.defineFunction(
             FunctionSpec("font", 0, allowedInText = true),
             listOf("\\rm", "\\sf", "\\tt", "\\bf", "\\it"),
-            { context: FunctionContext, args: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
+            { context: FunctionContext, _/* args */: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
                 val parser = context.parser
                 val fName = context.funcName
                 val breakOnTokenText = context.breakOnTokenText

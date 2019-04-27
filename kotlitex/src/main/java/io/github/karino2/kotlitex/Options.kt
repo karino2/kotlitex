@@ -10,9 +10,9 @@ val sizeMultipliers = listOf(
 // A font family applies to a group of fonts (i.e. SansSerif), while a font
 // represents a specific font (i.e. SansSerif Bold).
 // See: https://tex.stackexchange.com/questions/22350/difference-between-textrm-and-mathrm
-data class Options(var style: Style, val _color: String?=null, var size: Int = BASESIZE, val font: String="",
-                   val fontFamily: String = "", val fontWeight : CssClass = CssClass.EMPTY, val fontShape: CssClass = CssClass.EMPTY,
-                   val sizeMultiplier: Double = sizeMultipliers[size-1], val maxSize: Double = Double.POSITIVE_INFINITY) {
+data class Options(var style: Style, val _color: String? = null, var size: Int = BASESIZE, val font: String = "",
+                   val fontFamily: String = "", val fontWeight: CssClass = CssClass.EMPTY, val fontShape: CssClass = CssClass.EMPTY,
+                   val sizeMultiplier: Double = sizeMultipliers[size - 1], val maxSize: Double = Double.POSITIVE_INFINITY) {
 
     val textSize = size
 
@@ -21,13 +21,10 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
         return _color
     }
 
-
-
     val fontMetrics: FontMetrics
     by lazy {
             FontMetrics.getGlobalMetrics(size)
         }
-
 
     /**
      * Return the CSS sizing classes required to switch to the base size. Like
@@ -45,17 +42,15 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
      * changes to at least `\textstyle`.
      */
     fun havingBaseStyle(in_style: Style?): Options {
-        val style = in_style ?: this.style.text();
-        val wantSize = sizeAtStyle(BASESIZE, style);
+        val style = in_style ?: this.style.text()
+        val wantSize = sizeAtStyle(BASESIZE, style)
         return if (this.size == wantSize && this.textSize == BASESIZE
             && this.style == style) {
             this
         } else {
-            this.copy(style=style, size=wantSize)
+            this.copy(style = style, size = wantSize)
         }
     }
-
-
 
     /*
     sizingClasses
@@ -76,12 +71,11 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
         }
     }
 
-
     val sizeStyleMap = listOf(
     // Each element contains [textsize, scriptsize, scriptscriptsize].
     // The size mappings are taken from TeX with \normalsize=10pt.
     listOf(1, 1, 1),    // size1: [5, 5, 5]              \tiny
-        listOf(2, 1, 1),    // size2: [6, 5, 5]
+    listOf(2, 1, 1),    // size2: [6, 5, 5]
     listOf(3, 1, 1),    // size3: [7, 5, 5]              \scriptsize
     listOf(4, 2, 1),    // size4: [8, 6, 5]              \footnotesize
     listOf(5, 2, 1),    // size5: [9, 6, 5]              \small
@@ -94,9 +88,8 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
     )
 
     fun sizeAtStyle(size: Int, style: Style): Int {
-        return if(style.size < 2)  size else sizeStyleMap[size - 1][style.size - 1];
-    };
-
+        return if (style.size < 2) size else sizeStyleMap[size - 1][style.size - 1]
+    }
 
     /**
      * Return an options object with the given style. If `this.style === style`,
@@ -106,7 +99,7 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
         if (this.style == style) {
             return this
         } else {
-            return Options(style=style, size=sizeAtStyle(this.textSize, style))
+            return Options(style = style, size = sizeAtStyle(this.textSize, style))
         }
     }
 
@@ -118,19 +111,16 @@ data class Options(var style: Style, val _color: String?=null, var size: Int = B
         return havingStyle(style.cramp())
     }
 
-
     /**
      * Remove the effect of sizing changes such as \Huge.
      * Keep the effect of the current style, such as \scriptstyle.
      */
     fun havingBaseSizing(): Options {
         val newSize = when (this.style.id) {
-            4,5 -> 3  // normalsize in scriptstyle
+            4, 5 -> 3  // normalsize in scriptstyle
             6, 7-> 1 // normalsize in scriptscriptstyle
             else -> 6// normalsize in textstyle or displaystyle
         }
-        return copy(style = this.style, size=newSize)
+        return copy(style = this.style, size = newSize)
     }
-
-
 }

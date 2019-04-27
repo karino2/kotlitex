@@ -1,6 +1,5 @@
 package io.github.karino2.kotlitex
 
-
 sealed class ParseNode {
     abstract val mode: Mode
     abstract val loc: SourceLocation?
@@ -28,13 +27,11 @@ data class PNodeOp(override val mode: Mode, override val loc: SourceLocation?,
 
 abstract class PNodeOrd(override val mode: Mode, override val loc: SourceLocation?, val text: String) : ParseNode()
 
-
-
 class PNodeMathOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mode, loc, text) {
     override val type = "mathord"
 }
 
-class PNodeTextOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mode, loc, text){
+class PNodeTextOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mode, loc, text) {
     override val type = "textord"
 }
 
@@ -76,7 +73,6 @@ data class PNodeMClass(override val mode: Mode, override val loc: SourceLocation
     override val type = "mclass"
 }
 
-
 // LaTeX display style.
 enum class SizeStyle {
     TEXT,
@@ -85,7 +81,6 @@ enum class SizeStyle {
     SCRIPTSCRIPT,
     AUTO // should we include here?
 }
-
 
 data class PNodeGenFrac(
     override val mode: Mode,
@@ -108,19 +103,18 @@ data class PNodeColorToken(
     override val type = "color-token"
 }
 
-
 data class PNodeSize(
     override val mode: Mode,
     override val loc: SourceLocation?,
     val value: Measurement,
-    val isBlank : Boolean) : ParseNode() {
+    val isBlank: Boolean) : ParseNode() {
     override val type = "size"
 }
 
 data class PNodeUrl(
     override val mode: Mode,
     override val loc: SourceLocation?,
-    val url : String) : ParseNode() {
+    val url: String) : ParseNode() {
     override val type = "url"
 }
 
@@ -128,7 +122,7 @@ data class PNodeText(
     override val mode: Mode,
     override val loc: SourceLocation?,
     val body: List<ParseNode>,
-    val font: String? = null): ParseNode() {
+    val font: String? = null) : ParseNode() {
     override val type = "text"
 }
 
@@ -136,15 +130,15 @@ data class PNodeColor(
     override val mode: Mode,
     override val loc: SourceLocation?,
     val color: String,
-    val body: List<ParseNode>): ParseNode() {
+    val body: List<ParseNode>) : ParseNode() {
     override val type = "color"
 }
 
-data class PNodeSqrt (
+data class PNodeSqrt(
     override val mode: Mode,
     override val loc: SourceLocation?,
     val body: ParseNode,
     val index: ParseNode?
-): ParseNode() {
+) : ParseNode() {
     override val type = "sqrt"
 }
