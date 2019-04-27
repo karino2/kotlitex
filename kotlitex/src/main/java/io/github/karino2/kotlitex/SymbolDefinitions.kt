@@ -19,7 +19,6 @@ See https://github.com/Khan/KaTeX/wiki/Examining-TeX#group-types
  * accepted in (e.g. "math" or "text").
  */
 
-
 object SymbolDefinitions {
     // Some abbreviations for commonly used strings.
     // This helps minify the code, and also spotting typos using jshint.
@@ -46,7 +45,6 @@ object SymbolDefinitions {
     val textord = NonAtoms.textord
 
     // Now comes the symbol table
-    
     fun defineSymbol(mode: Mode, font: Font, group: Group, replace: String?, name: String, acceptUnicodeChar: Boolean = false) = Symbols.defineSymbol(mode, font, group, replace, name, acceptUnicodeChar)
 
     // Relation Symbols
@@ -226,7 +224,6 @@ object SymbolDefinitions {
         defineSymbol(math, ams, rel, "\ue016", "\\nsubseteqq")
         defineSymbol(math, ams, bin, "\u22b4", "\\unlhd")
         defineSymbol(math, ams, bin, "\u22b5", "\\unrhd")
-
 
 // AMS Negated Arrows
         defineSymbol(math, ams, rel, "\u219a", "\\nleftarrow", true)
@@ -829,7 +826,6 @@ object SymbolDefinitions {
             defineSymbol(math, main, mathord, ch, wideChar)
             defineSymbol(text, main, textord, ch, wideChar)
         }
-
     }
 
     fun defineUnicodeOther() {
@@ -852,8 +848,6 @@ object SymbolDefinitions {
         defineSymbol(text, main, textord, "\u2019", "’")
         defineSymbol(text, main, textord, "\u201c", "“")
         defineSymbol(text, main, textord, "\u201d", "”")
-
-
     }
 
     fun defineAllSymbols() {

@@ -13,8 +13,8 @@ package io.github.karino2.kotlitex
  * The main style class. Contains a unique id for the style, a size (which is
  * the same for cramped and uncramped version of a style), and a cramped flag.
  */
-data class Style(val id: Int, val size: Int, val cramped : Boolean) {
-    val isTight : Boolean
+data class Style(val id: Int, val size: Int, val cramped: Boolean) {
+    val isTight: Boolean
     get() = size >= 2
 
     companion object {
@@ -36,7 +36,6 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
         val _cramp = listOf(Dc, Dc, Tc, Tc, Sc, Sc, SSc, SSc)
         val _text = listOf(D, Dc, T, Tc, T, Tc, T, Tc)
 
-
         // Instances of the different styles
         val styles = listOf(
             Style(D, 0, false),
@@ -55,19 +54,18 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
         val SCRIPTSCRIPT = styles[SS]
     }
 
-
     /**
      * Get the style of a superscript given a base in the current style.
      */
     fun sup(): Style {
-        return styles[sup[this.id]];
+        return styles[sup[this.id]]
     }
 
     /**
      * Get the style of a subscript given a base in the current style.
      */
     fun sub(): Style {
-        return styles[sub[this.id]];
+        return styles[sub[this.id]]
     }
 
     /**
@@ -75,16 +73,15 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
      * style.
      */
     fun fracNum(): Style {
-        return styles[_fracNum[id]];
+        return styles[_fracNum[id]]
     }
-
 
     /**
      * Get the style of a fraction denominator given the fraction in the current
      * style.
      */
     fun fracDen(): Style {
-        return styles[_fracDen[id]];
+        return styles[_fracDen[id]]
     }
 
     /**
@@ -92,14 +89,14 @@ data class Style(val id: Int, val size: Int, val cramped : Boolean) {
      * doesn't change the style).
      */
     fun cramp(): Style {
-        return styles[_cramp[this.id]];
+        return styles[_cramp[this.id]]
     }
 
     /**
      * Get a text or display version of this style.
      */
     fun text(): Style {
-        return styles[_text[this.id]];
+        return styles[_text[this.id]]
     }
 
     /**

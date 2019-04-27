@@ -14,15 +14,14 @@ import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-
-private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, isMathMode: Boolean, val drawBounds: Boolean = false)  {
+private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, isMathMode: Boolean, val drawBounds: Boolean = false) {
     var rootNode: VerticalList
     init {
-        val options = if(isMathMode) Options(Style.DISPLAY) else Options(
+        val options = if (isMathMode) Options(Style.DISPLAY) else Options(
             Style.TEXT
         )
         val parser = Parser(expr)
-        val parsed =  parser.parse()
+        val parsed = parser.parse()
         val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
         val builder = VirtualNodeBuilder(nodes, baseSize.toDouble(), fontLoader)
         rootNode = builder.build()
@@ -67,9 +66,9 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
             }
             is TextNode -> {
                 textPaint.typeface = fontLoader.toTypeface(parent.font)
-                textPaint.textSize = parent.font.size.toFloat()*ratio
-                val x = translateX(parent.bounds.x*ratio)
-                val y = translateY(parent.bounds.y*ratio)
+                textPaint.textSize = parent.font.size.toFloat() * ratio
+                val x = translateX(parent.bounds.x * ratio)
+                val y = translateY(parent.bounds.y * ratio)
                 canvas.drawText(parent.text, x, y, textPaint)
                 drawBounds(canvas, parent.bounds, ratio)
             }
@@ -82,11 +81,10 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
                 drawBounds(canvas, parent.bounds, ratio)
             }
             is PathNode -> {
-                val x = translateX(parent.bounds.x*ratio)
-                val y = (translateY(parent.bounds.y*ratio) - parent.bounds.height*ratio).toFloat()
+                val x = translateX(parent.bounds.x * ratio)
+                val y = (translateY(parent.bounds.y * ratio) - parent.bounds.height * ratio).toFloat()
 
                 drawBounds(canvas, parent.bounds, ratio)
-
 
                 // TODO: support other preserve aspect ratio.
                 // "xMinYMin slice"
@@ -94,8 +92,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
                 val heightvb = parent.rnode.viewBox.height
                 val (_, _, wbVirtual, hbVirtual) = parent.bounds
-                val wb = wbVirtual*ratio
-                val hb = hbVirtual*ratio
+                val wb = wbVirtual * ratio
+                val hb = hbVirtual * ratio
 
                 // this is preserveAspectRatio = meet
                 /*
@@ -109,7 +107,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
                 Basically, width is far larger than height.
                 So we scale to fit to height, then clip.
                  */
-                val scale = (hb/heightvb).toFloat()
+                val scale = (hb / heightvb).toFloat()
                 mat.postScale(scale, scale)
                 mat.postTranslate(x, y)
 
@@ -121,9 +119,9 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
                 val path = Path()
 
                 canvas.save()
-                canvas.clipRect(RectF(x, y, x+wb.toFloat(), y+hb.toFloat()))
+                canvas.clipRect(RectF(x, y, x + wb.toFloat(), y + hb.toFloat()))
 
-                parent.rnode.children.forEach{
+                parent.rnode.children.forEach {
                     path.reset()
                     path.addPath(it.path, mat)
                     canvas.drawPath(path, paint)
@@ -136,13 +134,13 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
     }
 
     fun drawWithRatio(canvas: Canvas, ratio: Float) {
-        if(drawBounds)
+        if (drawBounds)
             drawBounds(canvas, calculateWholeBounds(), ratio)
         drawRenderNodes(canvas, rootNode, ratio)
     }
 
-    fun calculateBounds(wholeBounds : Bounds, parent: VirtualCanvasNode) {
-        if(parent.bounds.width != 0.0) {
+    fun calculateBounds(wholeBounds: Bounds, parent: VirtualCanvasNode) {
+        if (parent.bounds.width != 0.0) {
             wholeBounds.extend(parent.bounds)
             return
         }
@@ -173,7 +171,6 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
         return b
     }
-
 }
 
 // Similar to DynamicDrawableSpan, but getSize is a little different.
@@ -187,8 +184,8 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
         ensureDrawable()
-        if(isError)
-            return (baseHeight*5).toInt()
+        if (isError)
+            return (baseHeight * 5).toInt()
         return getSizeInternal(fm)
     }
 
@@ -221,14 +218,13 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
     fun ensureDrawable() {
         try {
             getCachedDrawable()
-        }catch(err: ParseError) {
+        } catch (err: ParseError) {
             Log.d("kotlitex", err.msg)
             isError = true
-        }catch(err: NotImplementedError) {
+        } catch (err: NotImplementedError) {
             Log.d("kotlitex", err.message)
             isError = true
         }
-
     }
 
     override fun draw(
@@ -242,7 +238,7 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         bottom: Int,
         paint: Paint
     ) {
-        if(isError) {
+        if (isError) {
             canvas.drawText("ERROR", x, y.toFloat(), paint)
             return
         }
@@ -254,8 +250,6 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         val ratio = baseHeight / virtualBaseHeight
 
         // Log.d("kotlitex", "x=$x, y=$y, top=$top, ratio=$ratio, expr=$expr")
-
-
 
         canvas.save()
         canvas.translate(x, y.toFloat())
@@ -274,7 +268,7 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         return drawable
     }
 
-    private fun getCachedDrawable() : MathExpressionDrawable {
+    private fun getCachedDrawable(): MathExpressionDrawable {
         val wr = drawableRef
         val d = wr?.get()
         if (d != null)
@@ -284,5 +278,5 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         return newDrawable
     }
 
-    private var drawableRef : WeakReference<MathExpressionDrawable>? = null
+    private var drawableRef: WeakReference<MathExpressionDrawable>? = null
 }

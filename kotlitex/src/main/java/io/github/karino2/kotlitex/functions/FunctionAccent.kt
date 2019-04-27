@@ -59,7 +59,7 @@ object FunctionAccent {
     fun renderNodeBuilder(grp: ParseNode, options: Options): RenderNode {
         // Accents are handled in the TeXbook pg. 443, rule 12.
         val (group, base, supSubGroup) = if (grp is PNodeSupSub) {
-            val supSub = grp as PNodeSupSub
+            val supSub = grp
             // If our base is a character box, and we have superscripts and
             // subscripts, the supsub will defer to us. In particular, we want
             // to attach the superscripts and subscripts to the inner body (so

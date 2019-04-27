@@ -6,7 +6,7 @@ import kotlin.IllegalArgumentException
 data class Measurement(val number: Int, val unit: String) {
     val isValidUnit: Boolean
     get() {
-        return when(unit) {
+        return when (unit) {
             "ex", "em", "mu" -> true
             else -> false
         }
@@ -16,13 +16,12 @@ data class Measurement(val number: Int, val unit: String) {
     }
 }
 
-
 object RenderTreeBuilder {
-    val groupBuilders : MutableMap<String, RenderNodeHandlerType>
-        get()= LatexFunctions.renderGroupBuilders
+    val groupBuilders: MutableMap<String, RenderNodeHandlerType>
+        get() = LatexFunctions.renderGroupBuilders
 
     // defineFunctionBuilder in js.
-    fun registerBuilder(nodeType: String, builder: (ParseNode, Options)->RenderNode) {
+    fun registerBuilder(nodeType: String, builder: (ParseNode, Options) -> RenderNode) {
         groupBuilders[nodeType] = builder
     }
 
@@ -30,22 +29,19 @@ object RenderTreeBuilder {
      * Calculate the height, depth, and maxFontSize of an element based on its
      * children.
      */
-    fun sizeElementFromChildren(
-            elem: RNodeSpan
-    ) {
-        var height = elem.children.map {it.height }.max() ?: 0.0
-        var depth = elem.children.map {it.depth }.max() ?: 0.0
-        var maxFontSize = elem.children.map {it.maxFontSize}.max() ?: 0.0
+    fun sizeElementFromChildren(elem: RNodeSpan) {
+        var height = elem.children.map { it.height }.max() ?: 0.0
+        var depth = elem.children.map { it.depth }.max() ?: 0.0
+        var maxFontSize = elem.children.map { it.maxFontSize }.max() ?: 0.0
 
         elem.height = height
         elem.depth = depth
         elem.maxFontSize = maxFontSize
-    };
+    }
 
-
-    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()) : RNodeSpan {
+    fun makeSpan(klasses: MutableSet<CssClass> = mutableSetOf(), children: MutableList<RenderNode> = mutableListOf(), options: Options? = null, style: CssStyle = CssStyle()): RNodeSpan {
         val span = RNodeSpan(klasses, children, options, style)
-        sizeElementFromChildren(span);
+        sizeElementFromChildren(span)
         return span
     }
 
@@ -53,12 +49,12 @@ object RenderTreeBuilder {
         className: CssClass,
         options: Options,
         thickness: Double? = null
-    ) : RNodeSpan {
-        val line = makeSpan(mutableSetOf(className), mutableListOf(), options);
-        line.height = thickness ?: options.fontMetrics.defaultRuleThickness;
+    ): RNodeSpan {
+        val line = makeSpan(mutableSetOf(className), mutableListOf(), options)
+        line.height = thickness ?: options.fontMetrics.defaultRuleThickness
         line.style.borderBottomWidth = line.height.toString() + "em"
-        line.maxFontSize = 1.0;
-        return line;
+        line.maxFontSize = 1.0
+        return line
     }
 
     fun makeNullDelimiter(
@@ -71,15 +67,12 @@ object RenderTreeBuilder {
         return makeSpan(classes.concat(moreClasses))
     }
 
-
-
     /**
      * buildGroup is the function that takes a group and calls the correct groupType
      * function for it. It also handles the interaction of size and style changes
      * between parents and children.
      */
-    fun buildGroup(group: ParseNode?, options: Options,
-                   baseOptions: Options? = null) : RenderNode {
+    fun buildGroup(group: ParseNode?, options: Options, baseOptions: Options? = null): RenderNode {
         if (group == null) {
             return makeSpan()
         }
@@ -92,24 +85,19 @@ object RenderTreeBuilder {
             // If the size changed between the parent and the current group, account
             // for that size difference.
             if (baseOptions != null && options.size != baseOptions.size) {
-                groupNode = makeSpan(options.sizingClasses(baseOptions),
-                    mutableListOf(groupNode), options);
+                groupNode = makeSpan(options.sizingClasses(baseOptions), mutableListOf(groupNode), options)
 
-                val multiplier =
-                options.sizeMultiplier / baseOptions.sizeMultiplier;
+                val multiplier = options.sizeMultiplier / baseOptions.sizeMultiplier
 
-                groupNode.height *= multiplier;
-                groupNode.depth *= multiplier;
+                groupNode.height *= multiplier
+                groupNode.depth *= multiplier
             }
 
-            return groupNode;
+            return groupNode
         } else {
             throw ParseError("Got group of unknown type: '${group.type}'", null)
         }
-
     }
-
-
 
     /**
      * Makes a symbolNode after translation via the list of symbols in symbols.js.
@@ -128,25 +116,24 @@ object RenderTreeBuilder {
         options: Options? = null,
         classes: MutableSet<CssClass> = mutableSetOf()
     ): RNodeSymbol {
-        val (value, metrics) = Symbols.lookupSymbol(in_value, fontName, mode);
+        val (value, metrics) = Symbols.lookupSymbol(in_value, fontName, mode)
 
         var symbolNode = if (metrics != null) {
-            var italic = metrics.italic;
+            var italic = metrics.italic
             if (mode == Mode.TEXT || (options != null && options.font == "mathit")) {
-                italic = 0.0;
+                italic = 0.0
             }
-            RNodeSymbol(
-                    value, height=metrics.height, depth=metrics.depth, italic = italic, skew = metrics.skew,
-            width=metrics.width, klasses = classes)
+            RNodeSymbol(value, height = metrics.height, depth = metrics.depth, italic = italic,
+                skew = metrics.skew, width = metrics.width, klasses = classes)
         } else {
             // TODO(emily): Figure out a good way to only print this in development
             Log.d("kotlitex", "No character metrics for '$value' in style '$fontName'")
 
-            RNodeSymbol(value, 0.0, 0.0, 0.0, classes, 0.0);
+            RNodeSymbol(value, 0.0, 0.0, 0.0, classes, 0.0)
         }
 
         if (options != null) {
-            symbolNode.maxFontSize = options.sizeMultiplier;
+            symbolNode.maxFontSize = options.sizeMultiplier
             if (options.style.isTight) {
                 symbolNode.klasses.add(CssClass.mtight)
             }
@@ -156,7 +143,7 @@ object RenderTreeBuilder {
             }
         }
 
-        return symbolNode;
+        return symbolNode
     }
 
     // The following have to be loaded from Main-Italic font, using class mathit
@@ -166,17 +153,15 @@ object RenderTreeBuilder {
         "\\pounds", "\\mathsterling", "\\textsterling", "£"   // pounds symbol
     )
 
-
     /**
      * Determines which of the two font names (Main-Italic and Math-Italic) and
      * corresponding style tags (maindefault or mathit) to use for default math font,
      * depending on the symbol.
      */
     fun mathdefault(value: String,
-    mode: Mode,
-    options: Options,
-    classes: MutableSet<CssClass>
-    ): Pair<String, CssClass> { // {| fontName: string, fontClass: string |}
+                    mode: Mode,
+                    options: Options,
+                    classes: MutableSet<CssClass>): Pair<String, CssClass> { // {| fontName: string, fontClass: string |}
         return if ("[0-9]".toRegex().matches(value[0].toString()) ||
             // glyphs for \imath and \jmath do not exist in Math-Italic so we
             // need to use Main-Italic instead
@@ -197,11 +182,8 @@ object RenderTreeBuilder {
      * "mathnormal", depending on the symbol.  Use this function instead of fontMap for
      * font "mathnormal".
      */
-    fun mathnormal(value: String,
-                   mode: Mode,
-                   options: Options,
-                   classes: MutableSet<CssClass>
-    ): Pair<String, CssClass> {
+    fun mathnormal(value: String, mode: Mode, options: Options,
+                   classes: MutableSet<CssClass>): Pair<String, CssClass> {
         return when {
             mathitLetters.contains(value) -> Pair("Main-Italic", CssClass.mathit)
             "[0-9]".toRegex().matches(value[0].toString()) -> Pair("Caligraphic-Regular", CssClass.mathcal)
@@ -229,7 +211,6 @@ object RenderTreeBuilder {
             Pair("Main-Bold", CssClass.mathbf)
         }
     }
-
 
     /**
      * Makes a symbol in Main-Regular or AMS-Regular.
@@ -262,7 +243,7 @@ object RenderTreeBuilder {
         }
     }
 
-    fun knownFontNameToCssClass(fontName: String) : CssClass {
+    fun knownFontNameToCssClass(fontName: String): CssClass {
         return when (fontName) {
             "amsrm" -> CssClass.amsrm
             "textrm" -> CssClass.textrm
@@ -271,15 +252,12 @@ object RenderTreeBuilder {
             "mathcal" -> CssClass.mathcal
             "mathbb" -> CssClass.mathbb
             "mathscr" -> CssClass.mathscr
-            else -> throw NotImplementedError("Custom font NYI. (${fontName})")
+            else -> throw NotImplementedError("Custom font NYI. ($fontName)")
         }
     }
 
     // Takes font options, and returns the appropriate fontLookup name
-    fun retrieveTextFontName(fontFamily: String,
-    fontWeight: CssClass,
-    fontShape: CssClass
-    ): String {
+    fun retrieveTextFontName(fontFamily: String, fontWeight: CssClass, fontShape: CssClass): String {
         val baseFontName = when (fontFamily) {
             "amsrm" -> "AMS"
             "textrm" -> "Main"
@@ -288,17 +266,17 @@ object RenderTreeBuilder {
             else -> fontFamily; // use fonts added by a plugin
         }
 
-        val fontStylesName = if (fontWeight ==  CssClass.textbf  && fontShape == CssClass.textit) {
-             "BoldItalic";
+        val fontStylesName= if (fontWeight == CssClass.textbf && fontShape == CssClass.textit) {
+            "BoldItalic"
         } else if (fontWeight == CssClass.textbf) {
-             "Bold";
+            "Bold"
         } else if (fontWeight == CssClass.textit) {
-            "Italic";
+            "Italic"
         } else {
-            "Regular";
+            "Regular"
         }
 
-        return "${baseFontName}-${fontStylesName}"
+        return "$baseFontName-$fontStylesName"
     }
 
     /**
@@ -359,7 +337,7 @@ object RenderTreeBuilder {
         )
     )
 
-    data class OneSvgData(val path: String, val width: Double, val height : Double)
+    data class OneSvgData(val path: String, val width: Double, val height: Double)
 
     // svgData in js
     val pathData = mapOf(
@@ -375,29 +353,27 @@ object RenderTreeBuilder {
     fun staticPath(value: String, options: Options): RNodePathSpan {
         // Create a span with inline SVG for the element.
         val (pathName, width, height) = pathData[value]!!
-        val path = RNodePath(pathName);
-        val svgNode : RenderNode = RNodePathHolder(mutableListOf(path),
+        val path = RNodePath(pathName)
+        val svgNode: RenderNode = RNodePathHolder(mutableListOf(path),
             "${width}em",
-             "${height}em",
+            "${height}em",
             // Override CSS rule `.katex svg { width: 100% }`
             // TODO: "style": "width:" + width + "em",
             ViewBox(0.0, 0.0, 1000 * width, 1000 * height),
             "xMinYMin")
 
         val span = RNodePathSpan(mutableSetOf(CssClass.overlay), mutableListOf(svgNode), options)
-        span.height = height;
-        span.style.height = "${height}em";
-        span.style.width =   "${width}em";
-        return span;
+        span.height = height
+        span.style.height = "${height}em"
+        span.style.width = "${width}em"
+        return span
     }
-
-
 
     /**
      * Makes either a mathord or textord in the correct font and color.
      */
     fun makeOrd(group: ParseNode, options: Options, type: String) : RNodeSymbol {
-        if(group !is PNodeOrd) {
+        if (group !is PNodeOrd) {
             throw IllegalArgumentException("unexpected type in makeOrd.")
         }
 
@@ -407,8 +383,8 @@ object RenderTreeBuilder {
         val classes = mutableSetOf(CssClass.mord)
 
         // Math mode or Old font (i.e. \rm)
-        val isFont = mode == Mode.MATH || (mode == Mode.TEXT && options.font != "");
-        val fontOrFamily = if(isFont)  options.font else options.fontFamily
+        val isFont = mode == Mode.MATH || (mode == Mode.TEXT && options.font != "")
+        val fontOrFamily = if (isFont) options.font else options.fontFamily
         /* TODO
         if (text[0].toInt() == 0xD835) {
             // surrogate pairs get special treatment
@@ -419,12 +395,12 @@ object RenderTreeBuilder {
             val (fontName, fontClasses) =
                 if (fontOrFamily == "boldsymbol" || fontOrFamily == "mathnormal") {
                     val (fontName, fontClass) =
-                        if(fontOrFamily == "boldsymbol") boldsymbol(text, mode, options, classes)
-                        else  mathnormal(text, mode, options, classes);
+                        if (fontOrFamily == "boldsymbol") boldsymbol(text, mode, options, classes)
+                        else mathnormal(text, mode, options, classes)
                     Pair(fontName, mutableSetOf(fontClass))
                 } else if (mathitLetters.contains(text)) {
                     Pair("Main-Italic", mutableSetOf(CssClass.mathit))
-                 } else if (isFont) {
+                } else if (isFont) {
                     Pair(fontMap.getValue(fontOrFamily).fontName, mutableSetOf(knownFontNameToCssClass(fontOrFamily)))
                 } else {
                     Pair(retrieveTextFontName(fontOrFamily, options.fontWeight, options.fontShape),
@@ -433,7 +409,7 @@ object RenderTreeBuilder {
 
             if (Symbols.lookupSymbol(text, fontName, mode).second != null) {
                 return makeSymbol(text, fontName, mode, options,
-                    classes.concat(fontClasses));
+                    classes.concat(fontClasses))
             } /* TODO
              else if (ligatures.hasOwnProperty(text) &&
                 fontName.substr(0, 10) === "Typewriter") {
@@ -451,46 +427,41 @@ object RenderTreeBuilder {
         if (group is PNodeMathOrd) {
             val (fontName, fontClass) = mathdefault(text, mode, options, classes)
             classes.add(fontClass)
-            return makeSymbol(text, fontName, mode, options, classes);
+            return makeSymbol(text, fontName, mode, options, classes)
         } else if (group is PNodeTextOrd) {
             val font = Symbols.get(mode)[text]?.font
             if (font == "ams") {
                 val fontName =
-                    retrieveTextFontName("amsrm", options.fontWeight, options.fontShape);
+                    retrieveTextFontName("amsrm", options.fontWeight, options.fontShape)
                 return makeSymbol(
                     text, fontName, mode, options,
-                    classes.concat(setOf(CssClass.amsrm, options.fontWeight, options.fontShape)));
+                    classes.concat(setOf(CssClass.amsrm, options.fontWeight, options.fontShape)))
             } else if (font == "main" || font == null) {
                 val fontName =
-                    retrieveTextFontName("textrm", options.fontWeight, options.fontShape);
+                    retrieveTextFontName("textrm", options.fontWeight, options.fontShape)
                 return makeSymbol(
                     text, fontName, mode, options,
-                    classes.concat(setOf(options.fontWeight, options.fontShape)));
+                    classes.concat(setOf(options.fontWeight, options.fontShape)))
             } else { // fonts added by plugins
 
                 val fontName = retrieveTextFontName(font, options.fontWeight,
-                options.fontShape);
+                options.fontShape)
                 // We add font name as a css class
                 return makeSymbol(
                     text, fontName, mode, options,
-                    classes.concat(setOf(/* fontName, */ options.fontWeight, options.fontShape)));
+                    classes.concat(setOf(/* fontName, */ options.fontWeight, options.fontShape)))
                 /* TODO:
                        fontName should be css classname in this case. How should we?
                 */
             }
         } else {
             // never reached here in kotlin.
-            throw Error("unexpected type: $type in makeOrd");
+            throw Error("unexpected type: $type in makeOrd")
         }
     }
 
-
-
     // Return the outermost node of a domTree.
-    fun getOutermostNode(
-            node: RenderNode,
-            side: String /* "left" or "right" */
-            ): RenderNode
+    fun getOutermostNode(node: RenderNode, side: String /* "left" or "right" */): RenderNode
     {
         // TODO:
         /*
@@ -506,7 +477,7 @@ object RenderTreeBuilder {
             }
         }
         */
-        return node;
+        return node
     }
 
     val domEnum = setOf(
@@ -520,7 +491,7 @@ object RenderTreeBuilder {
         CssClass.minner
     )
 
-    fun getTypeOfDomTree(in_node: RenderNode?, side: String /* left or right */) : CssClass {
+    fun getTypeOfDomTree(in_node: RenderNode?, side: String /* left or right */): CssClass {
         if (in_node == null) {
             return CssClass.EMPTY
         }
@@ -529,7 +500,7 @@ object RenderTreeBuilder {
         // This makes a lot of assumptions as to where the type of atom
         // appears.  We should do a better job of enforcing this.
         domEnum.forEach {
-            if(node.hasClass(it))
+            if (node.hasClass(it))
                 return it
         }
         return CssClass.EMPTY
@@ -538,38 +509,31 @@ object RenderTreeBuilder {
     // Binary atoms (first class `mbin`) change into ordinary atoms (`mord`)
     // depending on their surroundings. See TeXbook pg. 442-446, Rules 5 and 6,
     // and the text before Rule 19.
-    fun isBinLeftCanceller(
-        node: RenderNode?,
-        isRealGroup: Boolean
-        ): Boolean
+    fun isBinLeftCanceller(node: RenderNode?, isRealGroup: Boolean): Boolean
     {
         // karino: Below comment is original node one, our situationmight be different.
         // TODO: This code assumes that a node's math class is the first element
         // of its `classes` array. A later cleanup should ensure this, for
         // instance by changing the signature of `makeSpan`.
         if (node != null) {
-            return when(getTypeOfDomTree(node, "right")) {
+            return when (getTypeOfDomTree(node, "right")) {
                 CssClass.mbin, CssClass.mopen, CssClass.mrel,
                 CssClass.mop, CssClass.mpunct -> true
                 else -> false
             }
         } else {
-            return isRealGroup;
+            return isRealGroup
         }
-    };
+    }
 
-    fun isBinRightCanceller(
-        node: RenderNode?,
-        isRealGroup: Boolean
-        ): Boolean
-    {
+    fun isBinRightCanceller(node: RenderNode?, isRealGroup: Boolean): Boolean {
         if (node != null) {
-            return when(getTypeOfDomTree(node, "left")) {
+            return when (getTypeOfDomTree(node, "left")) {
                 CssClass.mrel, CssClass.mclose, CssClass.mpunct -> true
                 else -> false
             }
         } else {
-            return isRealGroup;
+            return isRealGroup
         }
     }
 
@@ -578,38 +542,38 @@ object RenderTreeBuilder {
     val thickspace = Measurement(5, "mu")
 
     // Spacing relationships for display and text styles
-    fun getSpacings(leftType: CssClass, rightType: CssClass) : Measurement? {
-        return when(leftType) {
+    fun getSpacings(leftType: CssClass, rightType: CssClass): Measurement? {
+        return when (leftType) {
             CssClass.mord -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mop, CssClass.minner -> thinspace
-                    CssClass.mbin-> mediumspace
-                    CssClass.mrel-> thickspace
+                    CssClass.mbin -> mediumspace
+                    CssClass.mrel -> thickspace
                     else -> null
                 }
             }
             CssClass.mop -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mord, CssClass.mop, CssClass.minner -> thinspace
                     CssClass.mrel -> thickspace
                     else -> null
                 }
             }
             CssClass.mbin -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.minner -> mediumspace
                     else -> null
                 }
             }
             CssClass.mrel -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.minner -> thickspace
                     else -> null
                 }
             }
             CssClass.mopen -> null
             CssClass.mclose -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mop, CssClass.minner -> thinspace
                     CssClass.mbin -> mediumspace
                     CssClass.mrel -> thickspace
@@ -617,7 +581,7 @@ object RenderTreeBuilder {
                 }
             }
             CssClass.mpunct -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mrel -> thickspace
                     CssClass.mord, CssClass.mop, CssClass.mopen,
                         CssClass.mclose, CssClass.mpunct, CssClass.minner -> thinspace
@@ -625,7 +589,7 @@ object RenderTreeBuilder {
                 }
             }
             CssClass.minner -> {
-                when(rightType) {
+                when (rightType) {
                     CssClass.mbin -> mediumspace
                     CssClass.mrel -> thickspace
                     CssClass.mord, CssClass.mop, CssClass.mopen, CssClass.mpunct, CssClass.minner -> thinspace
@@ -637,13 +601,13 @@ object RenderTreeBuilder {
     }
 
     // Spacing relationships for script and scriptscript styles
-    fun getTightSpacings(leftType: CssClass, rightType: CssClass) : Measurement? {
-        when(leftType) {
+    fun getTightSpacings(leftType: CssClass, rightType: CssClass): Measurement? {
+        when (leftType) {
             CssClass.mbin, CssClass.mrel, CssClass.mopen, CssClass.mpunct -> return null
             else -> {}
         }
 
-        return when(Pair(leftType, rightType)) {
+        return when (Pair(leftType, rightType)) {
             Pair(CssClass.mord, CssClass.mop) -> thinspace
             Pair(CssClass.mop, CssClass.mord) -> thinspace
             Pair(CssClass.mop, CssClass.mop) -> thinspace
@@ -658,14 +622,14 @@ object RenderTreeBuilder {
     // leftmost node in the fragment.
     // 'mtight' indicates that the node is script or scriptscript style.
     fun isLeftTight(in_node: RenderNode): Boolean {
-        val node = getOutermostNode(in_node, "left");
-        return node.hasClass(CssClass.mtight);
+        val node = getOutermostNode(in_node, "left")
+        return node.hasClass(CssClass.mtight)
     }
 
-    fun calculateSize(sizeValue: Measurement, options: Options) : Double {
+    fun calculateSize(sizeValue: Measurement, options: Options): Double {
         // TODO: now only support mu.
         val scale = options.fontMetrics.cssEmPerMu
-        return Math.min(sizeValue.number * scale, options.maxSize);
+        return Math.min(sizeValue.number * scale, options.maxSize)
     }
 
     // Glue is a concept from TeX which is a flexible space between elements in
@@ -673,12 +637,11 @@ object RenderTreeBuilder {
     // static space between elements in a horizontal layout.
     fun makeGlue(measurement: Measurement, options: Options): RNodeSpan {
         // Make an empty span for the space
-        val rule = makeSpan(mutableSetOf(CssClass.mspace), mutableListOf(), options);
-        val size = calculateSize(measurement, options);
-        rule.style.marginRight = "${size}em";
-        return rule;
-    };
-
+        val rule = makeSpan(mutableSetOf(CssClass.mspace), mutableListOf(), options)
+        val size = calculateSize(measurement, options)
+        rule.style.marginRight = "${size}em"
+        return rule
+    }
 
     /**
      * Take a list of nodes, build them in order, and return a list of the built
@@ -688,14 +651,13 @@ object RenderTreeBuilder {
      * a partial group (e.g. one created by \color). `surrounding` is an array
      * consisting type of nodes that will be added to the left and right.
      */
-    fun buildExpression(
-        expression: List<ParseNode>,
-        options: Options,
-        isRealGroup: Boolean
-        // TODO: , surrounding: [?DomType, ?DomType] = [null, null],
-        ): List<RenderNode> {
+    fun buildExpression(expression: List<ParseNode>,
+                        options: Options,
+                        isRealGroup: Boolean
+                        // TODO: , surrounding: [?DomType, ?DomType] = [null, null],
+                        ): List<RenderNode> {
         // Parse expressions into `groups`.
-        val rawGroups = mutableListOf<RenderNode>();
+        val rawGroups = mutableListOf<RenderNode>()
         for (expr in expression) {
             val output = buildGroup(expr, options);
             /* TODO:
@@ -713,7 +675,7 @@ object RenderTreeBuilder {
         // Ignore explicit spaces (e.g., \;, \,) when determining what implicit
         // spacing should go between atoms of different classes, and add dummy
         // spans for determining spacings between surrounding atoms.
-        val rowNonSpace = rawGroups.filter{group-> group != null && !group.klasses.contains(CssClass.mspace)}
+        val rowNonSpace = rawGroups.filter { group -> group != null && !group.klasses.contains(CssClass.mspace) }
         val nonSpaces = listOf<RenderNode?>(null, *rowNonSpace.toTypedArray(), null)
         /* TODO:
         const nonSpaces: (?HtmlDomNode)[] = [
@@ -725,9 +687,9 @@ object RenderTreeBuilder {
 
         // Before determining what spaces to insert, perform bin cancellation.
         // Binary operators change to ordinary symbols in some contexts.
-        for (i in 1 until (nonSpaces.size-1)) {
+        for (i in 1 until (nonSpaces.size - 1)) {
             val nonSpacesI = nonSpaces[i]!!
-            val left = getOutermostNode(nonSpacesI, "left");
+            val left = getOutermostNode(nonSpacesI, "left")
             if (left.klasses.contains(CssClass.mbin) &&
                 isBinLeftCanceller(nonSpaces[i - 1], isRealGroup)) {
                 left.klasses.remove(CssClass.mbin)
@@ -742,13 +704,13 @@ object RenderTreeBuilder {
             }
         }
 
-        val groups = mutableListOf<RenderNode>();
+        val groups = mutableListOf<RenderNode>()
         var j = 0
         var i = 0
 
         // inside loop, sometime i is changed so we cannot use normal for loop
-        while(i < rawGroups.size) {
-            groups.add(rawGroups[i]);
+        while (i < rawGroups.size) {
+            groups.add(rawGroups[i])
 
             // For any group that is not a space, get the next non-space.  Then
             // lookup what implicit space should be placed between those atoms and
@@ -757,8 +719,8 @@ object RenderTreeBuilder {
                 // if current non-space node is left dummy span, add a glue before
                 // first real non-space node
                 if (j == 0) {
-                    groups.removeAt(groups.size-1)
-                    i--;
+                    groups.removeAt(groups.size - 1)
+                    i--
                 }
 
                 // Get the type of the current non-space node.  If it's a document
@@ -774,7 +736,7 @@ object RenderTreeBuilder {
                 // to false to avoid processing spans multiple times.
                 if (left != CssClass.EMPTY && right != CssClass.EMPTY && isRealGroup) {
                     val nonSpacesJp1 = nonSpaces[j + 1]!!
-                    val space = if(isLeftTight(nonSpacesJp1)) getTightSpacings(left, right) else getSpacings(left, right)
+                    val space = if (isLeftTight(nonSpacesJp1)) getTightSpacings(left, right) else getSpacings(left, right)
 
                     if (space != null) {
                         var glueOptions = options
@@ -797,12 +759,11 @@ object RenderTreeBuilder {
                         groups.add(makeGlue(space, glueOptions))
                     }
                 }
-                j++;
+                j++
             }
             i++
         }
-
-        return groups;
+        return groups
     }
 
     fun wrapFragment(group: RenderNode, options: Options): RenderNode {
@@ -818,28 +779,27 @@ object RenderTreeBuilder {
     fun tryCombineChars(in_chars: List<RenderNode>): MutableList<RenderNode> {
         val chars = in_chars.toMutableList()
         var i = 0
-        while(i < chars.size-1) {
-            val prev = chars[i];
-            val next = chars[i + 1];
+        while (i < chars.size - 1) {
+            val prev = chars[i]
+            val next = chars[i + 1]
             if (prev is RNodeSymbol
                 && next is RNodeSymbol
                 && canCombine(prev, next)) {
 
-                prev.text += next.text;
-                prev.height = Math.max(prev.height, next.height);
-                prev.depth = Math.max(prev.depth, next.depth);
+                prev.text += next.text
+                prev.height = Math.max(prev.height, next.height)
+                prev.depth = Math.max(prev.depth, next.depth)
                 // Use the last character's italic correction since we use
                 // it to add padding to the right of the span created from
                 // the combined characters.
-                prev.italic = next.italic;
-                chars.removeAt(i+1)
-                i--;
+                prev.italic = next.italic
+                chars.removeAt(i + 1)
+                i--
             }
             i++
         }
         return chars
     }
-
 
     private fun canCombine(prev: RNodeSymbol, next: RNodeSymbol): Boolean {
         if (prev.klasses != next.klasses
@@ -862,23 +822,21 @@ object RenderTreeBuilder {
             }
         }
         */
-        if(prev.style != next.style)
+        if (prev.style != next.style)
             return false
 
         return true
     }
 
-
     init {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }
         registerBuilder("textord") { node, opt -> makeOrd(node, opt, "textord") }
-        registerBuilder("supsub") {node, opt-> RenderBuilderSupsub.makeSupsub(node, opt) }
+        registerBuilder("supsub") { node, opt -> RenderBuilderSupsub.makeSupsub(node, opt) }
         registerBuilder("atom") { node, opt ->
-            if(node !is PNodeAtom) {
+            if (node !is PNodeAtom) {
                 throw IllegalArgumentException("atom but not PNodeAtom")
             }
             RenderTreeBuilder.mathsym(node.text, node.mode, opt, mutableSetOf(CssClass.mFamily(node.family)))
         }
     }
-
 }

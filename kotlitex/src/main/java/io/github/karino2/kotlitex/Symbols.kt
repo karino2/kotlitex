@@ -1,19 +1,18 @@
 package io.github.karino2.kotlitex
 
 data class CharacterMetrics(
-   val depth: Double,
-   val height: Double,
-   val italic: Double,
-   val skew: Double,
-   val width: Double
+    val depth: Double,
+    val height: Double,
+    val italic: Double,
+    val skew: Double,
+    val width: Double
 )
 
-
 object Symbols {
-    val mathMap : MutableMap<String, CharInfo> = mutableMapOf()
-    val textMap : MutableMap<String, CharInfo> = mutableMapOf()
+    val mathMap: MutableMap<String, CharInfo> = mutableMapOf()
+    val textMap: MutableMap<String, CharInfo> = mutableMapOf()
 
-    fun get(mode: Mode) = if(mode == Mode.MATH) mathMap else textMap
+    fun get(mode: Mode) = if (mode == Mode.MATH) mathMap else textMap
 
     // These are very rough approximations.  We default to Times New Roman which
     // should have Latin-1 and Cyrillic characters, but may not depending on the
@@ -101,12 +100,10 @@ object Symbols {
     )
 
     // TODO:
-    fun supportedCodepoint(ch : Int) = true
+    fun supportedCodepoint(ch: Int) = true
 
-
-    fun getCharacterMetrics(character: String, font: String, mode: Mode) : CharacterMetrics? {
-        val metmap = MetricMap.metricMap[font] ?: throw Exception("Font metrics not found for font: ${font}.")
-
+    fun getCharacterMetrics(character: String, font: String, mode: Mode): CharacterMetrics? {
+        val metmap = MetricMap.metricMap[font] ?: throw Exception("Font metrics not found for font: $font.")
 
         val chInt = (extraCharacterMap[character[0]] ?: character[0]).toInt()
         val ch = chInt.toString()
@@ -126,17 +123,16 @@ object Symbols {
             }
         }
 
-
-        if(metric == null) {
+        if (metric == null) {
             return null
         }
 
         return CharacterMetrics(metric[0], metric[1], metric[2], metric[3], metric[4])
     }
 
-    fun lookupSymbol(in_value: String, fontName:String, mode: Mode) : Pair<String, CharacterMetrics?> {
+    fun lookupSymbol(in_value: String, fontName: String, mode: Mode): Pair<String, CharacterMetrics?> {
         var value = in_value
-        if(Symbols.get(mode)[value] != null && Symbols.get(mode)[value]!!.replace != null) {
+        if (Symbols.get(mode)[value] != null && Symbols.get(mode)[value]!!.replace != null) {
             value = Symbols.get(mode)[value]!!.replace!!
         }
         return Pair(value, getCharacterMetrics(value, fontName, mode))
@@ -145,7 +141,7 @@ object Symbols {
     fun defineSymbol(mode: Mode, font: Font, group: Group, replace: String?, name: String, acceptUnicodeChar: Boolean = false) {
         Symbols.get(mode)[name] = CharInfo(font, group, replace)
 
-        if(acceptUnicodeChar && replace != null) {
+        if (acceptUnicodeChar && replace != null) {
             Symbols.get(mode)[replace] = Symbols.get(mode)[name]!!
         }
     }
@@ -157,8 +153,7 @@ object Symbols {
     // but they are not actually in the font, nor are they supported by the
     // Unicode accent mechanism, so they fall back to Times font and look ugly.
     // TODO(edemaine): Fix this.
-    val extraLatin = "ÇÐÞçþ";
-
+    val extraLatin = "ÇÐÞçþ"
 
     val unicodeAccents = mapOf(
         '\u0301' to AccentRelation("\\'", "\\acute"),

@@ -2,7 +2,6 @@ package io.github.karino2.kotlitex
 
 object Stretchy {
 
-
     /* Below comment is from katex/stretchy.js. */
 // Many of the KaTeX SVG images have been adapted from glyphs in KaTeX fonts.
 // Copyright (c) 2009-2010, Design Science, Inc. (<www.mathjax.org>)
@@ -50,7 +49,7 @@ object Stretchy {
 // That is, inside the font, that arrowhead is 522 units tall, which
 // corresponds to 0.522 em inside the document.
 
-    data class KatexImageData(val paths: List<String>, val minWidth: Double, val viewBoxHeight: Int, val align: String="")
+    data class KatexImageData(val paths: List<String>, val minWidth: Double, val viewBoxHeight: Int, val align: String = "")
 
     val katexImagesData = mapOf(
         //   path(s), minWidth, height, align
@@ -112,15 +111,14 @@ object Stretchy {
         }
     }
 
-
     /*
     group: ParseNode<"accent"> | ParseNode<"accentUnder"> | ParseNode<"xArrow">
          | ParseNode<"horizBrace">
      */
     // stretchy.buildSvgSpan_ in js. inner function of svgSpan.
-    fun _buildPathSpan(group : ParseNode, options: Options) : Triple</* span: */ RNodePathSpan, /* minWidth: */ Double, /* height: */ Double> {
+    fun _buildPathSpan(group: ParseNode, options: Options): Triple</* span: */ RNodePathSpan, /* minWidth: */ Double, /* height: */ Double> {
         var viewBoxWidth = 400000  // default
-        val label = when(group) {
+        val label = when (group) {
             is PNodeAccent -> group.label.substring(1)
             is PNodeAccentUnder -> group.label.substring(1)
             is PNodeXArrow -> group.label.substring(1)
@@ -130,7 +128,7 @@ object Stretchy {
         if (setOf("widehat", "widecheck", "widetilde", "utilde").contains(label)) {
             // Each type in the `if` statement corresponds to one of the ParseNode
             // types below. This narrowing is required to access `grp.base`.
-            val groupbase = when(group) {
+            val groupbase = when (group) {
                 is PNodeAccent -> group.base
                 is PNodeAccentUnder -> group.base
                 else -> throw IllegalArgumentException("unexpected type with labels widehat... etc.")
@@ -167,10 +165,10 @@ object Stretchy {
                         )
                     }
                 }
-            val path = RNodePath(pathName);
+            val path = RNodePath(pathName)
             val svgNode = RNodePathHolder(mutableListOf(path),
-                widthStr= "100%",
-                heightStr= "${height}em",
+                widthStr = "100%",
+                heightStr = "${height}em",
                 viewBox = ViewBox(0.0, 0.0, viewBoxWidth.toDouble(), viewBoxHeight.toDouble()),
                 preserveAspectRatio = "none"
             )
@@ -194,15 +192,15 @@ object Stretchy {
                 3 -> Pair(listOf(CssClass.brace_left, CssClass.brace_center, CssClass.brace_right),
                     listOf("xMinYMin", "xMidYMin", "xMaxYMin"))
                 else -> throw IllegalArgumentException(
-                    "Correct katexImagesData or update code here to support ${numSvgChildren} children.")
+                    "Correct katexImagesData or update code here to support $numSvgChildren children.")
             }
 
-            (0 until numSvgChildren).forEach {i->
-                val path = RNodePath(paths[i]);
+            (0 until numSvgChildren).forEach { i ->
+                val path = RNodePath(paths[i])
 
                 val svgNode = RNodePathHolder(mutableListOf(path),
-                    widthStr= "400em",
-                    heightStr=   "${height}em",
+                    widthStr = "400em",
+                    heightStr = "${height}em",
                     viewBox = ViewBox(0.0, 0.0, viewBoxWidth.toDouble(), viewBoxHeight.toDouble()),
                     preserveAspectRatio = aligns[i] + " slice")
 
@@ -213,7 +211,7 @@ object Stretchy {
                 if (numSvgChildren == 1) {
                     return Triple(span, minWidth, height.toDouble())
                 } else {
-                    span.style.height =  "${height}em";
+                    span.style.height = "${height}em"
                     spans.add(span)
                 }
             }
@@ -231,18 +229,16 @@ object Stretchy {
     }
 
     // stretchy.svgSpan in js.
-    fun pathSpan(group : ParseNode, options: Options) : RNodePathSpan {
+    fun pathSpan(group: ParseNode, options: Options): RNodePathSpan {
         val (span, minWidth, height) = _buildPathSpan(group, options)
 
         // Note that we are returning span.depth = 0.
         // Any adjustments relative to the baseline must be done in buildHTML.
-        span.height = height;
-        span.style.height =  "${height}em";
+        span.height = height
+        span.style.height = "${height}em"
         if (minWidth > 0) {
-            span.style.minWidth = "${minWidth}em";
+            span.style.minWidth = "${minWidth}em"
         }
-
         return span
     }
-
 }

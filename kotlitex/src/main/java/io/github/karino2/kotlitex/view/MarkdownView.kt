@@ -24,28 +24,28 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
     // val mathExpPat = "\\$\\$(.*)\$\$".toRegex()
 
     fun oneNormalLineWithoutEOL(line: String) {
-        if(line.isEmpty())
+        if (line.isEmpty())
             return
 
         var lastMatchPos = 0
         var res = mathExpPat.find(line)
-        if(res == null) {
+        if (res == null) {
             handler.appendNormal(line)
             return
         }
 
-        while(res != null) {
-            if(lastMatchPos != res.range.start)
+        while (res != null) {
+            if (lastMatchPos != res.range.start)
                 handler.appendNormal(line.substring(lastMatchPos, res.range.start))
             handler.appendMathExp(res.groupValues[1])
-            lastMatchPos = res.range.last+1
+            lastMatchPos = res.range.last + 1
             res = res.next()
         }
-        if(lastMatchPos != line.length)
+        if (lastMatchPos != line.length)
             handler.appendNormal(line.substring(lastMatchPos))
     }
 
-    fun oneLine(line:String) {
+    fun oneLine(line: String) {
         mathExpLinePat.matchEntire(line)?.let {
             handler.appendMathLineExp(it.groupValues[1])
             return
@@ -53,23 +53,22 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
         oneNormalLineWithoutEOL(line)
         handler.appendEndOfLine()
     }
-
 }
 
 class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Float) :
     MathSpanHandler {
     fun reset() {
         // spannable.clear() seems slow.
-        if(spannable.isNotEmpty())
+        if (spannable.isNotEmpty())
             spannable = SpannableStringBuilder()
         isMathExist = false
     }
 
     var isMathExist = false
 
-    val mathExpressionSize : Float
+    val mathExpressionSize: Float
     get() {
-        return baseSize*1.2f
+        return baseSize * 1.2f
     }
 
     override fun appendNormal(text: String) {
@@ -82,7 +81,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
 
     private fun appendMathSpan(exp: String, isMathMode: Boolean) {
         isMathExist = true
-        val size = if(isMathMode) mathExpressionSize else baseSize
+        val size = if (isMathMode) mathExpressionSize else baseSize
         val span = MathExpressionSpan(exp, size, assetManager, isMathMode)
         span.ensureDrawable()
         val begin = spannable.length
@@ -100,23 +99,20 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
     }
 
     var spannable = SpannableStringBuilder()
-
-
 }
 
-class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context, attrSet) {
+class MarkdownView(context: Context, attrSet: AttributeSet) : TextView(context, attrSet) {
     companion object {
         var CACHE_ENABLED = true
         var CACHE_SIZE = 1024
-        val cache = object: LinkedHashMap<String, Spannable>(128, 0.75f, true) {
+        val cache = object : LinkedHashMap<String, Spannable>(128, 0.75f, true) {
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Spannable>?): Boolean {
                 return this.size > CACHE_SIZE
             }
         }
-
     }
 
-    var job : Job? = null
+    var job: Job? = null
 
     val handler by lazy {
         SpannableMathSpanHandler(context.assets, textSize)
@@ -130,7 +126,7 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
         val prevJob = job
         prevJob?.let { it.cancel() }
 
-        if(CACHE_ENABLED) {
+        if (CACHE_ENABLED) {
             cache[text]?.let {
                 setText(it)
                 return
@@ -149,16 +145,14 @@ class MarkdownView(context : Context, attrSet: AttributeSet) : TextView(context,
                     builder.oneLine(line)
                 }
             }
-            if(handler.isMathExist) {
+            if (handler.isMathExist) {
                 withContext(Dispatchers.Main) {
-                    if(CACHE_ENABLED) {
+                    if (CACHE_ENABLED) {
                         cache[text] = handler.spannable
                     }
                     setText(handler.spannable)
                 }
             }
         }
-
     }
-
 }
