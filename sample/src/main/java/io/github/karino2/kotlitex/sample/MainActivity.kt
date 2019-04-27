@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             |${"$$"}\underline{p_i} ${"$$"}
             |Some text between math lines.
             |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
+            |${"$$"} x_1 \ldots x_n ${"$$"}
             |${"$$"} \sqrt{5} ${"$$"}
             |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
         """.trimMargin())
