@@ -20,9 +20,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
     val builder = SpannableStringBuilder()
 
     val mathExpLinePat = "^\\$\\$([^\$]+)\\$\\$\$".toRegex()
-    //val mathExpLinePat = "^\\$\\$(.*)\\$\\$\$".toRegex()
     val mathExpPat = "\\$\\$([^$]+)\\$\\$".toRegex()
-    // val mathExpPat = "\\$\\$(.*)\$\$".toRegex()
 
     fun oneNormalLineWithoutEOL(line: String) {
         if (line.isEmpty())
