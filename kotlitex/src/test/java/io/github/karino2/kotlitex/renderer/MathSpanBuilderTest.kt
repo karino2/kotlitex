@@ -142,4 +142,18 @@ class MathSpanBuilderTest {
 
         handler.normals[0].assert(0, "abc def")
     }
+
+    @Test
+    fun testOneNormal_mathStart_mathEnd() {
+        target.oneLine("\$\$x^2\$\$abc\$\$y_2\$\$")
+
+        assertEquals(1, handler.normals.size)
+        assertEquals(2, handler.mathExps.size)
+
+        handler.normals[0].assert(1, "abc")
+
+        handler.mathExps[0].assert(0, "x^2")
+        handler.mathExps[1].assert(2, "y_2")
+
+    }
 }

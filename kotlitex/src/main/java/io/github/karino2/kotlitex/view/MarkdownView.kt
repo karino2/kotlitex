@@ -19,7 +19,8 @@ interface MathSpanHandler {
 class MathSpanBuilder(val handler: MathSpanHandler) {
     val builder = SpannableStringBuilder()
 
-    val mathExpLinePat = "^\\$\\$(.*)\\$\\$\$".toRegex()
+    val mathExpLinePat = "^\\$\\$([^\$]+)\\$\\$\$".toRegex()
+    //val mathExpLinePat = "^\\$\\$(.*)\\$\\$\$".toRegex()
     val mathExpPat = "\\$\\$([^$]+)\\$\\$".toRegex()
     // val mathExpPat = "\\$\\$(.*)\$\$".toRegex()
 
