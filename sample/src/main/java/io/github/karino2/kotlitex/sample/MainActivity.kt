@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             |${"$$"} x_1 \ldots x_n ${"$$"}
             |${"$$"} \sqrt{5} ${"$$"}
             |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
+            |${"$$"} \sqrt{5} ${"$$"} text ${"$$"} \sum^N_{k=1} k${"$$"}
         """.trimMargin())
     }
 
