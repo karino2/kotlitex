@@ -67,6 +67,12 @@ class MathSpanBuilderTest {
         assertNotNull(actual)
     }
 
+    @Test
+    fun testMathExpPat_MathBegEnd_ButNotMathLine() {
+        val actual = target.mathExpLinePat.matches("\$\$x^2\$\$abc\$\$y_2\$\$")
+        assertFalse(actual)
+    }
+
     @Before
     fun setupHandler() {
         handler.reset()
