@@ -156,4 +156,16 @@ class MathSpanBuilderTest {
         handler.mathExps[1].assert(2, "y_2")
 
     }
+
+    @Test
+    fun testOneNormal_MathExpButNotMathLineEnd() {
+        target.oneLine("\$\$x^2\$\$abc")
+
+        assertEquals(1, handler.normals.size)
+        assertEquals(1, handler.mathExps.size)
+
+        handler.normals[0].assert(1, "abc")
+
+        handler.mathExps[0].assert(0, "x^2")
+    }
 }
