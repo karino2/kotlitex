@@ -4,11 +4,11 @@ import android.graphics.Path
 import io.github.karino2.kotlitex.functions.SvgGeometry
 
 enum class CssClass {
-    accent, accent_body, accent_full, amsrm, base, boldsymbol, brace_left, brace_center, brace_right,
+    accent, accent_body, accent_full, allowbreak, amsrm, base , boldsymbol, brace_left, brace_center, brace_right,
     delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
     enclosing, frac_line, hide_tail, halfarrow_left, halfarrow_right, large_op,
     mathbb, mathbf, mathcal, mathdefault, mathit, mathscr, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
-    msupsub, mspace, mult, nulldelimiter, overlay,
+    msupsub, mspace, mult, nobreak, nulldelimiter, overlay,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstrut, op_symbol, op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,

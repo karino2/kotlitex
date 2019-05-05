@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val textView = findViewById<TextView>(R.id.textView)
-        // Log.d("kotlitex", "textSize = ${textView.textSize}")
         val spannable = SpannableStringBuilder("01234 This is direct math span test.")
         spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
@@ -28,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, MarkdownView. Math ${"$$"}x^2${"$$"} inlined.
             |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
             |${"$$"} \sum^N_{k=1} k${"$$"}
+            |${"$$"} x\ y${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
             |${"$$"}\underline{p_i} ${"$$"}

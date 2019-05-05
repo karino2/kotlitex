@@ -31,6 +31,10 @@ class PNodeMathOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mo
     override val type = "mathord"
 }
 
+class PNodeSpacingOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mode, loc, text) {
+    override val type = "spacing"
+}
+
 class PNodeTextOrd(mode: Mode, loc: SourceLocation?, text: String) : PNodeOrd(mode, loc, text) {
     override val type = "textord"
 }

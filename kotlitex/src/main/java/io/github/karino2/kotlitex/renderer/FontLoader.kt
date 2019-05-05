@@ -16,12 +16,23 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
     FontLoader {
     private val paint = Paint()
 
-    override fun measureSize(font: CssFont, text: String): Bounds {
+    fun measureSizeWithoutSpace(font: CssFont, text: String): Bounds {
         val rect = Rect()
+
         paint.typeface = toTypeface(font)
         paint.textSize = font.size.toFloat()
         paint.getTextBounds(text, 0, text.length, rect)
         return Bounds(0.0, 0.0, rect.width().toDouble(), rect.height().toDouble())
+    }
+
+    override fun measureSize(font: CssFont, text: String): Bounds {
+        // When measure bound of "\u00a0", android return 0 width.
+        // But we sometime use "\u00a0" for spacing, so I use half of "a" instead for white space measure.
+        if (text == "\u00a0") {
+            val b = measureSizeWithoutSpace(font, "a")
+            return Bounds(0.0, 0.0, b.width / 2, b.height)
+        }
+        return measureSizeWithoutSpace(font, text)
     }
 
     private val typefaceMap =
