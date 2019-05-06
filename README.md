@@ -32,16 +32,9 @@ Use [ktlint](https://ktlint.github.io). `./gradlew format` format all .kt files 
 
 MathExpression Span now render inside TextView.
 
-We provide MarkdownView class, which parse math expression of jekyll style asynchronously. (Though other markup is not yet supported).
+We provide MarkdownView class, which parse math expression of jekyll style asynchronously. (Though supported markup is only math expression and very limited).
 
 ![Sccreen Shot](https://raw.githubusercontent.com/karino2/kotlitex/master/screen_shot.jpg)
-
-(Partially) supported
-
-- frac
-- sqrt
-- Sum, Prod
-- mathcal
 
 # Include kotlitex to other project
 
