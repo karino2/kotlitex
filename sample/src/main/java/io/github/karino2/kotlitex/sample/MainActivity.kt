@@ -24,9 +24,9 @@ class MainActivity : AppCompatActivity() {
         textView.text = spannable
 
         MarkdownView.CACHE_ENABLED = false
-        findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""Hello, MarkdownView. Math ${"$$"}x^2${"$$"} inlined.
-            |No math line.
+        findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""yyyy gg. No math line with large descent(y).
             |${"$$"} \sum^N_{k=1} k${"$$"}
+            |Inline math ${"$$"}x^2${"$$"} support.
             |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
             |${"$$"} x\ y${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
