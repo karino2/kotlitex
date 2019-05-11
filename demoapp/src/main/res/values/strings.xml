@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">demoapp</string>
+    <string name="addButton">追加</string>
+</resources>
