@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">demoapp</string>
-    <string name="addButton">追加</string>
+    <string name="addButton">ADD</string>
 </resources>
