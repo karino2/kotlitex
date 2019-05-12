@@ -30,8 +30,7 @@ class DemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo)
 
         var data: MutableList<String> = mutableListOf()
-        data.add("${"$$"} \\sum^N_{k=1} k${"$$"}")
-        data.add("${"$$"} \\mathcal{X} = \\{1, 2, 3\\} ${"$$"}")
+        data.add("${"$$"} x^2 ${"$$"}")
 
         var adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
@@ -39,11 +38,7 @@ class DemoActivity : AppCompatActivity() {
         listView.setAdapter(adapter)
 
         listView.setOnItemClickListener() { _, view, position, id ->
-            var itemTextView: TextView = view.findViewById(android.R.id.text1)
-            val spannable = SpannableStringBuilder("")
-            spannable.setSpan(createMathSpan(data[position], PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-            //findViewById<TextView>(R.id.editText).text = data[position].toString()
-            findViewById<TextView>(R.id.editText).text = spannable
+            findViewById<TextView>(R.id.editText).text = data[position].toString()
         }
 
         val button: Button = findViewById(R.id.button)
