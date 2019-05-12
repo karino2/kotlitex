@@ -31,6 +31,9 @@ class DemoActivity : AppCompatActivity() {
 
         var data: MutableList<String> = mutableListOf()
         data.add("${"$$"} x^2 ${"$$"}")
+        data.add("${"$$"} \\frac{1}{1+\\frac{1}{x^2}} ${"$$"}")
+        data.add("${"$$"} \\frac{1}{1+\\frac{1}{x^2}} ${"$$"}")
+        data.add("${"$$"} x_1 \\ldots x_n ${"$$"}")
 
         var adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
