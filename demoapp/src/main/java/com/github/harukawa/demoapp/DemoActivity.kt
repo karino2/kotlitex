@@ -1,11 +1,8 @@
 package com.github.harukawa.demoapp
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +10,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import io.github.karino2.kotlitex.view.MarkdownView
@@ -32,8 +28,15 @@ class DemoActivity : AppCompatActivity() {
         var data: MutableList<String> = mutableListOf()
         data.add("${"$$"} x^2 ${"$$"}")
         data.add("${"$$"} \\frac{1}{1+\\frac{1}{x^2}} ${"$$"}")
-        data.add("${"$$"} \\frac{1}{1+\\frac{1}{x^2}} ${"$$"}")
         data.add("${"$$"} x_1 \\ldots x_n ${"$$"}")
+        data.add("""${"$$"}\underline{p_i} ${"$$"}
+            |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
+            |${"$$"} x_1 \ldots x_n ${"$$"}
+        """.trimMargin())
+        data.add("""Hello
+            |${"$$"} \sqrt{5} ${"$$"}
+            |End
+        """.trimMargin())
 
         var adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
@@ -61,7 +64,6 @@ class DemoActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
     }
     fun createMathSpan(expr: String, baseSize: Float) =
         MathExpressionSpan(expr, baseSize, assets, true)
@@ -69,7 +71,7 @@ class DemoActivity : AppCompatActivity() {
 
 class MarkListAdapter(context: Context, marks: List<String>) : ArrayAdapter<String>(context, 0, marks) {
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val inflater : LayoutInflater = LayoutInflater.from(context)
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = inflater.inflate(R.layout.list_markdown, parent, false)
