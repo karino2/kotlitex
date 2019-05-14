@@ -279,6 +279,12 @@ class RenderTreeBuilderTest {
         assertTrue(actual[1]!!.klasses.contains(CssClass.mspace))
     }
 
+    @Test
+    fun buildExpression_semicolon() {
+        val actual = buildExpression("[h; c]")
+        assertEquals(6, actual.size)
+    }
+
     private fun buildExpression(expression: String): List<RenderNode> {
         val input = parse(expression)
         val actual = RenderTreeBuilder.buildExpression(input, options, true)
