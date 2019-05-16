@@ -1,1 +1,1 @@
-include ':kotlitex', ':sample'
+include ':kotlitex', ':sample', ':demoapp'
