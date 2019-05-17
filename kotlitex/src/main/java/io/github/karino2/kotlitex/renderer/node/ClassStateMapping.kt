@@ -46,6 +46,12 @@ object ClassStateMapping {
             CssClass.frac_line -> {
                 withHorizLine(state, node)
             }
+            CssClass.accent -> {
+                state.copy(textAlign = Alignment.CENTER)
+            }
+            CssClass.op_limits -> {
+                state.copy(textAlign = Alignment.CENTER)
+            }
             CssClass.mfrac -> {
                 state.copy(textAlign = Alignment.CENTER)
             }

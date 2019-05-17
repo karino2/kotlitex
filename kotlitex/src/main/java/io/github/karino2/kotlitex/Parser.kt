@@ -109,6 +109,7 @@ class Parser(val input: String, val settings: Settings = Settings()) {
             FunctionFont.defineAll()
             FunctionAccent.defineAll()
             FunctionUnderline.defineAll()
+            FunctionSymbolsSpacing.defineAll()
         }
     }
 
@@ -624,6 +625,7 @@ class Parser(val input: String, val settings: Settings = Settings()) {
             }
             val group: Group = Symbols.get(mode).get(text)?.group ?: throw Exception("Never happens")
             val loc = SourceLocation.range(nucleus)
+
             var s /* TODO: SymbolParseNode */ = if (group is Atoms) {
                 PNodeAtom(group, mode, loc, text)
             } else {
@@ -631,6 +633,7 @@ class Parser(val input: String, val settings: Settings = Settings()) {
                 when (group) {
                     NonAtoms.textord -> PNodeTextOrd(mode, loc, text)
                     NonAtoms.mathord -> PNodeMathOrd(mode, loc, text)
+                    NonAtoms.spacing -> PNodeSpacingOrd(mode, loc, text)
                     else -> throw NotImplementedError("NYI for non ATOM symbols.")
                 }
                 /*

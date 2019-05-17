@@ -67,6 +67,12 @@ class MathSpanBuilderTest {
         assertNotNull(actual)
     }
 
+    @Test
+    fun testMathExpPat_MathBegEnd_ButNotMathLine() {
+        val actual = target.mathExpLinePat.matches("\$\$x^2\$\$abc\$\$y_2\$\$")
+        assertFalse(actual)
+    }
+
     @Before
     fun setupHandler() {
         handler.reset()
@@ -141,5 +147,31 @@ class MathSpanBuilderTest {
         assertTrue(handler.mathExps.isEmpty())
 
         handler.normals[0].assert(0, "abc def")
+    }
+
+    @Test
+    fun testOneNormal_mathStart_mathEnd() {
+        target.oneLine("\$\$x^2\$\$abc\$\$y_2\$\$")
+
+        assertEquals(1, handler.normals.size)
+        assertEquals(2, handler.mathExps.size)
+
+        handler.normals[0].assert(1, "abc")
+
+        handler.mathExps[0].assert(0, "x^2")
+        handler.mathExps[1].assert(2, "y_2")
+
+    }
+
+    @Test
+    fun testOneNormal_MathExpButNotMathLineEnd() {
+        target.oneLine("\$\$x^2\$\$abc")
+
+        assertEquals(1, handler.normals.size)
+        assertEquals(1, handler.mathExps.size)
+
+        handler.normals[0].assert(1, "abc")
+
+        handler.mathExps[0].assert(0, "x^2")
     }
 }

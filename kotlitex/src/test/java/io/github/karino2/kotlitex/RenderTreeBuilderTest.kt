@@ -271,6 +271,20 @@ class RenderTreeBuilderTest {
         assertEquals(1, actual.size)
     }
 
+    @Test
+    fun buildExpression_space() {
+        val actual = buildExpression("x\\ b")
+        assertEquals(3, actual.size)
+        // RNodeSpan { klasses = [mspace], children = [RNodeSymbol { text=' '}] }
+        assertTrue(actual[1]!!.klasses.contains(CssClass.mspace))
+    }
+
+    @Test
+    fun buildExpression_semicolon() {
+        val actual = buildExpression("[h; c]")
+        assertEquals(6, actual.size)
+    }
+
     private fun buildExpression(expression: String): List<RenderNode> {
         val input = parse(expression)
         val actual = RenderTreeBuilder.buildExpression(input, options, true)
