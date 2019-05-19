@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
             |${"$$"} x_1 \ldots x_n ${"$$"}
             |${"$$"} \sqrt{5} ${"$$"}
+            |${"$$"} \lim_{t \to 0} (1+t)^{\frac{1}{t}} ${"$$"}
             |${"$$"} o_t = tanh(W_c[h_t; c_t]) ${"$$"}
             |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"} text ${"$$"} \sum^N_{k=1} k${"$$"}
