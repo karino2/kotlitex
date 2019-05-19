@@ -3,10 +3,11 @@ package com.github.harukawa.demoapp
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -14,6 +15,7 @@ import android.widget.ListView
 import android.widget.TextView
 import io.github.karino2.kotlitex.view.MarkdownView
 import io.github.karino2.kotlitex.view.MathExpressionSpan
+import kotlinx.android.synthetic.main.activity_demo.*
 
 data class ViewHolder(val markdownView: MarkdownView)
 
@@ -38,13 +40,18 @@ class DemoActivity : AppCompatActivity() {
             |End
         """.trimMargin())
 
-        var adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
+        val adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
         val listView: ListView = findViewById<ListView>(R.id.list)
         listView.setAdapter(adapter)
 
+        var listPosition: Int = 0
+        var isListClickFlag: Boolean = false
+
         listView.setOnItemClickListener() { _, view, position, id ->
+            isListClickFlag = true
             findViewById<TextView>(R.id.editText).text = data[position].toString()
+            listPosition = position
         }
 
         val button: Button = findViewById(R.id.button)
@@ -52,18 +59,22 @@ class DemoActivity : AppCompatActivity() {
             adapter.add("empty")
         }
 
-        var editText: EditText = findViewById<EditText>(R.id.editText)
-
-        editText.setOnEditorActionListener { v, actionId, event ->
-            when (actionId) {
-                EditorInfo.IME_ACTION_DONE -> {
-
-                    finish()
-                    true
+        val editText: EditText = findViewById<EditText>(R.id.editText)
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (isListClickFlag == false) {
+                    data[listPosition] = s.toString()
+                    adapter.notifyDataSetChanged()
                 }
-                else -> false
+                isListClickFlag = false
             }
-        }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
     }
     fun createMathSpan(expr: String, baseSize: Float) =
         MathExpressionSpan(expr, baseSize, assets, true)
