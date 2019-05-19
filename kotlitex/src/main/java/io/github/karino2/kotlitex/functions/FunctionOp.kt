@@ -100,7 +100,7 @@ object FunctionOp {
             // operator's name.
             // TODO(emily): Add a space in the middle of some of these
             // operators, like \limsup
-            val output: MutableList<RenderNode> = group.name.map {
+            val output: MutableList<RenderNode> = group.name.drop(1).map {
                 RenderTreeBuilder.mathsym(it.toString(), group.mode, null, mutableSetOf())
             }.toMutableList()
 
@@ -279,6 +279,130 @@ object FunctionOp {
             },
             FunctionOp::renderNodeBuilder
         )
+        /*
+        // Note: calling defineFunction with a type that's already been defined only
+        // works because the same htmlBuilder and mathmlBuilder are being used.
+        defineFunction({
+            type: "op",
+            names: ["\\mathop"],
+            props: {
+                numArgs: 1,
+            },
+            handler: ({parser}, args) => {
+                const body = args[0];
+                return {
+                    type: "op",
+                    mode: parser.mode,
+                    limits: false,
+                    symbol: false,
+                    body: ordargument(body),
+                };
+            },
+            htmlBuilder,
+            mathmlBuilder,
+        });
+
+        // There are 2 flags for operators; whether they produce limits in
+        // displaystyle, and whether they are symbols and should grow in
+        // displaystyle. These four groups cover the four possible choices.
+
+        const singleCharIntegrals: {[string]: string} = {
+            "\u222b": "\\int",
+            "\u222c": "\\iint",
+            "\u222d": "\\iiint",
+            "\u222e": "\\oint",
+            "\u222f": "\\oiint",
+            "\u2230": "\\oiiint",
+        };
+
+        // No limits, not symbols
+        defineFunction({
+            type: "op",
+            names: [
+                "\\arcsin", "\\arccos", "\\arctan", "\\arctg", "\\arcctg",
+                "\\arg", "\\ch", "\\cos", "\\cosec", "\\cosh", "\\cot", "\\cotg",
+                "\\coth", "\\csc", "\\ctg", "\\cth", "\\deg", "\\dim", "\\exp",
+                "\\hom", "\\ker", "\\lg", "\\ln", "\\log", "\\sec", "\\sin",
+                "\\sinh", "\\sh", "\\tan", "\\tanh", "\\tg", "\\th",
+            ],
+            props: {
+                numArgs: 0,
+            },
+            handler({parser, funcName}) {
+                return {
+                    type: "op",
+                    mode: parser.mode,
+                    limits: false,
+                    symbol: false,
+                    name: funcName,
+                };
+            },
+            htmlBuilder,
+            mathmlBuilder,
+        });
+        */
+
+        /*
+                    FunctionSpec("op", 0),
+            listOf(
+                "\\coprod", "\\bigvee", "\\bigwedge", "\\biguplus", "\\bigcap",
+                "\\bigcup", "\\intop", "\\prod", "\\sum", "\\bigotimes",
+                "\\bigoplus", "\\bigodot", "\\bigsqcup", "\\smallint", "\u220F",
+                "\u2210", "\u2211", "\u22c0", "\u22c1", "\u22c2", "\u22c3", "\u2a00",
+                "\u2a01", "\u2a02", "\u2a04", "\u2a06"
+            ),
+            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
+
+         */
+        // Limits, not symbols
+        LatexFunctions.defineFunction(
+            FunctionSpec("op", 0),
+            listOf("\\det", "\\gcd", "\\inf", "\\lim", "\\max", "\\min", "\\Pr", "\\sup"),
+            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */: List<ParseNode?> ->
+                val parser = context.parser
+                val fName = context.funcName
+                PNodeOp(
+                    parser.mode,
+                    null,
+                    true,
+                    null,
+                    null,
+                    false,
+                    fName,
+                    null
+                )
+            },
+           FunctionOp::renderNodeBuilder)
+
+        /*
+        // No limits, symbols
+        defineFunction({
+            type: "op",
+            names: [
+                "\\int", "\\iint", "\\iiint", "\\oint", "\\oiint", "\\oiiint",
+                "\u222b", "\u222c", "\u222d", "\u222e", "\u222f", "\u2230",
+            ],
+            props: {
+                numArgs: 0,
+            },
+            handler({parser, funcName}) {
+                let fName = funcName;
+                if (fName.length === 1) {
+                    fName = singleCharIntegrals[fName];
+                }
+                return {
+                    type: "op",
+                    mode: parser.mode,
+                    limits: false,
+                    symbol: true,
+                    name: fName,
+                };
+            },
+            htmlBuilder,
+            mathmlBuilder,
+        });
+
+         */
     }
 
 }
