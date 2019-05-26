@@ -1,4 +1,4 @@
-package com.github.harukawa.demoapp
+package io.github.karino2.kotlitex.demoapp
 
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
