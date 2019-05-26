@@ -21,7 +21,6 @@ data class ViewHolder(val markdownView: MarkdownView)
 
 class DemoActivity : AppCompatActivity() {
 
-    private val PHYSICAL_BASE_SIZE = 72f // 24sp
     val initialContents = arrayOf(
         """Here is kotlitex demo.
             |You can change the cell by select and edit.
@@ -63,26 +62,26 @@ class DemoActivity : AppCompatActivity() {
         val adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
         val listView: ListView = findViewById<ListView>(R.id.list)
-        listView.setAdapter(adapter)
+        listView.adapter = adapter
 
         var listPosition: Int = 0
         var isListClickFlag: Boolean = false
 
-        listView.setOnItemClickListener() { _, view, position, id ->
+        listView.setOnItemClickListener() { _, _ /* view */, position, _ /* id */ ->
             isListClickFlag = true
             findViewById<TextView>(R.id.editText).text = data[position].toString()
             listPosition = position
         }
 
         val button: Button = findViewById(R.id.button)
-        button.setOnClickListener { view ->
+        button.setOnClickListener { _ /* view */ ->
             adapter.add("empty")
         }
 
         val editText: EditText = findViewById<EditText>(R.id.editText)
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (isListClickFlag == false) {
+                if (!isListClickFlag) {
                     data[listPosition] = s.toString()
                     adapter.notifyDataSetChanged()
                 }
@@ -96,8 +95,6 @@ class DemoActivity : AppCompatActivity() {
             }
         })
     }
-    fun createMathSpan(expr: String, baseSize: Float) =
-        MathExpressionSpan(expr, baseSize, assets, true)
 }
 
 class MarkListAdapter(context: Context, marks: List<String>) : ArrayAdapter<String>(context, 0, marks) {
@@ -108,7 +105,7 @@ class MarkListAdapter(context: Context, marks: List<String>) : ArrayAdapter<Stri
 
         val markDown = view.findViewById<MarkdownView>(R.id.markdownView)
 
-        markDown.setMarkdown(super.getItem(position).toString())
+        markDown.setMarkdown(super.getItem(position)?.toString() ?: "")
 
         return view
     }
