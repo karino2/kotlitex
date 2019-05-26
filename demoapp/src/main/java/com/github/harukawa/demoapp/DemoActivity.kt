@@ -22,23 +22,43 @@ data class ViewHolder(val markdownView: MarkdownView)
 class DemoActivity : AppCompatActivity() {
 
     private val PHYSICAL_BASE_SIZE = 72f // 24sp
+    val initialContents = arrayOf(
+        """Here is kotlitex demo.
+            |You can change the cell by select and edit.
+            |Math expression should be enclosed with $$.
+            |Like this. ${"$$"}x^2${"$$"}.
+       """.trimMargin(),
+        """If the line is solely math expression, this app handle that line as math mode. If the math expression is inside some other text, we treat it as inline mode.
+            |Below here is math mode examples.
+            |
+            |${"$$"} \sum^N_{k=1} k${"$$"}
+            |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
+            |${"$$"} x_1 \ldots x_n ${"$$"}
+            |${"$$"} \sqrt{5} ${"$$"}
+       """.trimMargin(),
+        """  Here is inline mode example. Note that the same expression rendered a little differently.
+            ${"$$"} \sum^N_{k=1} k${"$$"} inline.
+            ${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"} inline.
+            ${"$$"} x_1 \ldots x_n ${"$$"} inline.
+            ${"$$"} \sqrt{5} ${"$$"} inline.
+       """.trimIndent(),
+        """Other examples.
+            |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
+            |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
+            |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
+            |${"$$"}\underline{p_i} ${"$$"}
+       """.trimMargin(),
+        """${"$$"} \lim_{t \to 0} (1+t)^{\frac{1}{t}} ${"$$"}
+            |${"$$"} o_t = tanh(W_c[h_t; c_t]) ${"$$"}
+       """.trimMargin()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_demo)
 
         var data: MutableList<String> = mutableListOf()
-        data.add("${"$$"} x^2 ${"$$"}")
-        data.add("${"$$"} \\frac{1}{1+\\frac{1}{x^2}} ${"$$"}")
-        data.add("${"$$"} x_1 \\ldots x_n ${"$$"}")
-        data.add("""${"$$"}\underline{p_i} ${"$$"}
-            |${"$$"} \frac{1}{1+\frac{1}{x^2}} ${"$$"}
-            |${"$$"} x_1 \ldots x_n ${"$$"}
-        """.trimMargin())
-        data.add("""Hello
-            |${"$$"} \sqrt{5} ${"$$"}
-            |End
-        """.trimMargin())
+        initialContents.forEach { data.add(it) }
 
         val adapter: ArrayAdapter<String> = MarkListAdapter(this, data)
 
