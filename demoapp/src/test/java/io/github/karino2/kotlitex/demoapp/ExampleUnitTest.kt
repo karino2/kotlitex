@@ -1,4 +1,4 @@
-package com.github.harukawa.demoapp
+package io.github.karino2.kotlitex.demoapp
 
 import junit.framework.Assert.assertEquals
 import org.junit.Test

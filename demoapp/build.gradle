@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.github.harukawa.demoapp"
+        applicationId "io.github.karino2.kotlitex.demoapp"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1

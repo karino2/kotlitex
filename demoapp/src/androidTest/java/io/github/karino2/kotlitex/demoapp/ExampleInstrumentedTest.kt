@@ -1,4 +1,4 @@
-package com.github.harukawa.demoapp
+package io.github.karino2.kotlitex.demoapp
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
