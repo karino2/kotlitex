@@ -14,9 +14,6 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import io.github.karino2.kotlitex.view.MarkdownView
-import io.github.karino2.kotlitex.view.MathExpressionSpan
-import kotlinx.android.synthetic.main.activity_demo.*
-
 data class ViewHolder(val markdownView: MarkdownView)
 
 class DemoActivity : AppCompatActivity() {
