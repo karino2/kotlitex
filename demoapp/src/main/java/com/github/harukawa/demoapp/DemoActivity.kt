@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import io.github.karino2.kotlitex.view.MarkdownView
-data class ViewHolder(val markdownView: MarkdownView)
 
 class DemoActivity : AppCompatActivity() {
 
