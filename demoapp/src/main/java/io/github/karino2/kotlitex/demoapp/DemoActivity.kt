@@ -100,7 +100,12 @@ class MarkListAdapter(context: Context, marks: List<String>) : ArrayAdapter<Stri
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view = inflater.inflate(R.layout.list_markdown, parent, false)
+        val view: View
+        if (convertView == null) {
+            view = inflater.inflate(R.layout.list_markdown, parent, false)
+        } else {
+            view = convertView
+        }
 
         val markDown = view.findViewById<MarkdownView>(R.id.markdownView)
 
