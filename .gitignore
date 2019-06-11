@@ -12,3 +12,4 @@
 app/build/
 projectFilesBackup/
 .idea/misc.xml
+.idea/vcs.xml
