@@ -314,33 +314,31 @@ object FunctionOp {
             "\u222f": "\\oiint",
             "\u2230": "\\oiiint",
         };
+        */
 
         // No limits, not symbols
-        defineFunction({
-            type: "op",
-            names: [
-                "\\arcsin", "\\arccos", "\\arctan", "\\arctg", "\\arcctg",
+        LatexFunctions.defineFunction(
+            FunctionSpec("op", 0),
+            listOf("\\arcsin", "\\arccos", "\\arctan", "\\arctg", "\\arcctg",
                 "\\arg", "\\ch", "\\cos", "\\cosec", "\\cosh", "\\cot", "\\cotg",
                 "\\coth", "\\csc", "\\ctg", "\\cth", "\\deg", "\\dim", "\\exp",
                 "\\hom", "\\ker", "\\lg", "\\ln", "\\log", "\\sec", "\\sin",
-                "\\sinh", "\\sh", "\\tan", "\\tanh", "\\tg", "\\th",
-            ],
-            props: {
-                numArgs: 0,
+                "\\sinh", "\\sh", "\\tan", "\\tanh", "\\tg", "\\th"),
+            { context: FunctionContext, _ /* args */: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
+                val parser = context.parser
+                val fName = context.funcName
+                PNodeOp(
+                    parser.mode,
+                    null,
+                    false,
+                    null,
+                    null,
+                    false,
+                    fName,
+                    null
+                )
             },
-            handler({parser, funcName}) {
-                return {
-                    type: "op",
-                    mode: parser.mode,
-                    limits: false,
-                    symbol: false,
-                    name: funcName,
-                };
-            },
-            htmlBuilder,
-            mathmlBuilder,
-        });
-        */
+            FunctionOp::renderNodeBuilder)
 
         /*
                     FunctionSpec("op", 0),
