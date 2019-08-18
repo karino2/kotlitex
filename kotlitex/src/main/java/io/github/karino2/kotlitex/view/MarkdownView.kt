@@ -17,8 +17,6 @@ interface MathSpanHandler {
 
 // to make this class unit testable.
 class MathSpanBuilder(val handler: MathSpanHandler) {
-    val builder = SpannableStringBuilder()
-
     val mathExpLinePat = "^\\$\\$([^\$]+)\\$\\$\$".toRegex()
     val mathExpPat = "\\$\\$([^$]+)\\$\\$".toRegex()
 
