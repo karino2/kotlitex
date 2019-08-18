@@ -84,9 +84,10 @@ data class PNodeMClass(override val mode: Mode, override val loc: SourceLocation
             if(arg is PNodeOrdGroup) {
                 val atom = arg.body.firstOrNull() ?: arg
                 if(atom is PNodeAtom) {
-                    when(atom.family) {
-                        Atoms.bin -> return CssClass.mbin
-                        Atoms.rel -> return CssClass.mrel
+                    return when(atom.family) {
+                        Atoms.bin -> CssClass.mbin
+                        Atoms.rel -> CssClass.mrel
+                        else -> CssClass.mord
                     }
                 }
             }
