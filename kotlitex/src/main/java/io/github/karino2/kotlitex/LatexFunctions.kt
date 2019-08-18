@@ -108,7 +108,23 @@ object LatexFunctions {
         renderGroupBuilders[spec.type] = groupHandler
     }
 
+    fun defineFunctionHandlerOnly(spec: FunctionSpec, names: List<String>, handler: HandlerType) {
+        val fundef = FunctionDef(spec, handler)
+        for(name in names) {
+            functions[name] = fundef
+        }
+    }
+
     fun defineFunctionBuilder(type: String, groupHandler: RenderNodeHandlerType) {
         defineFunction(FunctionSpec(type, numArgs=0), listOf(), {_,_,_->throw Error("Should never be called.")}, groupHandler)
+    }
+
+    // Since the corresponding buildHTML/buildMathML function expects a
+    // list of elements, we normalize for different kinds of arguments
+    fun ordargument(arg: ParseNode): List<ParseNode> {
+        if(arg is PNodeOrdGroup) {
+            return arg.body
+        }
+        return listOf(arg)
     }
 }

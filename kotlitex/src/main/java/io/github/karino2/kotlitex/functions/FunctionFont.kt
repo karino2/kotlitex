@@ -47,24 +47,28 @@ object FunctionFont {
             FunctionFont::renderNodeBuilder
         )
 
-        /* TODO: need binrelClass in mclass. implement after mclass
-        LatexFunctions.defineFunction(
+        LatexFunctions.defineFunctionHandlerOnly(
             FunctionSpec("mclass", 1, greediness = 2),
-            listOf("\\boldsymbol", "\\bm"),
-            { context: FunctionContext, args: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
-                val parser = context.parser
-                val fName = context.funcName
+            listOf("\\boldsymbol", "\\bm")
+        ) { context: FunctionContext, args: List<ParseNode>, _ /* optArgs */ : List<ParseNode?> ->
+            val parser = context.parser
+            val body = args[0]
 
-                val func = if(fontAliases.containsKey(fName)) {
-                    fontAliases.getValue(fName)
-                } else fName
+            PNodeMClass(
+                parser.mode,
+                null,
+                PNodeMClass.binrelClass(body),
+                listOf(
+                    PNodeFont(
+                        parser.mode,
+                        null,
+                        "boldsymbol",
+                        body
+                    )
+                )
 
-                PNodeFont(parser.mode,
-                    null, func.substring(1), args[0])
-            },
-            FunctionFont::renderNodeBuilder
-        )
-        */
+            )
+        }
 
         // Old font changing functions
         LatexFunctions.defineFunction(
@@ -85,4 +89,5 @@ object FunctionFont {
             FunctionFont::renderNodeBuilder
         )
     }
+
 }

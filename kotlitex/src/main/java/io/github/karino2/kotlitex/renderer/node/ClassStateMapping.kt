@@ -75,6 +75,9 @@ object ClassStateMapping {
             CssClass.mathscr -> {
                 state.copy(weight = "normal", variant = "normal", family = "KaTeX_Script")
             }
+            CssClass.boldsymbol -> {
+                state.copy(weight = "bold", variant = "italic", family = "KaTeX_Math")
+            }
             CssClass.large_op -> {
                 state.copy(weight = "normal", variant = "normal", family = "KaTeX_Size2")
             }

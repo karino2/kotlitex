@@ -73,8 +73,27 @@ data class PNodeFont(override val mode: Mode, override val loc: SourceLocation?,
     override val type = "font"
 }
 
-data class PNodeMClass(override val mode: Mode, override val loc: SourceLocation?, val mclass: String, val body: List<ParseNode>) : ParseNode() {
+data class PNodeMClass(override val mode: Mode, override val loc: SourceLocation?, val mclass: CssClass, val body: List<ParseNode>) : ParseNode() {
     override val type = "mclass"
+    companion object {
+        fun binrelClass(arg: ParseNode): CssClass {
+            // \binrel@ spacing varies with (bin|rel|ord) of the atom in the argument.
+            // (by rendering separately and with {}s before and after, and measuring
+            // the change in spacing).  We'll do roughly the same by detecting the
+            // atom type directly.
+            if(arg is PNodeOrdGroup) {
+                val atom = arg.body.firstOrNull() ?: arg
+                if(atom is PNodeAtom) {
+                    when(atom.family) {
+                        Atoms.bin -> return CssClass.mbin
+                        Atoms.rel -> return CssClass.mrel
+                    }
+                }
+            }
+            return CssClass.mord
+        }
+
+    }
 }
 
 // LaTeX display style.

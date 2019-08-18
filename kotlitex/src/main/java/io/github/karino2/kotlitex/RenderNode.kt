@@ -53,6 +53,19 @@ enum class CssClass {
             }
         }
 
+        fun mclass(mclass: String): CssClass {
+            return when(mclass) {
+                "mord" -> CssClass.mord
+                "mbin" -> CssClass.mbin
+                "mrel"-> CssClass.mrel
+                "mopen"->CssClass.mopen
+                "mclose"->CssClass.mclose
+                "mpunct"->CssClass.mpunct
+                "minner"->CssClass.minner
+                else-> throw Error("No mclass $(mclass) in CssClass::mclass")
+            }
+        }
+
         fun mFamily(family: Atoms): CssClass {
             return when (family) {
                 Atoms.punct -> CssClass.mpunct

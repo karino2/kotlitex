@@ -65,10 +65,20 @@ class AndroidFontLoader(private val assetManager: AssetManager) :
     companion object {
         fun fontToTypefaceMapKey(font: CssFont): String {
             var variant = font.variant.capitalize()
-            if (variant.isEmpty() || variant == "Normal") {
-                variant = "Regular"
+            if (variant == "Normal") {
+                variant = ""
             }
-            return "${font.family}-$variant"
+            var weight = font.weight.capitalize()
+            if (weight == "Normal") {
+                weight = ""
+            }
+
+            var wv = "$weight$variant"
+            if (wv.isEmpty()) {
+                wv = "Regular"
+            }
+
+            return "${font.family}-$wv"
         }
     }
 

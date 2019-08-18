@@ -110,6 +110,7 @@ class Parser(val input: String, val settings: Settings = Settings()) {
             FunctionAccent.defineAll()
             FunctionUnderline.defineAll()
             FunctionSymbolsSpacing.defineAll()
+            FunctionMClass.defineAll()
         }
     }
 
