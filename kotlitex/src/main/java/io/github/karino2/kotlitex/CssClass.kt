@@ -6,7 +6,7 @@ enum class CssClass {
     delimcenter, delimsizing, delimsizinginner, delim_size1, delim_size4,
     enclosing, frac_line, hide_tail, halfarrow_left, halfarrow_right, large_op,
     mathbb, mathbf, mathcal, mathdefault, mathit, mathscr, mbin, mclose, mfrac, minner, mop, mopen, mord, mpunct, mrel, mtight,
-    msupsub, mspace, mult, nobreak, nulldelimiter, overlay,
+    msupsub, mspace, mult, newline, nobreak, nulldelimiter, overlay,
     vlist, vlist_r, vlist_s, vlist_t, vlist_t2, pstrut, op_symbol, op_limits,
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
@@ -91,6 +91,7 @@ data class CssStyle(
 
     var color: String? = null,
     var marginLeft: String? = null,
+    var marginTop: String? = null,
     var marginRight: String? = null,
     var borderBottomWidth: String? = null,
     var minWidth: String? = null,
@@ -104,7 +105,6 @@ data class CssStyle(
     borderRightWidth: string,
     borderTopWidth: string,
     bottom: string,
-    marginTop: string,
 
     verticalAlign: string,
 
