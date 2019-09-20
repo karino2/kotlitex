@@ -20,12 +20,10 @@ class MainActivity : AppCompatActivity() {
 
         val textView = findViewById<TextView>(R.id.textView)
         val spannable = SpannableStringBuilder("01234 This is direct math span test.")
-        // spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(createMathSpan("x \\\\ y", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
         MarkdownView.CACHE_ENABLED = false
-        /*
         findViewById<MarkdownView>(R.id.markdownView).setMarkdown("""yyyy gg. No math line with large descent(y).
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |Inline math ${"$$"}x^2${"$$"} support.
@@ -44,8 +42,6 @@ class MainActivity : AppCompatActivity() {
             |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"} text ${"$$"} \sum^N_{k=1} k${"$$"}
         """.trimMargin())
-
-         */
     }
 
     fun createMathSpan(expr: String, baseSize: Float) =

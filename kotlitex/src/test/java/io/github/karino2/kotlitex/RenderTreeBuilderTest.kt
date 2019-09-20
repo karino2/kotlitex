@@ -304,13 +304,11 @@ class RenderTreeBuilderTest {
         assertEquals(3, actual.size)
     }
 
-    /*
     @Test
     fun buildExpression_multiline() {
         val actual = buildDisplayExpression("x \\\\ y")
         assertEquals(3, actual.size)
     }
-    */
 
     private fun buildDisplayExpression(expression: String): List<RenderNode> {
         val input = parse(expression, Settings(displayMode = true))

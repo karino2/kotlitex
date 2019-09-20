@@ -51,7 +51,7 @@ data class CharInfo(val font: Font, val group: Group, val replace: String?)
 
 data class Settings(val displayMode: Boolean = false, val throwOnError: Boolean = true,
                     val errorColor: String = "#cc0000",
-                    val macros: Map<String, Any?> /*MacroMap*/ =  mapOf(),
+                    val macros: MutableMap<String, MacroDefinition> /*MacroMap*/ =  mutableMapOf(),
                     val colorIsTextColor: Boolean = false,
                     val strict : Any? /* strict: boolean | "ignore" | "warn" | "error" | StrictFunction */ = "warn",
                     val maxSize: Int = Int.MAX_VALUE,
@@ -159,12 +159,14 @@ class Parser(val input: String, val settings: Settings = Settings()) {
             FunctionSymbolsSpacing.defineAll()
             FunctionMClass.defineAll()
             FunctionCr.defineAll()
+
+            Macros.defineAll()
         }
     }
 
     var mode = Mode.MATH
     var _nextToken: Token? = null
-    val gullet = MacroExpander(input, mode)
+    val gullet = MacroExpander(input, settings, mode)
 
     fun consume() {
         _nextToken = gullet.expandNextToken()
