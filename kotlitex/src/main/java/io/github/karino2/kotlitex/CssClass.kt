@@ -11,7 +11,7 @@ enum class CssClass {
     reset_size1, reset_size2, reset_size3, reset_size4, reset_size5, reset_size6,
     reset_size7, reset_size8, reset_size9, reset_size10, reset_size11, root,
     sizing,  size1, size2, size3, size4, size5, size6, size7, size8, size9, size10, size11,
-    small_op, sqrt, struct, stretchy, svg_align,
+    small_op, sqrt, strut, stretchy, svg_align,
     textbf, textit, textrm, textsf, texttt,
     underline, underline_line,
     EMPTY;
@@ -98,6 +98,7 @@ data class CssStyle(
     var paddingLeft: String? = null,
     var position: String? = null,
     var left: String? = null,
+    var verticalAlign: String? = null,
     var width: String? = null
 /*
     backgroundColor: string,
@@ -106,7 +107,6 @@ data class CssStyle(
     borderTopWidth: string,
     bottom: string,
 
-    verticalAlign: string,
 
  */
 )

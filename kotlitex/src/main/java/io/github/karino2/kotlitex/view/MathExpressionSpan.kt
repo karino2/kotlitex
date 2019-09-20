@@ -22,7 +22,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         )
         val parser = Parser(expr)
         val parsed = parser.parse()
-        val nodes = RenderTreeBuilder.buildExpression(parsed, options, true)
+        val nodes = RenderTreeBuilder.buildHTML(parsed, options)
         val builder = VirtualNodeBuilder(nodes, baseSize.toDouble(), fontLoader)
         rootNode = builder.build()
     }

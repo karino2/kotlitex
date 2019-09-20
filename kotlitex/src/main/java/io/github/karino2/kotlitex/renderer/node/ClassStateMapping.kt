@@ -4,6 +4,7 @@ import io.github.karino2.kotlitex.CssClass
 import io.github.karino2.kotlitex.RNodeSpan
 import io.github.karino2.kotlitex.RenderNode
 import io.github.karino2.kotlitex.renderer.RenderingState
+import kotlin.math.max
 
 object ClassStateMapping {
     fun createState(klass: CssClass, state: RenderingState, node: RenderNode): RenderingState {
@@ -39,6 +40,30 @@ object ClassStateMapping {
                 tableRow.margin.left = state.marginLeft
                 tableRow.margin.right = state.marginRight
                 state.copy(pstrut = height)
+            }
+            CssClass.base -> {
+                val height = node.height * state.fontSize()
+                val strut = HPaddingNode(state.klasses)
+                val depth = node.depth * state.fontSize()
+                strut.setPosition(state.nextX(), state.y - height)
+                strut.bounds.height = height+depth
+                val lastRow = state.vlist.last()!!
+                // What's depth?
+                // lastRow.depth = depth
+                lastRow.addBaseStrut(strut)
+                state
+            }
+            CssClass.newline -> {
+                val tableRow= VerticalListRow(state.klasses)
+                val strutBounds = state.vlist.last()!!.strutBounds!!
+                val marginTop = node.style.marginTop
+                val topPadding = marginTop?.let { state.parseEm(marginTop) }  ?: 0.0
+                state.vlist.addRow(tableRow)
+                tableRow.setPosition(state.nextX(), state.y)
+                val lineHeight = state.fontSize() * 1.2
+                val strutHeight = strutBounds.height
+                val yOffset = max(lineHeight, strutHeight)
+                state.copy(pstrut = yOffset + topPadding)
             }
             CssClass.underline_line -> {
                 withHorizLine(state, node)

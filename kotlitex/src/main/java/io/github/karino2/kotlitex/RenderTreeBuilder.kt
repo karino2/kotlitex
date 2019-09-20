@@ -828,6 +828,124 @@ object RenderTreeBuilder {
         return true
     }
 
+    /**
+     * Combine an array of HTML DOM nodes (e.g., the output of `buildExpression`)
+     * into an unbreakable HTML node of class .base, with proper struts to
+     * guarantee correct vertical extent.  `buildHTML` calls this repeatedly to
+     * make up the entire expression as a sequence of unbreakable units.
+     */
+    fun buildHTMLUnbreakable(children : MutableList<RenderNode>, options: Options) : RNodeSpan {
+        // Compute height and depth of this chunk.
+        val body = makeSpan(mutableSetOf(CssClass.base), children, options);
+
+        // Add strut, which ensures that the top of the HTML element falls at
+        // the height of the expression, and the bottom of the HTML element
+        // falls at the depth of the expression.
+        // We used to have separate top and bottom struts, where the bottom strut
+        // would like to use `vertical-align: top`, but in IE 9 this lowers the
+        // baseline of the box to the bottom of this strut (instead of staying in
+        // the normal place) so we use an absolute value for vertical-align instead.
+        val strut = makeSpan(mutableSetOf(CssClass.strut))
+        strut.style.height = "${body.height + body.depth}em"
+        strut.style.verticalAlign =   "${-body.depth}em"
+        body.children.add(0, strut)
+
+        return body
+    }
+
+    /**
+     * Take an entire parse tree, and build it into an appropriate set of HTML
+     * nodes.
+     */
+    fun buildHTML(tree:  List<ParseNode>, options: Options): List<RenderNode> {
+        /*
+        var tag = null
+        // Strip off outer tag wrapper for processing below.
+        if (tree.length === 1 && tree[0].type === "tag") {
+            tag = tree[0].tag;
+            tree = tree[0].body;
+        }
+         */
+
+        // Build the expression contained in the tree
+        val expression = buildExpression(tree, options, true);
+
+        val children = mutableListOf<RenderNode>()
+
+        // Create one base node for each chunk between potential line breaks.
+        // The TeXBook [p.173] says "A formula will be broken only after a
+        // relation symbol like $=$ or $<$ or $\rightarrow$, or after a binary
+        // operation symbol like $+$ or $-$ or $\times$, where the relation or
+        // binary operation is on the ``outer level'' of the formula (i.e., not
+        // enclosed in {...} and not part of an \over construction)."
+
+        var parts = mutableListOf<RenderNode>()
+        var i = 0
+        while(i < expression.size) {
+            parts.add(expression[i])
+            if (expression[i].hasClass(CssClass.mbin) ||
+                expression[i].hasClass(CssClass.mrel) ) {
+                /* || expression[i].hasClass(CssClass.allowbreak) */
+
+                // Put any post-operator glue on same line as operator.
+                // Watch for \nobreak along the way.
+                var nobreak = false;
+                while (i < expression.size - 1 &&
+                    expression[i + 1].hasClass(CssClass.mspace)) {
+                    i++
+                    parts.add(expression[i])
+                    if (expression[i].hasClass(CssClass.nobreak)) {
+                        nobreak = true
+                    }
+                }
+                // Don't allow break if \nobreak among the post-operator glue.
+                if (!nobreak) {
+                    children.add(buildHTMLUnbreakable(parts, options));
+                    parts = mutableListOf<RenderNode>()
+                }
+            } else if (expression[i].hasClass(CssClass.newline)) {
+                // Write the line except the newline
+                parts.removeAt(parts.lastIndex)
+                if (parts.isNotEmpty()) {
+                    children.add(buildHTMLUnbreakable(parts, options))
+                    parts = mutableListOf<RenderNode>()
+                }
+                // Put the newline at the top level
+                children.add(expression[i])
+            }
+            i++
+        }
+        if (parts.isNotEmpty()) {
+            children.add(buildHTMLUnbreakable(parts, options));
+        }
+
+        // Now, if there was a tag, build it too and append it as a final child.
+        /* TODO:
+        let tagChild;
+        if (tag) {
+            tagChild = buildHTMLUnbreakable(
+                buildExpression(tag, options, true)
+            );
+            tagChild.classes = ["tag"];
+            children.push(tagChild);
+        }
+
+        val htmlNode = makeSpan(["katex-html"], children)
+        htmlNode.setAttribute("aria-hidden", "true");
+
+        // Adjust the strut of the tag to be the maximum height of all children
+        // (the height of the enclosing htmlNode) for proper vertical alignment.
+        if (tagChild) {
+            const strut = tagChild.children[0];
+            strut.style.height = (htmlNode.height + htmlNode.depth) + "em";
+            strut.style.verticalAlign = (-htmlNode.depth) + "em";
+        }
+        return htmlNode;
+
+         */
+        return children
+    }
+
     init {
         registerBuilder("mathord") { node, opt -> makeOrd(node, opt, "mathord") }
         registerBuilder("textord") { node, opt -> makeOrd(node, opt, "textord") }
