@@ -29,7 +29,11 @@ class MainActivity : AppCompatActivity() {
             |Inline math ${"$$"}x^2${"$$"} support.
             |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
             |${"$$"} x\ y T^I g_g${"$$"}
-            |${"$$"} 3x + 4y \\ 2x + 3y ${"$$"}
+            |Multiline test
+            |${"$$"}
+            |3x + 4y \\
+            |2x + 3y
+            |${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
             |${"$$"}\underline{p_i} ${"$$"}

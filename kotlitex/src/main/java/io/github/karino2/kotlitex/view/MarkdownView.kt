@@ -19,6 +19,9 @@ interface MathSpanHandler {
 class MathSpanBuilder(val handler: MathSpanHandler) {
     val mathExpLinePat = "^\\$\\$([^\$]+)\\$\\$\$".toRegex()
     val mathExpPat = "\\$\\$([^$]+)\\$\\$".toRegex()
+    val multiLineMathBeginEndPat = "^\\$\\$\$".toRegex()
+
+    var inMultiLineMath = false
 
     fun oneNormalLineWithoutEOL(line: String) {
         if (line.isEmpty())
@@ -42,11 +45,37 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
             handler.appendNormal(line.substring(lastMatchPos))
     }
 
+    val multiLineMathBuffer = StringBuilder()
+
+    fun oneLineInMultilineMath(line: String) {
+        multiLineMathBeginEndPat.matchEntire(line)?.let {
+            inMultiLineMath = false
+            val exp = multiLineMathBuffer.toString()
+            if(exp.isNotEmpty()) {
+                handler.appendMathLineExp(exp)
+            }
+            multiLineMathBuffer.clear()
+            return
+        }
+        multiLineMathBuffer.append(line)
+        multiLineMathBuffer.append(" ")
+
+    }
+
     fun oneLine(line: String) {
+        if(inMultiLineMath) {
+            oneLineInMultilineMath(line)
+            return
+        }
+        multiLineMathBeginEndPat.matchEntire(line)?.let {
+            inMultiLineMath = true
+            return
+        }
         mathExpLinePat.matchEntire(line)?.let {
             handler.appendMathLineExp(it.groupValues[1])
             return
         }
+
         oneNormalLineWithoutEOL(line)
         handler.appendEndOfLine()
     }

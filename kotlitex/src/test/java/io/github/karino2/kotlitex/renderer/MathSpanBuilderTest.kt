@@ -174,4 +174,47 @@ class MathSpanBuilderTest {
 
         handler.mathExps[0].assert(0, "x^2")
     }
+
+
+    @Test
+    fun testMultiLineMathBegin() {
+        assertFalse(target.inMultiLineMath)
+        target.oneLine("\$\$")
+        assertTrue(target.inMultiLineMath)
+        assertEquals(0, handler.normals.size)
+        assertEquals(0, handler.mathExps.size)
+    }
+
+    @Test
+    fun testMultiLineMathEndWithEmpty() {
+        target.oneLine("\$\$")
+        target.oneLine("\$\$")
+        assertFalse(target.inMultiLineMath)
+        assertEquals(0, handler.normals.size)
+        assertEquals(0, handler.mathLine.size)
+    }
+
+    @Test
+    fun testMultiLineMath() {
+        target.oneLine("\$\$")
+        target.oneLine("x+y \\\\")
+        target.oneLine("z+w")
+        target.oneLine("\$\$")
+        assertFalse(target.inMultiLineMath)
+        assertEquals(1, handler.mathLine.size)
+        assertEquals(0, handler.normals.size)
+    }
+
+    @Test
+    fun testMultiLineMathAfter() {
+        target.oneLine("\$\$")
+        target.oneLine("x+y \\\\")
+        target.oneLine("z+w")
+        target.oneLine("\$\$")
+        assertFalse(target.inMultiLineMath)
+        target.oneLine("abc")
+        assertEquals(1, handler.mathLine.size)
+        assertEquals(1, handler.normals.size)
+    }
+
 }
