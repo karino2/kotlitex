@@ -14,8 +14,21 @@ import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, isMathMode: Boolean, val drawBounds: Boolean = false) {
+private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val isMathMode: Boolean, val drawBounds: Boolean = false) {
     var rootNode: VerticalList
+
+    val firstVListRowBound : Bounds?
+    get() {
+        if(rootNode.nodes.isEmpty())
+            return null
+
+        val b = Bounds(rootNode.bounds.x, rootNode.bounds.y)
+        calculateBounds(b, rootNode.nodes[0])
+        return b
+    }
+
+    // for debug use only
+    val debugBaseSize = baseSize
     init {
         val options = if (isMathMode) Options(Style.DISPLAY) else Options(
             Style.TEXT
@@ -40,6 +53,18 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         return y.toFloat()
     }
 
+    private fun drawBoundsRect(canvas: Canvas, rect: RectF, color: Int) {
+        if (! drawBounds) {
+            return
+        }
+
+        paint.color = color
+        paint.strokeWidth = 2.0f
+        paint.style = Paint.Style.STROKE
+
+        canvas.drawRect(rect, paint)
+    }
+
     private fun drawBounds(canvas: Canvas, bounds: Bounds, ratio: Float) {
         if (! drawBounds) {
             return
@@ -48,14 +73,34 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         val x = translateX(bounds.x*ratio)
         val y = translateY(bounds.y*ratio)
 
-        paint.color = Color.RED
-        paint.strokeWidth = 1.0f
-        paint.style = Paint.Style.STROKE
-
-        // TODO: This doesn't look right though...
-        // canvas.drawRect(RectF(x, y - bounds.height.toFloat()*ratio, x + bounds.width.toFloat()*ratio, y), paint)
-        canvas.drawRect(RectF(x, y - bounds.height.toFloat()*ratio, x + bounds.width.toFloat()*ratio, y + bounds.height.toFloat()*ratio), paint)
+        drawBoundsRect(canvas, RectF(x, y- bounds.height.toFloat()*ratio, x + bounds.width.toFloat()*ratio, y), Color.RED)
     }
+
+    private fun drawWholeBound(canvas: Canvas, bounds: Bounds, ratio: Float) {
+        if (! drawBounds) {
+            return
+        }
+
+        val x = translateX(bounds.x*ratio)
+
+        val firstBound = firstVListRowBound ?: return
+
+        val ascent = (0.5+ firstBound.height*4/5).toInt()
+
+        /*
+        work around for \sum^N_i case. (#161)
+        In this case, firstBound.y becomes negative and normal acent calculation make ascent too upper.
+        I don't know how to handle this, so extend descend to try to avoid overlap for this case.
+         */
+        val deltaDescent = -firstBound.y
+
+        val y = -ascent
+        // val padding = (ascent/9).toInt()
+        val padding = 0
+        drawBoundsRect(canvas, RectF(x, (y-padding).toFloat(), x + bounds.width.toFloat()*ratio+padding, y+padding*2+(bounds.height*ratio+deltaDescent).toFloat()), Color.BLUE)
+    }
+
+
 
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode, ratio: Float) {
         when (parent) {
@@ -135,7 +180,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
     fun drawWithRatio(canvas: Canvas, ratio: Float) {
         if (drawBounds)
-            drawBounds(canvas, calculateWholeBounds(), ratio)
+            drawWholeBound(canvas, calculateWholeBounds(), ratio)
         drawRenderNodes(canvas, rootNode, ratio)
     }
 
@@ -195,24 +240,35 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         val d = getCachedDrawable()
         val rect = d.bounds
 
-        val ratio = baseHeight / virtualBaseHeight
-        if (fm == null) {
+        val ratio = 1f
+        val firstBound = d.firstVListRowBound
+        if (fm == null || firstBound == null) {
             return (rect.right * ratio).roundToInt()
         }
 
-        val scaledBottom = (rect.bottom * ratio + 0.5).roundToInt()
+        val bottom = (rect.bottom*ratio + 0.5).roundToInt()
 
-        val ascent = scaledBottom / 2
-        val descent = scaledBottom - ascent
+        val ascent = (0.5+firstBound.height*4/5).toInt()
 
-        fm.ascent = -ascent
-        fm.descent = descent
+
+        /*
+        work around for \sum^N_i case. (#161)
+        In this case, firstBound.y becomes negative and normal acent calculation make ascent too upper.
+        I don't know how to handle this, so extend descend to try to avoid overlap for this case.
+         */
+        val deltaDescent = (0.5-firstBound.y).roundToInt()
+
+
+        val padding = ascent/9
+        val descent = bottom - ascent+deltaDescent
+
+        fm.ascent = -ascent-padding
+        fm.descent = descent+padding
 
         fm.bottom = fm.descent
-        fm.top = -scaledBottom
+        fm.top = -ascent
 
-        // should we roundUp?
-        return (rect.right * ratio).roundToInt()
+        return (rect.right*ratio+0.5+padding).roundToInt()
     }
 
     fun ensureDrawable() {
@@ -245,9 +301,7 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
         val b = getCachedDrawable()
 
-        // We always use full height. So we do not need any alignment, right?
-        // val ratio = (bottom-top).toDouble() / b.bounds.bottom.toDouble()
-        val ratio = baseHeight / virtualBaseHeight
+        val ratio = 1F
 
         // Log.d("kotlitex", "x=$x, y=$y, top=$top, ratio=$ratio, expr=$expr")
 
@@ -257,12 +311,11 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
         canvas.restore()
     }
-    val virtualBaseHeight = 100.0f
 
     private fun getDrawable(): MathExpressionDrawable {
         // TODO: drawBounds should be always false. Unlike baseSize, we don't have to expose the flag to end-users.
         val drawable = MathExpressionDrawable(
-            expr, virtualBaseHeight,
+            expr, baseHeight,
             AndroidFontLoader(assetManager), isMathMode, drawBounds = false
         )
         return drawable

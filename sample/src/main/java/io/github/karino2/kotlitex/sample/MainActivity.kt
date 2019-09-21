@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val textView = findViewById<TextView>(R.id.textView)
         val spannable = SpannableStringBuilder("01234 This is direct math span test.")
-        spannable.setSpan(createMathSpan("x^2", PHYSICAL_BASE_SIZE), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        spannable.setSpan(createMathSpan("T^I g_g", PHYSICAL_BASE_SIZE, false), 0, 2, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         textView.text = spannable
 
         MarkdownView.CACHE_ENABLED = false
@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity() {
             |${"$$"} \sum^N_{k=1} k${"$$"}
             |Inline math ${"$$"}x^2${"$$"} support.
             |${"$$"} \mathbb{R} ${"$$"}, ${"$$"} \mathscr{F} ${"$$"}, ${"$$"} \bar{A} ${"$$"},
-            |${"$$"} x\ y${"$$"}
+            |${"$$"} x\ y T^I g_g${"$$"}
+            |${"$$"} 3x + 4y \\ 2x + 3y ${"$$"}
             |${"$$"} \mathcal{X} = \{1, 2, 3\} ${"$$"}
             |${"$$"}P_x(a) = \frac{N(a|x)}{n} ${"$$"}
             |${"$$"}\underline{p_i} ${"$$"}
@@ -42,8 +43,8 @@ class MainActivity : AppCompatActivity() {
             |Above are math lines. These are a little different from inline text mode like ${"$$"} \sum^N_{k=1} k${"$$"}.
             |${"$$"} \sqrt{5} ${"$$"} text ${"$$"} \sum^N_{k=1} k${"$$"}
         """.trimMargin())
-    }
+   }
 
-    fun createMathSpan(expr: String, baseSize: Float) =
-        MathExpressionSpan(expr, baseSize, assets, true)
+    fun createMathSpan(expr: String, baseSize: Float, isMathMode: Boolean = true) =
+        MathExpressionSpan(expr, baseSize, assets, isMathMode)
 }
