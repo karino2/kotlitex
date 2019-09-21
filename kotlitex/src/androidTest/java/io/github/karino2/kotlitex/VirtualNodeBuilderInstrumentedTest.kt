@@ -1,7 +1,7 @@
 package io.github.karino2.kotlitex
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import io.github.karino2.kotlitex.renderer.AndroidFontLoader
 import io.github.karino2.kotlitex.renderer.VirtualNodeBuilder
 import io.github.karino2.kotlitex.renderer.node.*
@@ -71,7 +71,8 @@ class VirtualNodeBuilderInstrumentedTest {
         val parser = Parser("\\sqrt{3}")
         val renderTree = RenderTreeBuilder.buildExpression(parser.parse(), Options(Style.DISPLAY), true)
 
-        val builder = VirtualNodeBuilder(renderTree, 100.0, AndroidFontLoader(InstrumentationRegistry.getContext().assets))
+        val builder = VirtualNodeBuilder(renderTree, 100.0, AndroidFontLoader(
+            InstrumentationRegistry.getInstrumentation().targetContext.assets))
         val virtualNodeTree = builder.build();
 
         val n = findFirst(virtualNodeTree) {
@@ -90,7 +91,7 @@ class VirtualNodeBuilderInstrumentedTest {
         println("Render Tree")
         printTree(renderTree)
 
-        val builder = VirtualNodeBuilder(renderTree, 100.0, AndroidFontLoader(InstrumentationRegistry.getContext().assets))
+        val builder = VirtualNodeBuilder(renderTree, 100.0, AndroidFontLoader(InstrumentationRegistry.getInstrumentation().targetContext.assets))
         val virtualNodeTree = builder.build();
 
         println("Virtual Node Tree")

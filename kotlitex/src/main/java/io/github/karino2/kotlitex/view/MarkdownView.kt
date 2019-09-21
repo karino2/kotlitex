@@ -10,8 +10,8 @@ import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 
 interface MathSpanHandler {
     fun appendNormal(text: String)
-    fun appendMathExp(exp: String)
-    fun appendMathLineExp(text: String)
+    fun appendInlineMathExp(exp: String)
+    fun appendDisplayMathExp(text: String)
     fun appendEndOfLine()
 }
 
@@ -19,6 +19,9 @@ interface MathSpanHandler {
 class MathSpanBuilder(val handler: MathSpanHandler) {
     val mathExpLinePat = "^\\$\\$([^\$]+)\\$\\$\$".toRegex()
     val mathExpPat = "\\$\\$([^$]+)\\$\\$".toRegex()
+    val multiLineMathBeginEndPat = "^\\$\\$\$".toRegex()
+
+    var inMultiLineMath = false
 
     fun oneNormalLineWithoutEOL(line: String) {
         if (line.isEmpty())
@@ -34,7 +37,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
         while (res != null) {
             if (lastMatchPos != res.range.start)
                 handler.appendNormal(line.substring(lastMatchPos, res.range.start))
-            handler.appendMathExp(res.groupValues[1])
+            handler.appendInlineMathExp(res.groupValues[1])
             lastMatchPos = res.range.last + 1
             res = res.next()
         }
@@ -42,11 +45,36 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
             handler.appendNormal(line.substring(lastMatchPos))
     }
 
-    fun oneLine(line: String) {
-        mathExpLinePat.matchEntire(line)?.let {
-            handler.appendMathLineExp(it.groupValues[1])
+    val multiLineMathBuffer = StringBuilder()
+
+    fun oneLineInMultilineMath(line: String) {
+        multiLineMathBeginEndPat.matchEntire(line)?.let {
+            inMultiLineMath = false
+            val exp = multiLineMathBuffer.toString()
+            if (exp.isNotEmpty()) {
+                handler.appendDisplayMathExp(exp)
+            }
+            multiLineMathBuffer.clear()
             return
         }
+        multiLineMathBuffer.append(line)
+        multiLineMathBuffer.append(" ")
+    }
+
+    fun oneLine(line: String) {
+        if (inMultiLineMath) {
+            oneLineInMultilineMath(line)
+            return
+        }
+        multiLineMathBeginEndPat.matchEntire(line)?.let {
+            inMultiLineMath = true
+            return
+        }
+        mathExpLinePat.matchEntire(line)?.let {
+            handler.appendDisplayMathExp(it.groupValues[1])
+            return
+        }
+
         oneNormalLineWithoutEOL(line)
         handler.appendEndOfLine()
     }
@@ -72,7 +100,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
         spannable.append(text)
     }
 
-    override fun appendMathExp(exp: String) {
+    override fun appendInlineMathExp(exp: String) {
         appendMathSpan(exp, false)
     }
 
@@ -86,7 +114,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
         spannable.setSpan(span, begin, spannable.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
     }
 
-    override fun appendMathLineExp(text: String) {
+    override fun appendDisplayMathExp(text: String) {
         appendMathSpan(text, true)
         spannable.append("\n")
     }

@@ -51,7 +51,7 @@ data class CharInfo(val font: Font, val group: Group, val replace: String?)
 
 data class Settings(val displayMode: Boolean = false, val throwOnError: Boolean = true,
                     val errorColor: String = "#cc0000",
-                    val macros: Map<String, Any?> /*MacroMap*/ =  mapOf(),
+                    val macros: MutableMap<String, MacroDefinition> /*MacroMap*/ =  mutableMapOf(),
                     val colorIsTextColor: Boolean = false,
                     val strict : Any? /* strict: boolean | "ignore" | "warn" | "error" | StrictFunction */ = "warn",
                     val maxSize: Int = Int.MAX_VALUE,
@@ -90,6 +90,53 @@ data class Settings(val displayMode: Boolean = false, val throwOnError: Boolean 
                         */
         }
     }
+
+    /**
+     * Check whether to apply strict (LaTeX-adhering) behavior for unusual
+     * input (like `\\`).  Unlike `nonstrict`, will not throw an error;
+     * instead, "error" translates to a return value of `true`, while "ignore"
+     * translates to a return value of `false`.  May still print a warning:
+     * "warn" prints a warning and returns `false`.
+     * This is for the second category of `errorCode`s listed in the README.
+     */
+    fun useStrictBehavior(errorCode: String, errorMsg: String, token: Any? /* Token | AnyParseNode*/) : Boolean {
+        // TODO:
+        /*
+        val strict = this.strict;
+        if (typeof strict === "function") {
+            // Allow return value of strict function to be boolean or string
+            // (or null/undefined, meaning no further processing).
+            // But catch any exceptions thrown by function, treating them
+            // like "error".
+            try {
+                strict = strict(errorCode, errorMsg, token);
+            } catch (error) {
+                strict = "error";
+            }
+        }
+
+         */
+        return if (strict == null || strict == "ignore") {
+            false
+        } else if (strict == true || strict == "error") {
+            true
+        } else if (strict == "warn") {
+            /*
+            typeof console !== "undefined" && console.warn(
+                "LaTeX-incompatible input and strict mode is set to 'warn': " +
+                        `${errorMsg} [${errorCode}]`);
+                */
+            false
+        } else {  // won't happen in type-safe code
+            /*
+            typeof console !== "undefined" && console.warn(
+                "LaTeX-incompatible input and strict mode is set to " +
+                        `unrecognized '${strict}': ${errorMsg} [${errorCode}]`);
+
+             */
+            false
+        }
+    }
 }
 
 data class AccentRelation(val text: String, val math: String) {
@@ -111,12 +158,15 @@ class Parser(val input: String, val settings: Settings = Settings()) {
             FunctionUnderline.defineAll()
             FunctionSymbolsSpacing.defineAll()
             FunctionMClass.defineAll()
+            FunctionCr.defineAll()
+
+            Macros.defineAll()
         }
     }
 
     var mode = Mode.MATH
     var _nextToken: Token? = null
-    val gullet = MacroExpander(input, mode)
+    val gullet = MacroExpander(input, settings, mode)
 
     fun consume() {
         _nextToken = gullet.expandNextToken()

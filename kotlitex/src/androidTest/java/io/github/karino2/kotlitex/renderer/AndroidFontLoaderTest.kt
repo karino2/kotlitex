@@ -1,7 +1,7 @@
 package io.github.karino2.kotlitex.renderer
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import io.github.karino2.kotlitex.renderer.node.CssFont
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AndroidFontLoaderTest {
     private fun createLoader(): FontLoader {
-        val ctx = InstrumentationRegistry.getTargetContext()
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
         return AndroidFontLoader(ctx.assets)
     }
 
@@ -32,7 +32,7 @@ class AndroidFontLoaderTest {
 
     @Test
     fun fontToTypefaceMapKeyHandleNormal() {
-        val font = CssFont("KaTeX_Main", "Normal", 10.0)
+        val font = CssFont("KaTeX_Main", "Normal", "", 10.0)
         assertEquals("KaTeX_Main-Regular", AndroidFontLoader.fontToTypefaceMapKey(font))
     }
 }
