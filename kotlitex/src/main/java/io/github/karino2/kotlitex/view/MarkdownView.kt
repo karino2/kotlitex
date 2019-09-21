@@ -10,8 +10,8 @@ import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 
 interface MathSpanHandler {
     fun appendNormal(text: String)
-    fun appendMathExp(exp: String)
-    fun appendMathLineExp(text: String)
+    fun appendInlineMathExp(exp: String)
+    fun appendDisplayMathExp(text: String)
     fun appendEndOfLine()
 }
 
@@ -37,7 +37,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
         while (res != null) {
             if (lastMatchPos != res.range.start)
                 handler.appendNormal(line.substring(lastMatchPos, res.range.start))
-            handler.appendMathExp(res.groupValues[1])
+            handler.appendInlineMathExp(res.groupValues[1])
             lastMatchPos = res.range.last + 1
             res = res.next()
         }
@@ -52,7 +52,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
             inMultiLineMath = false
             val exp = multiLineMathBuffer.toString()
             if (exp.isNotEmpty()) {
-                handler.appendMathLineExp(exp)
+                handler.appendDisplayMathExp(exp)
             }
             multiLineMathBuffer.clear()
             return
@@ -71,7 +71,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
             return
         }
         mathExpLinePat.matchEntire(line)?.let {
-            handler.appendMathLineExp(it.groupValues[1])
+            handler.appendDisplayMathExp(it.groupValues[1])
             return
         }
 
@@ -100,7 +100,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
         spannable.append(text)
     }
 
-    override fun appendMathExp(exp: String) {
+    override fun appendInlineMathExp(exp: String) {
         appendMathSpan(exp, false)
     }
 
@@ -114,7 +114,7 @@ class SpannableMathSpanHandler(val assetManager: AssetManager, val baseSize: Flo
         spannable.setSpan(span, begin, spannable.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
     }
 
-    override fun appendMathLineExp(text: String) {
+    override fun appendDisplayMathExp(text: String) {
         appendMathSpan(text, true)
         spannable.append("\n")
     }

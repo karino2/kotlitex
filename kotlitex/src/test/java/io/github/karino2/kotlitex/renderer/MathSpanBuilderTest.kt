@@ -10,15 +10,15 @@ class MathSpanBuilderTest {
     class HandlerForTest : MathSpanHandler {
         var counter = 0
         val normals = ArrayList<Pair<Int, String>>()
-        val mathLine = ArrayList<Pair<Int, String>>()
-        val mathExps = ArrayList<Pair<Int, String>>()
+        val displayMathExps = ArrayList<Pair<Int, String>>()
+        val inlineMathExps = ArrayList<Pair<Int, String>>()
         val eols = ArrayList<Int>()
 
         fun reset() {
             counter = 0
             normals.clear()
-            mathLine.clear()
-            mathExps.clear()
+            displayMathExps.clear()
+            inlineMathExps.clear()
             eols.clear()
         }
 
@@ -26,12 +26,12 @@ class MathSpanBuilderTest {
             normals.add(Pair(counter++, text))
         }
 
-        override fun appendMathLineExp(text: String) {
-            mathLine.add(Pair(counter++, text))
+        override fun appendDisplayMathExp(text: String) {
+            displayMathExps.add(Pair(counter++, text))
         }
 
-        override fun appendMathExp(exp: String) {
-            mathExps.add(Pair(counter++, exp))
+        override fun appendInlineMathExp(exp: String) {
+            inlineMathExps.add(Pair(counter++, exp))
         }
 
         override fun appendEndOfLine() {
@@ -87,15 +87,15 @@ class MathSpanBuilderTest {
     @Test
     fun testMathLine() {
         target.oneLine("\$\$x^2\$\$")
-        handler.mathLine[0].assert(0, "x^2")
+        handler.displayMathExps[0].assert(0, "x^2")
     }
 
     @Test
     fun testOneLine_EmptyLine() {
         target.oneLine("")
 
-        assertTrue(handler.mathLine.isEmpty())
-        assertTrue(handler.mathExps.isEmpty())
+        assertTrue(handler.displayMathExps.isEmpty())
+        assertTrue(handler.inlineMathExps.isEmpty())
         assertTrue(handler.normals.isEmpty())
         assertEquals(1, handler.eols.size)
         assertEquals(0, handler.eols[0])
@@ -106,13 +106,13 @@ class MathSpanBuilderTest {
     fun testOneLine_Mixed() {
         target.oneLine("abc\$\$x^2\$\$")
 
-        assertTrue(handler.mathLine.isEmpty())
-        assertEquals(1, handler.mathExps.size)
+        assertTrue(handler.displayMathExps.isEmpty())
+        assertEquals(1, handler.inlineMathExps.size)
         assertEquals(1, handler.normals.size)
         assertEquals(1, handler.eols.size)
 
         handler.normals[0].assert(0, "abc")
-        handler.mathExps[0].assert(1, "x^2")
+        handler.inlineMathExps[0].assert(1, "x^2")
         assertEquals(2, handler.eols[0])
     }
 
@@ -120,7 +120,7 @@ class MathSpanBuilderTest {
     fun testOneNormal_normalEnd() {
         target.oneLine("\$\$x^2\$\$def")
         handler.normals[0].assert(1, "def")
-        handler.mathExps[0].assert(0, "x^2")
+        handler.inlineMathExps[0].assert(0, "x^2")
     }
 
     @Test
@@ -128,14 +128,14 @@ class MathSpanBuilderTest {
         target.oneLine("abc\$\$x^2\$\$def\$\$y_2\$\$ghi")
 
         assertEquals(3, handler.normals.size)
-        assertEquals(2, handler.mathExps.size)
+        assertEquals(2, handler.inlineMathExps.size)
 
         handler.normals[0].assert(0, "abc")
         handler.normals[1].assert(2, "def")
         handler.normals[2].assert(4, "ghi")
 
-        handler.mathExps[0].assert(1, "x^2")
-        handler.mathExps[1].assert(3, "y_2")
+        handler.inlineMathExps[0].assert(1, "x^2")
+        handler.inlineMathExps[1].assert(3, "y_2")
 
     }
 
@@ -144,7 +144,7 @@ class MathSpanBuilderTest {
         target.oneLine("abc def")
 
         assertEquals(1, handler.normals.size)
-        assertTrue(handler.mathExps.isEmpty())
+        assertTrue(handler.inlineMathExps.isEmpty())
 
         handler.normals[0].assert(0, "abc def")
     }
@@ -154,12 +154,12 @@ class MathSpanBuilderTest {
         target.oneLine("\$\$x^2\$\$abc\$\$y_2\$\$")
 
         assertEquals(1, handler.normals.size)
-        assertEquals(2, handler.mathExps.size)
+        assertEquals(2, handler.inlineMathExps.size)
 
         handler.normals[0].assert(1, "abc")
 
-        handler.mathExps[0].assert(0, "x^2")
-        handler.mathExps[1].assert(2, "y_2")
+        handler.inlineMathExps[0].assert(0, "x^2")
+        handler.inlineMathExps[1].assert(2, "y_2")
 
     }
 
@@ -168,11 +168,11 @@ class MathSpanBuilderTest {
         target.oneLine("\$\$x^2\$\$abc")
 
         assertEquals(1, handler.normals.size)
-        assertEquals(1, handler.mathExps.size)
+        assertEquals(1, handler.inlineMathExps.size)
 
         handler.normals[0].assert(1, "abc")
 
-        handler.mathExps[0].assert(0, "x^2")
+        handler.inlineMathExps[0].assert(0, "x^2")
     }
 
 
@@ -182,7 +182,7 @@ class MathSpanBuilderTest {
         target.oneLine("\$\$")
         assertTrue(target.inMultiLineMath)
         assertEquals(0, handler.normals.size)
-        assertEquals(0, handler.mathExps.size)
+        assertEquals(0, handler.inlineMathExps.size)
     }
 
     @Test
@@ -191,7 +191,7 @@ class MathSpanBuilderTest {
         target.oneLine("\$\$")
         assertFalse(target.inMultiLineMath)
         assertEquals(0, handler.normals.size)
-        assertEquals(0, handler.mathLine.size)
+        assertEquals(0, handler.displayMathExps.size)
     }
 
     @Test
@@ -201,7 +201,7 @@ class MathSpanBuilderTest {
         target.oneLine("z+w")
         target.oneLine("\$\$")
         assertFalse(target.inMultiLineMath)
-        assertEquals(1, handler.mathLine.size)
+        assertEquals(1, handler.displayMathExps.size)
         assertEquals(0, handler.normals.size)
     }
 
@@ -213,7 +213,7 @@ class MathSpanBuilderTest {
         target.oneLine("\$\$")
         assertFalse(target.inMultiLineMath)
         target.oneLine("abc")
-        assertEquals(1, handler.mathLine.size)
+        assertEquals(1, handler.displayMathExps.size)
         assertEquals(1, handler.normals.size)
     }
 
