@@ -65,23 +65,23 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         canvas.drawRect(rect, paint)
     }
 
-    private fun drawBounds(canvas: Canvas, bounds: Bounds, ratio: Float) {
+    private fun drawBounds(canvas: Canvas, bounds: Bounds) {
         if (! drawBounds) {
             return
         }
 
-        val x = translateX(bounds.x*ratio)
-        val y = translateY(bounds.y*ratio)
+        val x = translateX(bounds.x)
+        val y = translateY(bounds.y)
 
-        drawBoundsRect(canvas, RectF(x, y- bounds.height.toFloat()*ratio, x + bounds.width.toFloat()*ratio, y), Color.RED)
+        drawBoundsRect(canvas, RectF(x, y- bounds.height.toFloat(), x + bounds.width.toFloat(), y), Color.RED)
     }
 
-    private fun drawWholeBound(canvas: Canvas, bounds: Bounds, ratio: Float) {
+    private fun drawWholeBound(canvas: Canvas, bounds: Bounds) {
         if (! drawBounds) {
             return
         }
 
-        val x = translateX(bounds.x*ratio)
+        val x = translateX(bounds.x)
 
         val firstBound = firstVListRowBound ?: return
 
@@ -97,39 +97,39 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         val y = -ascent
         // val padding = (ascent/9).toInt()
         val padding = 0
-        drawBoundsRect(canvas, RectF(x, (y-padding).toFloat(), x + bounds.width.toFloat()*ratio+padding, y+padding*2+(bounds.height*ratio+deltaDescent).toFloat()), Color.BLUE)
+        drawBoundsRect(canvas, RectF(x, (y-padding).toFloat(), x + bounds.width.toFloat()+padding, y+padding*2+(bounds.height+deltaDescent).toFloat()), Color.BLUE)
     }
 
 
 
-    private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode, ratio: Float) {
+    private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
         when (parent) {
             is VirtualContainerNode<*> -> {
                 parent.nodes.forEach {
-                    drawRenderNodes(canvas, it, ratio)
+                    drawRenderNodes(canvas, it)
                 }
             }
             is TextNode -> {
                 textPaint.typeface = fontLoader.toTypeface(parent.font)
-                textPaint.textSize = parent.font.size.toFloat() * ratio
-                val x = translateX(parent.bounds.x * ratio)
-                val y = translateY(parent.bounds.y * ratio)
+                textPaint.textSize = parent.font.size.toFloat()
+                val x = translateX(parent.bounds.x )
+                val y = translateY(parent.bounds.y )
                 canvas.drawText(parent.text, x, y, textPaint)
-                drawBounds(canvas, parent.bounds, ratio)
+                drawBounds(canvas, parent.bounds)
             }
             is HorizontalLineNode -> {
                 paint.color = Color.BLACK
-                paint.strokeWidth = max(1.0f, parent.bounds.height.toFloat()*ratio)
-                val x = translateX(parent.bounds.x*ratio)
-                val y = translateY(parent.bounds.y*ratio)
-                canvas.drawLine(x, y, x + parent.bounds.width.toFloat()*ratio, y, paint)
-                drawBounds(canvas, parent.bounds, ratio)
+                paint.strokeWidth = max(1.0f, parent.bounds.height.toFloat())
+                val x = translateX(parent.bounds.x)
+                val y = translateY(parent.bounds.y)
+                canvas.drawLine(x, y, x + parent.bounds.width.toFloat(), y, paint)
+                drawBounds(canvas, parent.bounds)
             }
             is PathNode -> {
-                val x = translateX(parent.bounds.x * ratio)
-                val y = (translateY(parent.bounds.y * ratio) - parent.bounds.height * ratio).toFloat()
+                val x = translateX(parent.bounds.x)
+                val y = (translateY(parent.bounds.y) - parent.bounds.height).toFloat()
 
-                drawBounds(canvas, parent.bounds, ratio)
+                drawBounds(canvas, parent.bounds)
 
                 // TODO: support other preserve aspect ratio.
                 // "xMinYMin slice"
@@ -137,8 +137,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
                 val heightvb = parent.rnode.viewBox.height
                 val (_, _, wbVirtual, hbVirtual) = parent.bounds
-                val wb = wbVirtual * ratio
-                val hb = hbVirtual * ratio
+                val wb = wbVirtual
+                val hb = hbVirtual
 
                 // this is preserveAspectRatio = meet
                 /*
@@ -178,10 +178,10 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         }
     }
 
-    fun drawWithRatio(canvas: Canvas, ratio: Float) {
+    fun drawAllRenderNodes(canvas: Canvas) {
         if (drawBounds)
-            drawWholeBound(canvas, calculateWholeBounds(), ratio)
-        drawRenderNodes(canvas, rootNode, ratio)
+            drawWholeBound(canvas, calculateWholeBounds())
+        drawRenderNodes(canvas, rootNode)
     }
 
     fun calculateBounds(wholeBounds: Bounds, parent: VirtualCanvasNode) {
@@ -240,13 +240,12 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         val d = getCachedDrawable()
         val rect = d.bounds
 
-        val ratio = 1f
         val firstBound = d.firstVListRowBound
         if (fm == null || firstBound == null) {
-            return (rect.right * ratio).roundToInt()
+            return rect.right
         }
 
-        val bottom = (rect.bottom*ratio + 0.5).roundToInt()
+        val bottom = (rect.bottom + 0.5).roundToInt()
 
         val ascent = (0.5+firstBound.height*4/5).toInt()
 
@@ -268,7 +267,7 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
         fm.bottom = fm.descent
         fm.top = -ascent
 
-        return (rect.right*ratio+0.5+padding).roundToInt()
+        return (rect.right+0.5+padding).roundToInt()
     }
 
     fun ensureDrawable() {
@@ -301,13 +300,11 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
         val b = getCachedDrawable()
 
-        val ratio = 1F
-
         // Log.d("kotlitex", "x=$x, y=$y, top=$top, ratio=$ratio, expr=$expr")
 
         canvas.save()
         canvas.translate(x, y.toFloat())
-        b.drawWithRatio(canvas, ratio.toFloat())
+        b.drawAllRenderNodes(canvas)
 
         canvas.restore()
     }
