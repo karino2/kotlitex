@@ -17,9 +17,9 @@ import kotlin.math.roundToInt
 private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoader: FontLoader, val isMathMode: Boolean, val drawBounds: Boolean = false) {
     var rootNode: VerticalList
 
-    val firstVListRowBound : Bounds?
+    val firstVListRowBound: Bounds?
     get() {
-        if(rootNode.nodes.isEmpty())
+        if (rootNode.nodes.isEmpty())
             return null
 
         val b = Bounds(rootNode.bounds.x, rootNode.bounds.y)
@@ -73,7 +73,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         val x = translateX(bounds.x)
         val y = translateY(bounds.y)
 
-        drawBoundsRect(canvas, RectF(x, y- bounds.height.toFloat(), x + bounds.width.toFloat(), y), Color.RED)
+        drawBoundsRect(canvas, RectF(x, y - bounds.height.toFloat(), x + bounds.width.toFloat(), y), Color.RED)
     }
 
     private fun drawWholeBound(canvas: Canvas, bounds: Bounds) {
@@ -85,7 +85,7 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
 
         val firstBound = firstVListRowBound ?: return
 
-        val ascent = (0.5+ firstBound.height*4/5).toInt()
+        val ascent = (0.5 + firstBound.height * 4 / 5).toInt()
 
         /*
         work around for \sum^N_i case. (#161)
@@ -97,10 +97,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
         val y = -ascent
         // val padding = (ascent/9).toInt()
         val padding = 0
-        drawBoundsRect(canvas, RectF(x, (y-padding).toFloat(), x + bounds.width.toFloat()+padding, y+padding*2+(bounds.height+deltaDescent).toFloat()), Color.BLUE)
+        drawBoundsRect(canvas, RectF(x, (y - padding).toFloat(), x + bounds.width.toFloat() + padding, y + padding*2 + (bounds.height + deltaDescent).toFloat()), Color.BLUE)
     }
-
-
 
     private fun drawRenderNodes(canvas: Canvas, parent: VirtualCanvasNode) {
         when (parent) {
@@ -112,8 +110,8 @@ private class MathExpressionDrawable(expr: String, baseSize: Float, val fontLoad
             is TextNode -> {
                 textPaint.typeface = fontLoader.toTypeface(parent.font)
                 textPaint.textSize = parent.font.size.toFloat()
-                val x = translateX(parent.bounds.x )
-                val y = translateY(parent.bounds.y )
+                val x = translateX(parent.bounds.x)
+                val y = translateY(parent.bounds.y)
                 canvas.drawText(parent.text, x, y, textPaint)
                 drawBounds(canvas, parent.bounds)
             }
@@ -247,27 +245,25 @@ class MathExpressionSpan(val expr: String, val baseHeight: Float, val assetManag
 
         val bottom = (rect.bottom + 0.5).roundToInt()
 
-        val ascent = (0.5+firstBound.height*4/5).toInt()
-
+        val ascent = (0.5 + firstBound.height * 4 / 5).toInt()
 
         /*
         work around for \sum^N_i case. (#161)
         In this case, firstBound.y becomes negative and normal acent calculation make ascent too upper.
         I don't know how to handle this, so extend descend to try to avoid overlap for this case.
          */
-        val deltaDescent = (0.5-firstBound.y).roundToInt()
+        val deltaDescent = (0.5 - firstBound.y).roundToInt()
 
+        val padding = ascent / 9
+        val descent = bottom - ascent + deltaDescent
 
-        val padding = ascent/9
-        val descent = bottom - ascent+deltaDescent
-
-        fm.ascent = -ascent-padding
-        fm.descent = descent+padding
+        fm.ascent = -ascent - padding
+        fm.descent = descent + padding
 
         fm.bottom = fm.descent
         fm.top = -ascent
 
-        return (rect.right+0.5+padding).roundToInt()
+        return (rect.right + 0.5 + padding).roundToInt()
     }
 
     fun ensureDrawable() {

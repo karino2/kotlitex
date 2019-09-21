@@ -51,7 +51,7 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
         multiLineMathBeginEndPat.matchEntire(line)?.let {
             inMultiLineMath = false
             val exp = multiLineMathBuffer.toString()
-            if(exp.isNotEmpty()) {
+            if (exp.isNotEmpty()) {
                 handler.appendMathLineExp(exp)
             }
             multiLineMathBuffer.clear()
@@ -59,11 +59,10 @@ class MathSpanBuilder(val handler: MathSpanHandler) {
         }
         multiLineMathBuffer.append(line)
         multiLineMathBuffer.append(" ")
-
     }
 
     fun oneLine(line: String) {
-        if(inMultiLineMath) {
+        if (inMultiLineMath) {
             oneLineInMultilineMath(line)
             return
         }
